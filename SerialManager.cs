@@ -13,15 +13,17 @@ namespace iDash
     {        
         private int commandLength;
         private const int BUFFER_SIZE = 40;
-        byte[] serialCommand = new byte[BUFFER_SIZE];
-        SerialPort serialPort = new SerialPort(); //create of serial port
-        private static bool isArduinoConnected = false;
+        private byte[] serialCommand = new byte[BUFFER_SIZE];
+        private SerialPort serialPort = new SerialPort(); //create of serial port
+        private static bool isArduinoConnected = false;        
+        private object dataLock = new object();
+        private object commandLock = new object();
+        private double lastSynAck = 0;
+
         public static bool stopThreads = false;
-        object dataLock = new object();
-        object commandLock = new object();
 
         //CommandHandlers
-        ButtonHandler bh = new ButtonHandler();
+        ButtonHandler bh;
 
         public SerialManager()
         {
@@ -40,31 +42,17 @@ namespace iDash
             new Thread(new ThreadStart(start)).Start();
             //new Thread(new ThreadStart(ConsumeCommand)).Start();
 
+            bh = new ButtonHandler(this);
+
             foreach (string port in this.getportnames())
             {
-                if (serialPort.IsOpen)  //if port is  open 
-                {
-                    serialPort.Close();  //close port
-                }
-                serialPort.PortName = port;    //selected name of port
-                Debug.Print("Connecting to " + port + "...");
-                try {
-                    serialPort.Open();        //open serial port                
-                }
-                catch
-                {
-                    Thread.Sleep(300);        //port is probably closing, wait...
-                    serialPort.Open();        //try again
-                }
+                this.tryToConnect(port);
 
-                long currentTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-                while (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - currentTime < 2000 && !isArduinoConnected) {
-                    Thread.Sleep(100);               
-                }
+                this.waitForArduinoResponse();
 
                 if (isArduinoConnected)
                 {
+                    //send ack to arduino
                     this.sendSynAck();
                     Debug.Print("Arduino found at port " + port + "...");
                     break;
@@ -74,9 +62,53 @@ namespace iDash
 
         }
 
+
+        private void tryToConnect(string port)
+        {
+            if (serialPort.IsOpen)  //if port is  open 
+            {
+                serialPort.Close();  //close port
+            }
+            serialPort.PortName = port;    //selected name of port
+            Debug.Print("Connecting to " + port + "...");
+            try
+            {
+                serialPort.Open();        //open serial port                
+            }
+            catch
+            {
+                Thread.Sleep(300);        //port is probably closing, wait...
+                serialPort.Open();        //try again
+            }
+        }
+
+
+        private void waitForArduinoResponse()
+        {
+            long currentTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+
+            while (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - currentTime < 2000 && !isArduinoConnected)
+            {
+                Thread.Sleep(100);
+            }
+        }
+
         private void start()
         {
-            while (!stopThreads) { }
+            long currentTime = 0;
+
+            while (!stopThreads) {
+                if (isArduinoConnected)
+                {
+                    isArduinoConnected = false;
+                    currentTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+                    if (currentTime - lastSynAck > 2000)
+                    {
+                        this.sendSynAck();
+                        lastSynAck = currentTime;
+                    }
+                }
+            }
             if (serialPort.IsOpen)
             {
                 serialPort.Dispose();
@@ -86,7 +118,7 @@ namespace iDash
 
         private void sendSynAck()
         {
-            Command synack = new Command((byte)'a', new byte[0]);
+            Command synack = new Command(Command.CMD_SYN_ACK, new byte[0]);
             sendCommand(synack);
         }
 
@@ -94,11 +126,11 @@ namespace iDash
         {
             lock(commandLock)
             {
-                //Debug.Print("Command processed:" + Utils.ByteArrayToString(command.getRawData()));
+                Debug.Print("Command processed:" + Utils.ByteArrayToString(command.getRawData()));
                 byte c = command.getData()[0];
                 switch (c)
                 {
-                    case Command.CMD_HANDSHAKING:
+                    case Command.CMD_SYN:
                         isArduinoConnected = true;
                         break;
                     case Command.CMD_BUTTON_STATUS:
@@ -179,7 +211,7 @@ namespace iDash
             {                
                 byte[] data = new byte[serialPort.BytesToRead];
                 serialPort.Read(data, 0, data.Length);
-                //Debug.Print("Raw Data Received: " + Utils.ByteArrayToString(data));     
+                Debug.Print("Raw Data Received: " + Utils.ByteArrayToString(data));     
                 lock(dataLock)
                 {
                     if(data.Length > 0)

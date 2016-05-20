@@ -53,9 +53,11 @@ namespace iDash
 
     }
 
-    class ButtonHandler : ICommandHandler
+    class ButtonHandler : CommandHandler
     {
         List<State> currentStates = new List<State>();
+
+        public ButtonHandler(SerialManager sm) : base(sm) {}
 
         private void updateKeyState(byte[] bStates)
         {

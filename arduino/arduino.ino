@@ -173,6 +173,7 @@ volatile int encoderPos[] = {15000, 15000};
 int lastPos[] = {15000, 15000};
 
 long lastRotaryBounce = 0;
+long lastSynAck = 0;
 
 bool syn_ack = false;
 
@@ -340,32 +341,6 @@ int sendButtonState(int offset, byte *response) {
   return offset;
 }
 
-
-int readline(int readch, byte *buffer, int len)
-{  
-  static int pos = 0;
-  int rpos;
-
-  if (readch > 0) {
-    switch (readch) {
-      case '^': // command init found
-        pos = 0;
-        break;        
-      case '\n': // End command
-        rpos = pos;
-        pos = 0;  // Reset position index ready for next time
-        return rpos;
-      default:
-        if (pos < len-1) {
-          buffer[pos++] = readch;
-          buffer[pos] = 0;
-        }
-    }
-  }
-  // No end of line has been found, so return -1.
-  return -1;
-}
-
 int calculateCrc(int commandLength, byte *response) {
   int crc = 0;
   
@@ -396,21 +371,49 @@ void sendDataToSerial(int commandLength, byte *response) {
 }
 
 void processCommand(byte *buffer) {
-  if(buffer[1] == 'a') {
+  if(buffer[0] == 'a') {
     syn_ack = true;
+    lastSynAck = millis();
   }
     
   buffer[0] = 0;
 }
 
-void processData() {
-  static byte buffer[30];
+
+int readline(int readch, byte *buffer, int len)
+{  
+  static int pos = 0;
+  int rpos;
+
+  if (readch > 0) {
+    switch (readch) {
+      case '^': // command init found (this is ignored and not appended to the buffer)
+        pos = 0;
+        break;        
+      case '\n': // End command
+        rpos = pos;
+        pos = 0;  // Reset position index ready for next time
+        return rpos;
+      default:
+        if (pos < len-1) {
+          buffer[pos++] = readch;
+          buffer[pos] = 0;
+        }
+    }
+  }
+  // No end of line has been found, so return -1.
+  return -1;
+}
+
+
+void processData() {  
+    static byte buffer[50];
   int commandLength = 0;
   
   if(isDebug) {
     commandLength = 3;
   } else {
-    commandLength = readline(Serial.read(), buffer, 30);    
+    commandLength = readline(Serial.read(), buffer, 50);    
   }
   
   if ( commandLength > 0) {   
@@ -448,6 +451,10 @@ void sendButtonStatus() {
 }
 
 void loop() {  
+  //haven't received Syn Ack from IDash for too long
+  if(millis() - lastSynAck > 5000) {
+    syn_ack = false;
+  }
   if(syn_ack) {
     sendButtonStatus();       
   } else {

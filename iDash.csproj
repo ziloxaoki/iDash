@@ -49,6 +49,7 @@
     <Compile Include="ButtonHandler.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CommandHandler.cs" />
+    <Compile Include="ICommandHandler.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
