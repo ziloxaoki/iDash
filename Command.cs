@@ -14,6 +14,7 @@ namespace iDash
 
         public const byte COMMAND_INIT = (byte)'^'; //94
         public const byte COMMAND_END = (byte)'\n'; //10
+        public const byte COMMAND_DEBUG = 1;
         public const byte CMD_SYN = (byte)'A'; //65
         public const byte CMD_SYN_ACK = (byte)'a'; //97
         public const byte CMD_BUTTON_STATUS = (byte)'D'; //68
@@ -76,6 +77,7 @@ namespace iDash
                         return result;
                     }
                 }
+                return result;
             }
             return 0;
         }

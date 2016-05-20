@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using vJoyInterfaceWrap;
 
 namespace iDash
 {    
@@ -13,15 +14,20 @@ namespace iDash
     public partial class MainForm : Form
     {
 
-        SerialManager sm;
-        //ArduinoMonitor am;        
+        private SerialManager sm;
+        private ButtonHandler bh;
+        private VJoyFeeder vf;        
 
         public MainForm()
-        {            
-            sm = new SerialManager();
-            //am = new ArduinoMonitor(sm);
-            sm.Init();
+        {
             InitializeComponent();
+            sm = new SerialManager();
+            bh = new ButtonHandler(sm);
+            vf = new VJoyFeeder(bh);
+            sm.StatusMessageSubscribers += UpdateStatusBar;
+            vf.StatusMessageSubscribers += UpdateStatusBar;
+            sm.Init();
+            vf.InitializeJoystick();
         }
 
               
@@ -29,22 +35,8 @@ namespace iDash
         private void buttonSend_Click(object sender, EventArgs e) // send button  event
         {
             byte[] aux = System.Text.Encoding.ASCII.GetBytes(richTextBoxSend.Text);
-            sm.sendCommand(new Command(aux[0], Utils.getSubArray<byte>(aux, 1, aux.Length - 1)));     //transmit data
-        }
-
-        private void buttonReload_Click(object sender, EventArgs e)//reload button event ,most useful if you use virtual COM port e.g FTDI,Prolific 
-        {
-
-        }
-
-        public void ProcessSerialData(String myString)
-        {
-            
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            //this.serialDelegate = new AddDataDelegate(ProcessSerialData);
+            Command command = new Command(0x01, Utils.getSubArray<byte>(aux, 0, aux.Length));
+            sm.sendCommand(command);     //transmit data
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -52,14 +44,17 @@ namespace iDash
             SerialManager.stopThreads = true;
         }
 
-        private void richTextBoxReceive_TextChanged(object sender, EventArgs e)
+        public void UpdateStatusBar(string s)
         {
-            
+            this.statusBar.Text += s;
         }
 
-        private void clearDebug_Click(object sender, EventArgs e)
+        private void statusBar_TextChanged(object sender, EventArgs e)
         {
-           
+            // set the current caret position to the end
+            statusBar.SelectionStart = statusBar.Text.Length;
+            // scroll it automatically
+            statusBar.ScrollToCaret();
         }
     }
 }

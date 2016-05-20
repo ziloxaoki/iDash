@@ -5,16 +5,24 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iDash", "iDash.csproj", "{EFAAFA0C-E0BF-46F4-9D7A-4134B034C89B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{590011FD-59D1-428E-B373-57B32BA9AECF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{EFAAFA0C-E0BF-46F4-9D7A-4134B034C89B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EFAAFA0C-E0BF-46F4-9D7A-4134B034C89B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFAAFA0C-E0BF-46F4-9D7A-4134B034C89B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EFAAFA0C-E0BF-46F4-9D7A-4134B034C89B}.Debug|x64.Build.0 = Debug|Any CPU
 		{EFAAFA0C-E0BF-46F4-9D7A-4134B034C89B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFAAFA0C-E0BF-46F4-9D7A-4134B034C89B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFAAFA0C-E0BF-46F4-9D7A-4134B034C89B}.Release|x64.ActiveCfg = Release|x64
+		{EFAAFA0C-E0BF-46F4-9D7A-4134B034C89B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -34,6 +34,7 @@
             this.mainTab = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.debugTab = new System.Windows.Forms.TabPage();
+            this.statusBar = new System.Windows.Forms.RichTextBox();
             this.mainTab.SuspendLayout();
             this.debugTab.SuspendLayout();
             this.SuspendLayout();
@@ -80,7 +81,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(732, 498);
+            this.tabPage1.Size = new System.Drawing.Size(792, 592);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -98,15 +99,25 @@
             this.debugTab.Text = "Debug";
             this.debugTab.UseVisualStyleBackColor = true;
             // 
+            // statusBar
+            // 
+            this.statusBar.Location = new System.Drawing.Point(3, 632);
+            this.statusBar.Name = "statusBar";
+            this.statusBar.ReadOnly = true;
+            this.statusBar.Size = new System.Drawing.Size(795, 187);
+            this.statusBar.TabIndex = 0;
+            this.statusBar.Text = "";
+            this.statusBar.TextChanged += new System.EventHandler(this.statusBar_TextChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(804, 631);
+            this.ClientSize = new System.Drawing.Size(804, 831);
+            this.Controls.Add(this.statusBar);
             this.Controls.Add(this.mainTab);
             this.Name = "MainForm";
             this.Text = "MainForm";
-            this.Load += new System.EventHandler(this.MainForm_Load);
             this.mainTab.ResumeLayout(false);
             this.debugTab.ResumeLayout(false);
             this.debugTab.PerformLayout();
@@ -123,6 +134,7 @@
         private System.Windows.Forms.TabControl mainTab;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage debugTab;
+        private System.Windows.Forms.RichTextBox statusBar;
     }
 }
 

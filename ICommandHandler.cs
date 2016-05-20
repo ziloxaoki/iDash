@@ -9,5 +9,6 @@ namespace iDash
     interface ICommandHandler
     {
         void executeCommand(Command command);
+
     }
 }

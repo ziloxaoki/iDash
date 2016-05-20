@@ -57,7 +57,13 @@ namespace iDash
     {
         List<State> currentStates = new List<State>();
 
-        public ButtonHandler(SerialManager sm) : base(sm) {}
+        //----------------------------------------- Events
+        public delegate void ButtonStateHandler(byte[] states);
+        public ButtonStateHandler ButtonStateSubscribers;
+
+        public ButtonHandler(SerialManager sm) : base(sm) {
+            sm.CommandReceivedSubscribers += new SerialManager.CommandReceivedHandler(executeCommand);            
+        }
 
         private void updateKeyState(byte[] bStates)
         {
@@ -73,7 +79,8 @@ namespace iDash
                     {
                         currentStates.Add(State.None);
                     }
-                } else
+                }
+                else
                 {
                     if (currentStates.Count > i)
                     {
@@ -83,9 +90,10 @@ namespace iDash
                     {
                         currentStates.Add(State.KeyDown);
                     }
-                    Console.WriteLine("Key {0} is {1}.", i, currentStates[i]);
                 }
             }
+
+            NotifyButtonStateReceived(bStates);
         } 
 
         public void executeCommand(Command command)
@@ -93,6 +101,18 @@ namespace iDash
             if(command.getData()[0] == Command.CMD_BUTTON_STATUS)
             {
                 this.updateKeyState(Utils.getSubArray(command.getData(), 1, command.getData().Length - 1));
+            }
+        }
+
+        //----------------------------------------- Events
+
+        public void NotifyButtonStateReceived(byte[] args)
+        {
+            ButtonStateHandler handler = ButtonStateSubscribers;
+
+            if (handler != null)
+            {
+                handler(args);
             }
         }
     }

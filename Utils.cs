@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace iDash
 {
     class Utils
     {
+
         public static string ByteArrayToString(byte[] ba)
         {
             if (ba != null && ba.Length > 0)
@@ -34,5 +37,26 @@ namespace iDash
 
             return result;
         }
+
+        public static async Task WaitWithoutBlocking(int milliseconds)
+        {
+            await Task.Delay(milliseconds);      
+        }
+
+        public static long getCurrentTimeMillis()
+        {
+            return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        }
+
+        public static bool hasTimedOut(long startTime, long millisec)
+        {
+            return getCurrentTimeMillis() - startTime > millisec; 
+        }
+
+        public static string byteArrayToStr(byte[] array)
+        {
+            return System.Text.Encoding.Default.GetString(array);
+        }
+
     }
 }
