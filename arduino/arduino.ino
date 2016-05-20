@@ -253,34 +253,26 @@ void setup()
 
 
 void rotEncoder1(){
-  //int pinB = digitalRead(encoderPinB[0]);
   int pinB = digitalState(encoderPinB[0]);
-  //int pinA = digitalState(encoderPinA[0]);
-  //if(pinA == LOW) {
-    if(millis() - lastRotaryBounce > 20) {
-      if (pinB == LOW) {
-        encoderPos[0]--;  
-      } else {
-        encoderPos[0]++;
-      }
+  if(millis() - lastRotaryBounce > 20) {
+    if (pinB == LOW) {
+      encoderPos[0]--;  
+    } else {
+      encoderPos[0]++;
     }
-  //}
+  }
   lastRotaryBounce = millis();
 }
 
 void rotEncoder2(){
-  //int pinB = digitalRead(encoderPinB[1]);
   int pinB = digitalState(encoderPinB[1]);
-  int pinA = digitalState(encoderPinA[1]);
-  //if(pinA == LOW) {
-    if(millis() - lastRotaryBounce > 20) {
-      if (pinB == LOW) {
-        encoderPos[1]--;  
-      } else {
-        encoderPos[1]++;
-      }
+  if(millis() - lastRotaryBounce > 20) {
+    if (pinB == LOW) {
+      encoderPos[1]--;  
+    } else {
+      encoderPos[1]++;
     }
-  //}
+  }
   
   lastRotaryBounce = millis();
 }
@@ -335,7 +327,7 @@ int sendAnalogState(int offset, byte *response) {
 
 int sendButtonState(int offset, byte *response) {
   for (int i = 0; i < ENABLED_BUTTONS_COUNT; i++) {      
-    response[offset++] = digitalRead(BUTTON_PINS[i]) == HIGH ? 0 : 1;
+    response[offset++] = digitalState(BUTTON_PINS[i]) == HIGH ? 0 : 1;
   }   
 
   return offset;
@@ -371,14 +363,55 @@ void sendDataToSerial(int commandLength, byte *response) {
 }
 
 void processCommand(byte *buffer) {
-  if(buffer[0] == 'a') {
-    syn_ack = true;
-    lastSynAck = millis();
-  }
+  //debug
+  switch(buffer[0]) {
+    case 1 :
+      returnDebugData(buffer);
+      break;
     
+    //syn ack
+    case 'a' : 
+      syn_ack = true;
+      lastSynAck = millis();
+      break;
+  }  
   buffer[0] = 0;
 }
 
+void echo(byte *buffer) {
+  byte response[50];
+  int offset = 0;
+  
+  //return buttons state      
+  response[offset++] = COMMAND_INIT;
+  response[offset++] = 1; 
+  for(int i = 0; buffer[i] != '\n'; i++) { 
+    response[offset++] = buffer[i];
+  }  
+  response[offset++] = '\n';
+  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = COMMAND_END;   
+  
+  sendDataToSerial(offset, response);   
+}
+
+int returnDebugData(byte *buffer) {
+  switch (buffer[1]) {    
+    case 'A': // command init found (this is ignored and not appended to the buffer)
+      sendHandshacking(true); 
+      break;
+    case 'a':
+      { byte r[] = {'S','Y','N',' ','A','C','K',' ','r','e','c','e','i','v','e','d','.'};      
+        echo(r); }
+      break;
+    case 'D':  
+      sendButtonStatus(true);  
+      break;    
+    default:
+      echo(buffer);
+      break;
+  }
+}
 
 int readline(int readch, byte *buffer, int len)
 {  
@@ -407,7 +440,7 @@ int readline(int readch, byte *buffer, int len)
 
 
 void processData() {  
-    static byte buffer[50];
+  static byte buffer[50];
   int commandLength = 0;
   
   if(isDebug) {
@@ -422,24 +455,31 @@ void processData() {
   
 }
 
-void sendHandshacking() {
-  byte response[4];
+void sendHandshacking(bool isDebug) {
+  byte response[5];
+  int offset = 0;
   
   //handshaking
-  response[0] = COMMAND_INIT;
-  response[1] = 'A';
-  response[2] = calculateCrc(2, response);
-  response[3] = COMMAND_END;
+  response[offset++] = COMMAND_INIT;
+  if(isDebug) {
+    response[offset++] = 1;
+  }
+  response[offset++] = 'A';
+  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = COMMAND_END;
   
-  sendDataToSerial(4, response);
+  sendDataToSerial(offset, response);
 }
 
-void sendButtonStatus() {
+void sendButtonStatus(bool isDebug) {
   byte response[50];
   int offset = 0;
   
   //return buttons state      
   response[offset++] = COMMAND_INIT;
+  if(isDebug) {
+    response[offset++] = 1;  
+  }
   response[offset++] = 'D';
   offset = sendButtonState(offset, response);
   offset = sendAnalogState(offset, response);
@@ -451,15 +491,16 @@ void sendButtonStatus() {
 }
 
 void loop() {  
+   
   //haven't received Syn Ack from IDash for too long
   if(millis() - lastSynAck > 5000) {
     syn_ack = false;
   }
   if(syn_ack) {
-    sendButtonStatus();       
+    sendButtonStatus(false);       
   } else {
     //keep sending SYN until SYN-ACK received
-    sendHandshacking();
+    sendHandshacking(false);
     delay(100);
   }
 
