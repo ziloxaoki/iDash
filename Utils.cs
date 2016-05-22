@@ -38,11 +38,6 @@ namespace iDash
             return result;
         }
 
-        public static async Task WaitWithoutBlocking(int milliseconds)
-        {
-            await Task.Delay(milliseconds);      
-        }
-
         public static long getCurrentTimeMillis()
         {
             return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -56,7 +51,14 @@ namespace iDash
         public static string byteArrayToStr(byte[] array)
         {
             return System.Text.Encoding.Default.GetString(array);
-        }
+        } 
 
+    }
+
+    public enum DebugMode
+    {
+        None,
+        Default,
+        Verbose
     }
 }

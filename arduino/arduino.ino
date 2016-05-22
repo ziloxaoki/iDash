@@ -148,10 +148,10 @@ int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT_PULLUP}, //A7 Left paddle - INPUT_PUL
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
-int BUTTON_LIMITS[8][4][2] = {{{350, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
-                              {{350, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
-                              {{605, 625}, {500, 525}, {665, 695}, {715, 745}},   //A5 Extra 1 - INPUT
-                              {{500, 525}, {600, 625}, {715, 745}, {665, 705}},   //A4 Extra 2 - INPUT                 
+int BUTTON_LIMITS[8][4][2] = {{{400, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
+                              {{400, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
+                              {{500, 525}, {605, 625}, {665, 695}, {715, 745}},   //A5 Extra 1 - INPUT
+                              {{500, 525}, {600, 625}, {655, 710}, {715, 745}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
@@ -159,8 +159,9 @@ int BUTTON_LIMITS[8][4][2] = {{{350, 900}, {-1, -1}, {-1, -1}, {-1, -1}},       
                               
 int GROUND_ANALOG_PIN = 15; //A1                                
 
-int extra_button_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int extra_button_last_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   // the previous reading from the input pin                            
+int extra_button_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int extra_button_last_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   // the previous reading from the input pin               
+long lastButtonBounce = 0;             
 
 // -------------------- ROTARY ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -171,13 +172,15 @@ const int encoderPinB[] = {4,5};
 
 volatile int encoderPos[] = {15000, 15000};
 int lastPos[] = {15000, 15000};
+byte lastState[] = {0, 0};
+long lastRotaryStateChange = 0;
 
 long lastRotaryBounce = 0;
 long lastSynAck = 0;
 
-bool syn_ack = false;
-
-boolean isDebug = false;
+bool isConnected = false;
+boolean isDebugMode = false;
+long lastMessageSent = 0;
 
 
 
@@ -227,11 +230,6 @@ void setup()
     pinAsInputPullUp(BUTTON_PINS[btnIdx]);
   }
 
-
-
-
-
-
   // Extra buttons
   for(int i = 0; i < EXTRA_BUTTONS_TOTAL; i++) { 
     if(EXTRA_BUTTONS_INIT[i][1] == INPUT_PULLUP) {
@@ -254,19 +252,20 @@ void setup()
 
 void rotEncoder1(){
   int pinB = digitalState(encoderPinB[0]);
-  if(millis() - lastRotaryBounce > 20) {
+  if(millis() - lastRotaryBounce > 10) {
     if (pinB == LOW) {
       encoderPos[0]--;  
     } else {
       encoderPos[0]++;
     }
   }
+  
   lastRotaryBounce = millis();
 }
 
 void rotEncoder2(){
   int pinB = digitalState(encoderPinB[1]);
-  if(millis() - lastRotaryBounce > 20) {
+  if(millis() - lastRotaryBounce > 10) {
     if (pinB == LOW) {
       encoderPos[1]--;  
     } else {
@@ -280,47 +279,69 @@ void rotEncoder2(){
 
 int sendRotaryState(int offset, byte *response) {  
   for(int i = 0; i < TOTAL_ROTARY; i++) {                  
-    
-    if(encoderPos[i] != lastPos[i]) {      
-      if(lastPos[i] < encoderPos[i]) {      
-        response[offset++] = 0;
-        response[offset++] = 1;
-      } else {        
-        response[offset++] = 1;
-        response[offset++] = 0;        
-      }
-      lastPos[i] = encoderPos[i];        
-      
-    } else {
-      response[offset++] = 0;
-      response[offset++] = 0;       
-    }              
-  }
 
+    if(millis() - lastRotaryStateChange > 100) {  
+      if(encoderPos[i] != lastPos[i]) {      
+        if(lastPos[i] < encoderPos[i]) {  
+          lastState[i] = 1;    
+        } else {      
+          lastState[i] = 2;       
+        }
+        lastPos[i] = encoderPos[i];        
+        
+      } else {
+        lastState[i] = 0;     
+      }  
+      if(i == TOTAL_ROTARY - 1) {
+        lastRotaryStateChange = millis();              
+      }
+    }
+
+    switch(lastState[i]) {
+      case 0:
+        response[offset++] = 0;
+        response[offset++] = 0; 
+        break;
+      case 1:
+        response[offset++] = 0;
+        response[offset++] = 1; 
+        break;
+      case 2:
+        response[offset++] = 1;
+        response[offset++] = 0; 
+        break;
+    }
+  }
+    
   return offset;
 }
 
 
 int sendAnalogState(int offset, byte *response) {
 
+  int btn = 0;
+  
   for(int i = 0; i < EXTRA_BUTTONS_TOTAL; i++) {
     // read the state of the switch into a local variable:
-    int reading = analogRead(EXTRA_BUTTONS_INIT[i][0]);  
+    int reading = analogRead(EXTRA_BUTTONS_INIT[i][0]); 
 
     for(int x = 0; x < MAXIMUM_BUTTONS_PER_ANALOG; x++) {
-    
       int tmpButtonState = LOW;             // the current reading from the input pin
-       
-      if(reading > BUTTON_LIMITS[i][x][0] && reading < BUTTON_LIMITS[i][x][1]){
-        //Read switch 1
-        tmpButtonState = 1;
-      }
-             
-      response[offset++] = tmpButtonState;                
-     }
-   
-  }  
 
+      if((reading > BUTTON_LIMITS[i][x][0]) && (reading < BUTTON_LIMITS[i][x][1])){
+        //Read switch 1
+        tmpButtonState = 1;               
+      }      
+
+      if((tmpButtonState != extra_button_last_states[btn]) && (millis() - lastButtonBounce > 50)) {
+        extra_button_last_states[btn++] = tmpButtonState; 
+        response[offset++] = tmpButtonState;
+        lastButtonBounce = millis(); 
+      } else {
+        response[offset++] = extra_button_last_states[btn++];
+      }      
+    }      
+  }    
   return offset;  
 }
 
@@ -346,72 +367,36 @@ int calculateCrc(int commandLength, byte *response) {
 }
 
 void sendDataToSerial(int commandLength, byte *response) {
-  for(int i = 0; i < commandLength; i++) {
-    if(isDebug) {      
-      Serial.print(response[i]);
-    } else {
-      Serial.write(response[i]);
-    }
-  }
-
-  if(isDebug) {
-      Serial.println();
-      delay(2000);
+  if(!isDebugMode || millis() - lastMessageSent > 1000 || response[1] == 0x01) {
+    Serial.write(response, commandLength);
+    lastMessageSent = millis();
   }
 
   Serial.flush();
 }
 
-void processCommand(byte *buffer) {
+void processCommand(byte *buffer) {  
   //debug
   switch(buffer[0]) {
-    case 1 :
-      returnDebugData(buffer);
+    case 0x01 :
+      isDebugMode = (buffer[1] == 1);
+      sendDebugModeState(buffer[1]);       
       break;
+
+    /*case 'D' :
+      sendButtonStatus();   
+      break;*/
     
     //syn ack
     case 'a' : 
-      syn_ack = true;
+      isConnected = true;
       lastSynAck = millis();
+      sendHandshacking();  
       break;
   }  
   buffer[0] = 0;
 }
 
-void echo(byte *buffer) {
-  byte response[50];
-  int offset = 0;
-  
-  //return buttons state      
-  response[offset++] = COMMAND_INIT;
-  response[offset++] = 1; 
-  for(int i = 0; buffer[i] != '\n'; i++) { 
-    response[offset++] = buffer[i];
-  }  
-  response[offset++] = '\n';
-  response[offset++] = calculateCrc(offset - 1, response);
-  response[offset++] = COMMAND_END;   
-  
-  sendDataToSerial(offset, response);   
-}
-
-int returnDebugData(byte *buffer) {
-  switch (buffer[1]) {    
-    case 'A': // command init found (this is ignored and not appended to the buffer)
-      sendHandshacking(true); 
-      break;
-    case 'a':
-      { byte r[] = {'S','Y','N',' ','A','C','K',' ','r','e','c','e','i','v','e','d','.'};      
-        echo(r); }
-      break;
-    case 'D':  
-      sendButtonStatus(true);  
-      break;    
-    default:
-      echo(buffer);
-      break;
-  }
-}
 
 int readline(int readch, byte *buffer, int len)
 {  
@@ -442,28 +427,40 @@ int readline(int readch, byte *buffer, int len)
 void processData() {  
   static byte buffer[50];
   int commandLength = 0;
-  
-  if(isDebug) {
-    commandLength = 3;
-  } else {
+
+  long startReading = millis();
+  while (Serial.available()) {
     commandLength = readline(Serial.read(), buffer, 50);    
-  }
-  
-  if ( commandLength > 0) {   
-    processCommand(buffer);    
+    if ( commandLength > 0) {   
+      processCommand(buffer);    
+    }
+    if(millis() - startReading > 10) {
+      break;
+    }
   }
   
 }
 
-void sendHandshacking(bool isDebug) {
+void sendDebugModeState(byte state) {
+  byte response[6];
+  int offset = 0;
+  
+  //handshaking
+  response[offset++] = COMMAND_INIT;
+  response[offset++] = 1;
+  response[offset++] = state;
+  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = COMMAND_END;
+  
+  sendDataToSerial(offset, response);
+}
+
+void sendHandshacking() {
   byte response[5];
   int offset = 0;
   
   //handshaking
   response[offset++] = COMMAND_INIT;
-  if(isDebug) {
-    response[offset++] = 1;
-  }
   response[offset++] = 'A';
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = COMMAND_END;
@@ -471,15 +468,12 @@ void sendHandshacking(bool isDebug) {
   sendDataToSerial(offset, response);
 }
 
-void sendButtonStatus(bool isDebug) {
+void sendButtonStatus() {
   byte response[50];
   int offset = 0;
   
   //return buttons state      
   response[offset++] = COMMAND_INIT;
-  if(isDebug) {
-    response[offset++] = 1;  
-  }
   response[offset++] = 'D';
   offset = sendButtonState(offset, response);
   offset = sendAnalogState(offset, response);
@@ -494,17 +488,16 @@ void loop() {
    
   //haven't received Syn Ack from IDash for too long
   if(millis() - lastSynAck > 5000) {
-    syn_ack = false;
-  }
-  if(syn_ack) {
-    sendButtonStatus(false);       
-  } else {
-    //keep sending SYN until SYN-ACK received
-    sendHandshacking(false);
+    isConnected = false;    
+    sendHandshacking();
     delay(100);
-  }
+  }  
 
   processData();
+
+  if(isConnected) {
+    sendButtonStatus(); 
+  }  
 }
 
 

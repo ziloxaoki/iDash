@@ -28,12 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.buttonSend = new System.Windows.Forms.Button();
             this.richTextBoxSend = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.mainTab = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.debugTab = new System.Windows.Forms.TabPage();
+            this.label2 = new System.Windows.Forms.Label();
+            this.debugModes = new System.Windows.Forms.ComboBox();
+            this.clearData = new System.Windows.Forms.Button();
+            this.debugData = new System.Windows.Forms.RichTextBox();
             this.statusBar = new System.Windows.Forms.RichTextBox();
             this.mainTab.SuspendLayout();
             this.debugTab.SuspendLayout();
@@ -88,6 +93,10 @@
             // 
             // debugTab
             // 
+            this.debugTab.Controls.Add(this.label2);
+            this.debugTab.Controls.Add(this.debugModes);
+            this.debugTab.Controls.Add(this.clearData);
+            this.debugTab.Controls.Add(this.debugData);
             this.debugTab.Controls.Add(this.label1);
             this.debugTab.Controls.Add(this.buttonSend);
             this.debugTab.Controls.Add(this.richTextBoxSend);
@@ -98,6 +107,47 @@
             this.debugTab.TabIndex = 1;
             this.debugTab.Text = "Debug";
             this.debugTab.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(9, 48);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(34, 13);
+            this.label2.TabIndex = 14;
+            this.label2.Text = "Mode";
+            // 
+            // debugModes
+            // 
+            this.debugModes.FormattingEnabled = true;
+            this.debugModes.Items.AddRange(new object[] {
+            iDash.DebugMode.None,
+            iDash.DebugMode.Default,
+            iDash.DebugMode.Verbose});
+            this.debugModes.Location = new System.Drawing.Point(9, 67);
+            this.debugModes.Name = "debugModes";
+            this.debugModes.Size = new System.Drawing.Size(165, 21);
+            this.debugModes.TabIndex = 13;
+            this.debugModes.SelectedIndexChanged += new System.EventHandler(this.debugModes_SelectedIndexChanged);
+            // 
+            // clearData
+            // 
+            this.clearData.Location = new System.Drawing.Point(689, 56);
+            this.clearData.Name = "clearData";
+            this.clearData.Size = new System.Drawing.Size(97, 34);
+            this.clearData.TabIndex = 12;
+            this.clearData.Text = "Clear All";
+            this.clearData.UseVisualStyleBackColor = true;
+            this.clearData.Click += new System.EventHandler(this.clearData_Click);
+            // 
+            // debugData
+            // 
+            this.debugData.Location = new System.Drawing.Point(9, 94);
+            this.debugData.Name = "debugData";
+            this.debugData.Size = new System.Drawing.Size(777, 492);
+            this.debugData.TabIndex = 10;
+            this.debugData.Text = "";
+            this.debugData.TextChanged += new System.EventHandler(this.debugData_TextChanged);
             // 
             // statusBar
             // 
@@ -116,8 +166,9 @@
             this.ClientSize = new System.Drawing.Size(804, 831);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.mainTab);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
-            this.Text = "MainForm";
+            this.Text = "iDash";
             this.mainTab.ResumeLayout(false);
             this.debugTab.ResumeLayout(false);
             this.debugTab.PerformLayout();
@@ -135,6 +186,10 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage debugTab;
         private System.Windows.Forms.RichTextBox statusBar;
+        private System.Windows.Forms.Button clearData;
+        private System.Windows.Forms.RichTextBox debugData;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox debugModes;
     }
 }
 
