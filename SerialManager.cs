@@ -75,17 +75,18 @@ namespace iDash
                     serialPort.Open();        //try again
                 }
 
+                //wait for arduino ACK message
                 await Task.Delay(WAIT_SERIAL_CONNECT);
 
+                //is arduino ack was received this method returns true
                 if (isArduinoAlive())
                 {
-                    //send ack to arduino
-                    this.sendSynAck();
                     NotifyStatusMessage("Arduino found at port " + port + "...");
                     break;
                 }
 
             }  
+            //could not find arduino keep trying to find it
             if(!isArduinoAlive())
             {
                 this.tryToConnect();
@@ -128,14 +129,17 @@ namespace iDash
                 byte c = command.getData()[0];
                 switch (c)
                 {
+                    //ACK message sent by Arduino
                     case Command.CMD_SYN:
                         lastArduinoResponse = Utils.getCurrentTimeMillis();
                         type = "CMD_SYN";
                         break;
+                    //Arduino response to a set debug mode message
                     case Command.CMD_SET_DEBUG_MODE:                        
                         isArduinoInDebugMode = command.getData()[1] == 1;
                         type = "CMD_SET_DEBUG_MODE";
                         break;
+                    //Arduino buttons state message
                     case Command.CMD_BUTTON_STATUS:                        
                         NotifyCommandReceived(command);
                         type = "CMD_BUTTON_STATUS";

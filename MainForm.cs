@@ -98,13 +98,16 @@ namespace iDash
 
         private async void debugModes_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //dbug mode off
             byte[] state = { 0x00 };
             if (debugModes.SelectedIndex != 0)
             {
+                //debug mode on
                 state[0] = 0x01;
             }
             Command command = new Command(Command.CMD_SET_DEBUG_MODE, state);
             SerialManager.debugMode = (DebugMode)debugModes.SelectedItem;
+            //make sure Arduino has received/updated the debug mode state
             while (SerialManager.isArduinoInDebugMode != (state[0] == 1))
             {
                 sm.sendCommand(command);     //transmit data
