@@ -69,35 +69,41 @@ namespace iDash
         {
             for (int i = 0; i < bStates.Length; i++)
             {
+                //if button is not pressed
                 if (bStates[i] == 0)
                 {
-                    if (currentStates.Count > i)
+                    //if button states is stored in the list
+                    if (i < currentStates.Count)
                     {
                         currentStates[i] = currentStates[i].NextUpState();
                     }
                     else
                     {
+                        //default button state when not pressed
                         currentStates.Add(State.None);
                     }
                 }
                 else
                 {
-                    if (currentStates.Count > i)
+                    //if button states is stored in the list
+                    if (i < currentStates.Count)
                     {
                         currentStates[i] = currentStates[i].NextDownState();
                     }
                     else
                     {
+                        //default button state when pressed
                         currentStates.Add(State.KeyDown);
                     }
                 }
             }
-
+            
             NotifyButtonStateReceived(bStates);
         } 
 
         public void executeCommand(Command command)
         {
+            //is the command a status button command
             if(command.getData()[0] == Command.CMD_BUTTON_STATUS)
             {
                 this.updateKeyState(Utils.getSubArray(command.getData(), 1, command.getData().Length - 1));
@@ -105,7 +111,7 @@ namespace iDash
         }
 
         //----------------------------------------- Events
-
+        //notify subscribers about button state received event
         public void NotifyButtonStateReceived(byte[] args)
         {
             ButtonStateHandler handler = ButtonStateSubscribers;
