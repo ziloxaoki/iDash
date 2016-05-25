@@ -63,7 +63,7 @@ namespace iDash
                 }
 
                 serialPort.PortName = port;    //selected name of port
-                NotifyStatusMessage("Connecting to " + port + "...");
+                NotifyStatusMessage("Searching for Arduino at " + port + "...");
 
                 try
                 {
@@ -86,7 +86,7 @@ namespace iDash
                 }
 
             }  
-            if(!serialPort.IsOpen)
+            if(!isArduinoAlive())
             {
                 this.tryToConnect();
             }
