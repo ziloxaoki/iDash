@@ -218,5 +218,32 @@ namespace iDash
                 this.MoveItem(selected, 1);
             }
         }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (views.SelectedIndex != -1)
+            {
+                for (int i = views.SelectedItems.Count - 1; i >= 0; i--)
+                    views.Items.Remove(views.SelectedItems[i]);
+            }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            string viewValue = null;
+
+            foreach (string item in selected.Items)
+            {
+                viewValue += item + ",";                
+            }
+            if (viewValue != null && viewValue.Length > 0)
+            {
+                viewValue += textFormat.Text + "," + isSimConnected.Checked;
+                if (!views.Items.Contains(viewValue))
+                {
+                    views.Items.Add(viewValue);
+                }
+            }
+        }
     }
 }

@@ -47,11 +47,9 @@
             this.selected = new System.Windows.Forms.ListBox();
             this.views = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textFormat = new System.Windows.Forms.TextBox();
             this.isSimConnected = new System.Windows.Forms.CheckBox();
             this.button11 = new System.Windows.Forms.Button();
-            this.button10 = new System.Windows.Forms.Button();
-            this.button9 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
@@ -199,8 +197,6 @@
             // tm1637
             // 
             this.tm1637.Controls.Add(this.button11);
-            this.tm1637.Controls.Add(this.button10);
-            this.tm1637.Controls.Add(this.button9);
             this.tm1637.Controls.Add(this.button7);
             this.tm1637.Controls.Add(this.button8);
             this.tm1637.Controls.Add(this.button5);
@@ -210,7 +206,7 @@
             this.tm1637.Controls.Add(this.button2);
             this.tm1637.Controls.Add(this.button1);
             this.tm1637.Controls.Add(this.isSimConnected);
-            this.tm1637.Controls.Add(this.textBox1);
+            this.tm1637.Controls.Add(this.textFormat);
             this.tm1637.Controls.Add(this.label3);
             this.tm1637.Controls.Add(this.views);
             this.tm1637.Controls.Add(this.selected);
@@ -237,29 +233,29 @@
             // 
             this.props.FormattingEnabled = true;
             this.props.Items.AddRange(new object[] {
-            "AirDensity ",
-            "AirPressure ",
+            "AirDensity",
+            "AirPressure",
             "AirTemp",
-            "Alt ",
-            "Brake ",
+            "Alt",
+            "Brake",
             "BrakeRaw",
-            "CamCameraNumber ",
-            "CamCameraState ",
-            "CamCarIdx ",
-            "CamGroupNumber ",
+            "CamCameraNumber",
+            "CamCameraState",
+            "CamCarIdx",
+            "CamGroupNumber",
             "Clutch",
-            "CpuUsageBG ",
-            "DCDriversSoFar ",
-            "DCLapStatus ",
-            "DisplayUnits ",
-            "DriverMarker ",
-            "EngineWarnings ",
-            "EnterExitReset ",
-            "FogLevel ",
-            "FrameRate ",
-            "FuelLevel ",
-            "FuelLevelPct ",
-            "FuelPress ",
+            "CpuUsageBG",
+            "DCDriversSoFar",
+            "DCLapStatus",
+            "DisplayUnits",
+            "DriverMarker",
+            "EngineWarnings",
+            "EnterExitReset",
+            "FogLevel",
+            "FrameRate",
+            "FuelLevel",
+            "FuelLevelPct",
+            "FuelPress",
             "FuelUsePerHour",
             "Gear",
             "IsDiskLoggingActive",
@@ -274,17 +270,17 @@
             "LapBestNLapLap",
             "LapBestNLapTime",
             "LapCurrentLapTime",
-            "LapDeltaToBestLap ",
+            "LapDeltaToBestLap",
             "LapDeltaToBestLap_DD",
             "LapDeltaToBestLap_OK",
             "LapDeltaToOptimalLap",
-            "LapDeltaToOptimalLap_DD ",
+            "LapDeltaToOptimalLap_DD",
             "LapDeltaToOptimalLap_OK",
             "LapDeltaToSessionBestLap",
-            "LapDeltaToSessionBestLap_DD ",
+            "LapDeltaToSessionBestLap_DD",
             "LapDeltaToSessionBestLap_OK",
             "LapDeltaToSessionLastlLap",
-            "LapDeltaToSessionLastlLap_DD ",
+            "LapDeltaToSessionLastlLap_DD",
             "LapDeltaToSessionLastlLap_OK",
             "LapDeltaToSessionOptimalLap",
             "LapDeltaToSessionOptimalLap_DD",
@@ -404,18 +400,18 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(837, 142);
+            this.label3.Location = new System.Drawing.Point(837, 145);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(66, 13);
             this.label3.TabIndex = 3;
             this.label3.Text = "Text Format:";
             // 
-            // textBox1
+            // textFormat
             // 
-            this.textBox1.Location = new System.Drawing.Point(909, 142);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(162, 20);
-            this.textBox1.TabIndex = 4;
+            this.textFormat.Location = new System.Drawing.Point(909, 142);
+            this.textFormat.Name = "textFormat";
+            this.textFormat.Size = new System.Drawing.Size(162, 20);
+            this.textFormat.TabIndex = 4;
             // 
             // isSimConnected
             // 
@@ -437,24 +433,6 @@
             this.button11.UseVisualStyleBackColor = true;
             this.button11.Click += new System.EventHandler(this.button11_Click);
             // 
-            // button10
-            // 
-            this.button10.Image = global::iDash.Properties.Resources.Delete_black_32;
-            this.button10.Location = new System.Drawing.Point(1489, 688);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(33, 31);
-            this.button10.TabIndex = 15;
-            this.button10.UseVisualStyleBackColor = true;
-            // 
-            // button9
-            // 
-            this.button9.Image = global::iDash.Properties.Resources.Delete_black_32;
-            this.button9.Location = new System.Drawing.Point(1489, 133);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(33, 31);
-            this.button9.TabIndex = 14;
-            this.button9.UseVisualStyleBackColor = true;
-            // 
             // button7
             // 
             this.button7.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
@@ -463,6 +441,7 @@
             this.button7.Size = new System.Drawing.Size(33, 48);
             this.button7.TabIndex = 13;
             this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // button8
             // 
@@ -472,6 +451,7 @@
             this.button8.Size = new System.Drawing.Size(33, 48);
             this.button8.TabIndex = 12;
             this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
             // button5
             // 
@@ -571,7 +551,7 @@
         private System.Windows.Forms.TabPage max7221;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.CheckBox isSimConnected;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textFormat;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox views;
         private System.Windows.Forms.ListBox selected;
@@ -583,8 +563,6 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button10;
-        private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Button button11;
     }
 }
