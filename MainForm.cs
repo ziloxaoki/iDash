@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -32,6 +33,17 @@ namespace iDash
             this.appendToStatusBar = new AppendToStatusBarDelegate(UpdateStatusBar);
             this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
             InitializeComponent();
+
+            //save TM1637 and MAX7221 settings
+            if (Properties.Settings.Default.TM1637 != null)
+            {
+                this.views.Items.AddRange(Properties.Settings.Default.TM1637.ToArray());
+            }
+            if (Properties.Settings.Default.MAX7221 != null)
+            {
+                this.views2.Items.AddRange(Properties.Settings.Default.MAX7221.ToArray());
+            }
+
             sm = new SerialManager();
             bh = new ButtonHandler(sm);
             vf = new VJoyFeeder(bh);
@@ -42,8 +54,14 @@ namespace iDash
             vf.InitializeJoystick();
         }
 
-              
-        
+            
+        private void saveAppSettings()
+        {
+            Properties.Settings.Default.TM1637 = new ArrayList(views.Items);
+            Properties.Settings.Default.MAX7221 = new ArrayList(views2.Items);
+            Properties.Settings.Default.Save();
+        }
+
         private void buttonSend_Click(object sender, EventArgs e) // send button  event
         {
             byte[] aux = System.Text.Encoding.ASCII.GetBytes(richTextBoxSend.Text);
@@ -57,6 +75,8 @@ namespace iDash
             sm.StatusMessageSubscribers -= UpdateStatusBar;
             vf.StatusMessageSubscribers -= UpdateStatusBar;
             sm.DebugMessageSubscribers -= UpdateDebugData;
+
+            saveAppSettings();
         }
 
         public void AppendToStatusBar(String s)
@@ -133,30 +153,17 @@ namespace iDash
         private void button11_Click(object sender, EventArgs e)
         {
             byte[] PDF = Properties.Resources.telemetry_11_23_15;
-
-
-
             MemoryStream ms = new MemoryStream(PDF);
 
-
-
             //Create PDF File From Binary of resources folders help.pdf
-
             FileStream f = new FileStream("telemetry_11_23_15.pdf", FileMode.OpenOrCreate);
 
-
-
             //Write Bytes into Our Created help.pdf
-
             ms.WriteTo(f);
-
             f.Close();
-
             ms.Close();
-
-
+            
             // Finally Show the Created PDF from resources
-
             Process.Start("telemetry_11_23_15.pdf");
         }
 
@@ -342,14 +349,15 @@ namespace iDash
             }
         }
 
-        private void views_SelectedValueChanged(object sender, EventArgs e)
+        private void views_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (views.SelectedIndex >= 0) {
+            if (views.SelectedIndex >= 0)
+            {
                 string[] selectedValue = views.SelectedItem.ToString().Split(',');
                 isSimConnected.Checked = Convert.ToBoolean(selectedValue[selectedValue.Length - 1]);
                 textFormat.Text = selectedValue[selectedValue.Length - 2];
                 selected.Items.Clear();
-                for(int i = 0; i < selectedValue.Length - 2; i++)
+                for (int i = 0; i < selectedValue.Length - 2; i++)
                 {
                     selected.Items.Add(selectedValue[i]);
                 }

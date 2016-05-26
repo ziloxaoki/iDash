@@ -22,5 +22,27 @@ namespace iDash.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.ArrayList TM1637 {
+            get {
+                return ((global::System.Collections.ArrayList)(this["TM1637"]));
+            }
+            set {
+                this["TM1637"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.ArrayList MAX7221 {
+            get {
+                return ((global::System.Collections.ArrayList)(this["MAX7221"]));
+            }
+            set {
+                this["MAX7221"] = value;
+            }
+        }
     }
 }
