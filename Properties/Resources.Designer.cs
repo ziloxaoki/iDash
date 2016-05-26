@@ -59,5 +59,115 @@ namespace iDash.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _112_DownArrowShort_Grey_32x32_72 {
+            get {
+                object obj = ResourceManager.GetObject("_112_DownArrowShort_Grey_32x32_72", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _112_LeftArrowShort_Grey_32x32_72 {
+            get {
+                object obj = ResourceManager.GetObject("_112_LeftArrowShort_Grey_32x32_72", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _112_RightArrowShort_Grey_32x32_72 {
+            get {
+                object obj = ResourceManager.GetObject("_112_RightArrowShort_Grey_32x32_72", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _112_UpArrowShort_Grey_32x42_72 {
+            get {
+                object obj = ResourceManager.GetObject("_112_UpArrowShort_Grey_32x42_72", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap arrowdown32 {
+            get {
+                object obj = ResourceManager.GetObject("arrowdown32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap arrowleft32 {
+            get {
+                object obj = ResourceManager.GetObject("arrowleft32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap arrowright32 {
+            get {
+                object obj = ResourceManager.GetObject("arrowright32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap arrowup32 {
+            get {
+                object obj = ResourceManager.GetObject("arrowup32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Delete_black_32 {
+            get {
+                object obj = ResourceManager.GetObject("Delete_black_32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap PrintEntireDocument {
+            get {
+                object obj = ResourceManager.GetObject("PrintEntireDocument", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] telemetry_11_23_15 {
+            get {
+                object obj = ResourceManager.GetObject("telemetry_11_23_15", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

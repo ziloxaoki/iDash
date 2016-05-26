@@ -180,11 +180,13 @@ namespace iDash
                 foreach (byte b in serialData) { 
                     switch (b)
                     {
+                        //command init char found
                         case Command.CMD_INIT:
                             serialCommand[0] = b;
                             commandLength = 1;
                             break;
 
+                        //command end char found, send it to be processed
                         case Command.CMD_END:
                             serialCommand[commandLength] = b;
 
@@ -201,6 +203,7 @@ namespace iDash
                             Utils.resetArray(serialCommand);
                             break;
 
+                        //command init char already found, start adding the command data to buffer
                         default:
                             if (commandLength > 0)
                             {
@@ -217,7 +220,7 @@ namespace iDash
             }
         }
                 
-
+        //event handler triggered by serial port
         public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             if (serialPort.IsOpen)
@@ -239,6 +242,7 @@ namespace iDash
             }
         }
 
+        //notify subscribers that a command was received
         protected virtual void NotifyCommandReceived(Command args)
         {
             CommandReceivedHandler handler = CommandReceivedSubscribers;
@@ -249,6 +253,7 @@ namespace iDash
             }
         }
 
+        //notify subscribers (statusbar) that a message has to be logged
         public void NotifyStatusMessage(string args)
         {
             StatusMessageHandler handler = StatusMessageSubscribers;
@@ -259,6 +264,7 @@ namespace iDash
             }
         }
 
+        //notify subscribers (debug field) that a message has to be logged
         public void NotifyDebugMessage(string args)
         {
             DebugMessageHandler handler = DebugMessageSubscribers;

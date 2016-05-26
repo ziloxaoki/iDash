@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -125,6 +127,95 @@ namespace iDash
             if (debugData.Lines.Count() > 200)
             {
                 debugData.Clear();
+            }
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            byte[] PDF = Properties.Resources.telemetry_11_23_15;
+
+
+
+            MemoryStream ms = new MemoryStream(PDF);
+
+
+
+            //Create PDF File From Binary of resources folders help.pdf
+
+            FileStream f = new FileStream("telemetry_11_23_15.pdf", FileMode.OpenOrCreate);
+
+
+
+            //Write Bytes into Our Created help.pdf
+
+            ms.WriteTo(f);
+
+            f.Close();
+
+            ms.Close();
+
+
+            // Finally Show the Created PDF from resources
+
+            Process.Start("telemetry_11_23_15.pdf");
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            foreach (string item in props.SelectedItems)
+            {
+                if(!selected.Items.Contains(item))
+                {
+                    selected.Items.Add(item);
+                }
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (selected.SelectedIndex != -1)
+            {
+                for (int i = selected.SelectedItems.Count - 1; i >= 0; i--)
+                    selected.Items.Remove(selected.SelectedItems[i]);
+            }
+        }
+
+        public void MoveItem(ListBox lb, int direction)
+        {
+            // Checking selected item
+            if (lb.SelectedItem == null || lb.SelectedIndex < 0)
+                return; // No selected item - nothing to do
+
+            // Calculate new index using move direction
+            int newIndex = lb.SelectedIndex + direction;
+
+            // Checking bounds of the range
+            if (newIndex < 0 || newIndex >= lb.Items.Count)
+                return; // Index out of range - nothing to do
+
+            object selected = lb.SelectedItem;
+
+            // Removing removable element
+            lb.Items.Remove(selected);
+            // Insert it in new position
+            lb.Items.Insert(newIndex, selected);
+            // Restore selection
+            lb.SetSelected(newIndex, true);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (selected.SelectedIndex > 0)
+            {
+                this.MoveItem(selected, -1);
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (selected.SelectedIndex < selected.Items.Count - 1)
+            {
+                this.MoveItem(selected, 1);
             }
         }
     }

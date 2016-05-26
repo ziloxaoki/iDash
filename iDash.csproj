@@ -117,6 +117,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\telemetry_11_23_15.pdf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -127,6 +128,17 @@
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
     <Content Include="icon.ico" />
+    <None Include="Resources\PrintEntireDocument.png" />
+    <None Include="Resources\112_UpArrowShort_Grey_32x42_72.png" />
+    <None Include="Resources\112_RightArrowShort_Grey_32x32_72.png" />
+    <None Include="Resources\112_LeftArrowShort_Grey_32x32_72.png" />
+    <None Include="Resources\112_DownArrowShort_Grey_32x32_72.png" />
+    <None Include="Resources\Delete_black_32x32.png" />
+    <None Include="Resources\arrowup32.png" />
+    <None Include="Resources\arrowright32.png" />
+    <None Include="Resources\arrowleft32.png" />
+    <None Include="Resources\arrowdown32.png" />
+    <None Include="Resources\arrowup.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
