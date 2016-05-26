@@ -261,5 +261,114 @@ namespace iDash
                 this.MoveItem(views, 1);
             }
         }
+
+        private void button18_Click(object sender, EventArgs e)
+        {
+            foreach (string item in props2.SelectedItems)
+            {
+                if (!selected2.Items.Contains(item))
+                {
+                    selected2.Items.Add(item);
+                }
+            }
+        }
+
+        private void button17_Click(object sender, EventArgs e)
+        {
+            if (selected2.SelectedIndex != -1)
+            {
+                for (int i = selected2.SelectedItems.Count - 1; i >= 0; i--)
+                    selected2.Items.Remove(selected2.SelectedItems[i]);
+            }
+        }
+
+        private void button16_Click(object sender, EventArgs e)
+        {
+            if (selected2.SelectedIndex > 0)
+            {
+                this.MoveItem(selected2, -1);
+            }
+        }
+
+        private void button15_Click(object sender, EventArgs e)
+        {
+            if (selected2.SelectedIndex < selected2.Items.Count - 1)
+            {
+                this.MoveItem(selected2, 1);
+            }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            if (views2.SelectedIndex != -1)
+            {
+                for (int i = views2.SelectedItems.Count - 1; i >= 0; i--)
+                    views2.Items.Remove(views2.SelectedItems[i]);
+            }
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            string viewValue = null;
+
+            foreach (string item in selected2.Items)
+            {
+                viewValue += item + ",";
+            }
+            if (viewValue != null && viewValue.Length > 0)
+            {
+                viewValue += textFormat2.Text + "," + isSimConnected2.Checked;
+                if (!views2.Items.Contains(viewValue))
+                {
+                    views2.Items.Add(viewValue);
+                }
+            }
+        }
+
+        private void button14_Click(object sender, EventArgs e)
+        {
+            if (views2.SelectedIndex > 0)
+            {
+                this.MoveItem(views2, -1);
+            }
+        }
+
+
+        private void button13_Click(object sender, EventArgs e)
+        {
+            if (views2.SelectedIndex < views2.Items.Count - 1)
+            {
+                this.MoveItem(views2, 1);
+            }
+        }
+
+        private void views_SelectedValueChanged(object sender, EventArgs e)
+        {
+            if (views.SelectedIndex >= 0) {
+                string[] selectedValue = views.SelectedItem.ToString().Split(',');
+                isSimConnected.Checked = Convert.ToBoolean(selectedValue[selectedValue.Length - 1]);
+                textFormat.Text = selectedValue[selectedValue.Length - 2];
+                selected.Items.Clear();
+                for(int i = 0; i < selectedValue.Length - 2; i++)
+                {
+                    selected.Items.Add(selectedValue[i]);
+                }
+            }
+        }
+
+        private void views2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (views2.SelectedIndex >= 0)
+            {
+                string[] selectedValue = views2.SelectedItem.ToString().Split(',');
+                isSimConnected2.Checked = Convert.ToBoolean(selectedValue[selectedValue.Length - 1]);
+                textFormat2.Text = selectedValue[selectedValue.Length - 2];
+                selected2.Items.Clear();
+                for (int i = 0; i < selectedValue.Length - 2; i++)
+                {
+                    selected2.Items.Add(selectedValue[i]);
+                }
+            }
+        }
     }
 }
