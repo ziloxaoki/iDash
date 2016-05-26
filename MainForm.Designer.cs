@@ -400,7 +400,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(837, 145);
+            this.label3.Location = new System.Drawing.Point(834, 162);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(66, 13);
             this.label3.TabIndex = 3;
@@ -408,7 +408,7 @@
             // 
             // textFormat
             // 
-            this.textFormat.Location = new System.Drawing.Point(909, 142);
+            this.textFormat.Location = new System.Drawing.Point(906, 159);
             this.textFormat.Name = "textFormat";
             this.textFormat.Size = new System.Drawing.Size(162, 20);
             this.textFormat.TabIndex = 4;
@@ -416,7 +416,7 @@
             // isSimConnected
             // 
             this.isSimConnected.AutoSize = true;
-            this.isSimConnected.Location = new System.Drawing.Point(1088, 144);
+            this.isSimConnected.Location = new System.Drawing.Point(1085, 161);
             this.isSimConnected.Name = "isSimConnected";
             this.isSimConnected.Size = new System.Drawing.Size(109, 17);
             this.isSimConnected.TabIndex = 5;
@@ -461,6 +461,7 @@
             this.button5.Size = new System.Drawing.Size(33, 48);
             this.button5.TabIndex = 11;
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button6
             // 
@@ -470,6 +471,7 @@
             this.button6.Size = new System.Drawing.Size(33, 48);
             this.button6.TabIndex = 10;
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // button4
             // 

@@ -245,5 +245,21 @@ namespace iDash
                 }
             }
         }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            if(views.SelectedIndex > 0)
+            {
+                this.MoveItem(views, -1);
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (views.SelectedIndex < views.Items.Count - 1)
+            {
+                this.MoveItem(views, 1);
+            }
+        }
     }
 }
