@@ -11,13 +11,14 @@ namespace iDash
         private byte[] rawData;
         private byte[] data;
         private byte crc;
-
-        public const byte CMD_INIT = (byte)'^'; //94
-        public const byte CMD_END = (byte)'\n'; //10
+        //BC e BF
+        public const byte CMD_INIT = (byte)'^'; //94d 5Eh
+        public const byte CMD_END = (byte)'\n'; //10d Ah
         public const byte CMD_SET_DEBUG_MODE = 0x01;
-        public const byte CMD_SYN = (byte)'A'; //65
-        public const byte CMD_SYN_ACK = (byte)'a'; //97
-        public const byte CMD_BUTTON_STATUS = (byte)'D'; //68
+        public const byte CMD_SYN = (byte)'A'; //65d 41h
+        public const byte CMD_7_SEGS = (byte)'B'; //66d 42h
+        public const byte CMD_SYN_ACK = (byte)'a'; //97d 61h
+        public const byte CMD_BUTTON_STATUS = (byte)'D'; //68d 44h
 
         public Command(byte[] buffer)
         {

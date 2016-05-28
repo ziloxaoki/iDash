@@ -1,40 +1,12 @@
-
-
-
-
-// Uncomment to use adafruit HT16K33 modules
-//#define INCLUDE_LEDBACKPACK //{"Name":"INCLUDE_LEDBACKPACK","Type":"autodefine","Condition":"[ENABLE_ADA_HT16K33_7SEGMENTS]>0 || [ENABLE_ADA_HT16K33_Matrix]>0"}
-
-// Uncomment to use tm1637
-#define INCLUDE_TM1637 //{"Name":"INCLUDE_TM1637","Type":"autodefine","Condition":"[TM1637_ENABLEDMODULES]>0"}
-
-#define INCLUDE_WS2812B //{"Name":"INCLUDE_WS2812B","Type":"autodefine","Condition":"[WS2812B_RGBLEDCOUNT]>0"}
-
-
-
-// Uncomment to use Nokia 5110/3310 LCD
-//#define INCLUDE_NOKIALCD //{"Name":"INCLUDE_NOKIALCD","Type":"autodefine","Condition":"[ENABLED_NOKIALCD]>0"}
 #include <avr/pgmspace.h>
 #include <EEPROM.h>
-
 #include <SPI.h>
 #include "Arduino.h"
 #include <avr/pgmspace.h>
-
-#include <Wire.h>
 #include "LedControl.h"
-#include "Adafruit_GFX.h"
-#include <Servo.h>
-
-#ifdef INCLUDE_TM1637
-#include "TM1637.h"
-#endif
-
-#ifdef INCLUDE_WS2812B
+#include <TM1637Display.h>
 #include <Adafruit_NeoPixel.h>
-#endif
-
-
+#include <MemoryFree.h>
 
 
 #define portOfPin(P)\
@@ -58,38 +30,43 @@
 const char COMMAND_INIT = '^';
 const char COMMAND_END = '\n';
 
+// -------------------------------------------------------------------------------------------------------
+// TM1637 7 Segment modules -----------------------------------------------------------------------------
+//
+// -------------------------------------------------------------------------------------------------------
+
+
 // Number of Connected TM1637 modules
 // 0 disabled, > 0 enabled
-int TM1637_ENABLEDMODULES = 1; //{"Group":"TM1637","Name":"TM1637_ENABLEDMODULES","Title":"TM1637 modules connected\r\nSet to 0 if none","DefaultValue":"0","Type":"integer","Template":"int TM1637_ENABLEDMODULES = {0};"}
-#ifdef INCLUDE_TM1637
-#define TM1637_DIO1 9 //{"Group":"TM1637","Name":"TM1637_DIO1","Title":"1st TM1637 DIO digital pin number","DefaultValue":"4","Type":"integer","Template":"#define TM1637_DIO1 {0}"}
-#define TM1637_CLK1 8 //{"Group":"TM1637","Name":"TM1637_CLK1","Title":"1st TM1637 CLK digital pin number","DefaultValue":"3","Type":"integer","Template":"#define TM1637_CLK1 {0}"}
+int TM1637_ENABLEDMODULES = 1;
 
-#define TM1637_DIO2 4 //{"Group":"TM1637","Name":"TM1637_DIO2","Title":"2nd TM1637 DIO digital pin number","DefaultValue":"4","Type":"integer","Template":"#define TM1637_DIO2 {0}"}
-#define TM1637_CLK2 3 //{"Group":"TM1637","Name":"TM1637_CLK2","Title":"2nd TM1637 CLK digital pin number","DefaultValue":"3","Type":"integer","Template":"#define TM1637_CLK2 {0}"}
+#define TM1637_DIO1 9
+#define TM1637_CLK1 8
 
-#define TM1637_DIO3 4 //{"Group":"TM1637","Name":"TM1637_DIO3","Title":"3rd TM1637 DIO digital pin number","DefaultValue":"4","Type":"integer","Template":"#define TM1637_DIO3 {0}"}
-#define TM1637_CLK3 3 //{"Group":"TM1637","Name":"TM1637_CLK3","Title":"3rd TM1637 CLK digital pin number","DefaultValue":"3","Type":"integer","Template":"#define TM1637_CLK3 {0}"}
+#define TM1637_DIO2 4
+#define TM1637_CLK2 3
 
-#define TM1637_DIO4 4 //{"Group":"TM1637","Name":"TM1637_DIO4","Title":"4th TM1637 DIO digital pin number","DefaultValue":"4","Type":"integer","Template":"#define TM1637_DIO4 {0}"}
-#define TM1637_CLK4 3 //{"Group":"TM1637","Name":"TM1637_CLK4","Title":"4th TM1637 CLK digital pin number","DefaultValue":"3","Type":"integer","Template":"#define TM1637_CLK4 {0}"}
+#define TM1637_DIO3 4
+#define TM1637_CLK3 3
 
-#define TM1637_DIO5 4 //{"Group":"TM1637","Name":"TM1637_DIO5","Title":"5th TM1637 DIO digital pin number","DefaultValue":"4","Type":"integer","Template":"#define TM1637_DIO5 {0}"}
-#define TM1637_CLK5 3 //{"Group":"TM1637","Name":"TM1637_CLK5","Title":"5th TM1637 CLK digital pin number","DefaultValue":"3","Type":"integer","Template":"#define TM1637_CLK5 {0}"}
+#define TM1637_DIO4 4
+#define TM1637_CLK4 3
 
-#define TM1637_DIO6 4 //{"Group":"TM1637","Name":"TM1637_DIO6","Title":"6th TM1637 DIO digital pin number","DefaultValue":"4","Type":"integer","Template":"#define TM1637_DIO6 {0}"}
-#define TM1637_CLK6 3 //{"Group":"TM1637","Name":"TM1637_CLK6","Title":"6th TM1637 CLK digital pin number","DefaultValue":"3","Type":"integer","Template":"#define TM1637_CLK6 {0}"}
+#define TM1637_DIO5 4
+#define TM1637_CLK5 3
+
+#define TM1637_DIO6 4
+#define TM1637_CLK6 3
 
 
-TM1637 TM1637_module1(TM1637_CLK1, TM1637_DIO1);
-TM1637 TM1637_module2(TM1637_CLK2, TM1637_DIO2);
-TM1637 TM1637_module3(TM1637_CLK3, TM1637_DIO3);
-TM1637 TM1637_module4(TM1637_CLK4, TM1637_DIO4);
-TM1637 TM1637_module5(TM1637_CLK5, TM1637_DIO5);
-TM1637 TM1637_module6(TM1637_CLK6, TM1637_DIO6);
+TM1637Display TM1637_module1(TM1637_CLK1, TM1637_DIO1);
+TM1637Display TM1637_module2(TM1637_CLK2, TM1637_DIO2);
+TM1637Display TM1637_module3(TM1637_CLK3, TM1637_DIO3);
+TM1637Display TM1637_module4(TM1637_CLK4, TM1637_DIO4);
+TM1637Display TM1637_module5(TM1637_CLK5, TM1637_DIO5);
+TM1637Display TM1637_module6(TM1637_CLK6, TM1637_DIO6);
 
-TM1637 * TM1637_screens[] = { &TM1637_module1, &TM1637_module2, &TM1637_module3, &TM1637_module4, &TM1637_module5, &TM1637_module6 };
-#endif
+TM1637Display * TM1637_screens[] = { &TM1637_module1, &TM1637_module2, &TM1637_module3, &TM1637_module4, &TM1637_module5, &TM1637_module6 };
 
 // -------------------------------------------------------------------------------------------------------
 // MAX7219 / MAX7221 7 Segment modules -----------------------------------------------------------------------------
@@ -97,26 +74,43 @@ TM1637 * TM1637_screens[] = { &TM1637_module1, &TM1637_module2, &TM1637_module3,
 // -------------------------------------------------------------------------------------------------------
 
 // 0 disabled, > 0 enabled
-int MAX7221_ENABLEDMODULES = 2; //{"Group":"MAX7221","Name":"MAX7221_ENABLEDMODULES","Title":"MAX7219 / MAX7221 7 Segment modules connected \r\nSet to 0 if none\r\nMultiple modules can be cascaded connected module output to next module input","DefaultValue":"0","Type":"integer","Template":"int MAX7221_ENABLEDMODULES = {0};"}
+int MAX7221_ENABLEDMODULES = 2;
 // DATA IN - pin of the first MAX7221
-#define MAX7221_DATA 11 //{"Group":"MAX7221","Name":"MAX7221_DATA","Title":"DATA (DIN) digital pin number","DefaultValue":"3","Type":"integer","Template":"#define MAX7221_DATA {0}"}
+#define MAX7221_DATA 11
 // CLK - pin of the first MAX7221
-#define MAX7221_CLK 13 //{"Group":"MAX7221","Name":"MAX7221_CLK","Title":"CLOCK (CLK) digital pin number","DefaultValue":"5","Type":"integer","Template":"#define MAX7221_CLK {0}"}
+#define MAX7221_CLK 13
 // LOAD(/ CS) - pin of the first MAX7221
-#define MAX7221_LOAD 10 //{"Group":"MAX7221","Name":"MAX7221_LOAD","Title":"LOAD (LD) digital pin number","DefaultValue":"4","Type":"integer","Template":"#define MAX7221_LOAD {0}"}
+#define MAX7221_LOAD 10
 LedControl MAX7221 = LedControl(MAX7221_DATA, MAX7221_CLK, MAX7221_LOAD, MAX7221_ENABLEDMODULES);
+
+/*
+struct ScreenItem {
+public:
+  byte Intensity;
+
+  ScreenItem() { }
+};
+
+
+ScreenItem MAX7221_screen1;
+ScreenItem MAX7221_screen2;
+ScreenItem MAX7221_screen3;
+ScreenItem MAX7221_screen4;
+ScreenItem MAX7221_screen5;
+ScreenItem MAX7221_screen6;
+
+ScreenItem * MAX7221_screens[] = { &MAX7221_screen1, &MAX7221_screen2, &MAX7221_screen3, &MAX7221_screen4, &MAX7221_screen5, &MAX7221_screen6 };
+*/
 
 // WS2812b chained RGBLEDS count
 // 0 disabled, > 0 enabled
-int WS2812B_RGBLEDCOUNT = 16; //{"Group":"WS2812B_RGBLED","Name":"WS2812B_RGBLEDCOUNT","Title":"WS2812B RGB leds count\r\nSet to 0 if none","DefaultValue":"0","Type":"integer","Template":"int WS2812B_RGBLEDCOUNT = {0};"}
+int WS2812B_RGBLEDCOUNT = 16; 
 // 0 leds will be used from left to right, 1 leds will be used from right to left
-int WS2812B_RIGHTTOLEFT = 1; //{"Group":"WS2812B_RGBLED","Name":"WS2812B_RIGHTTOLEFT","Title":"Reverse led order \r\n0 = No, 1 = Yes","DefaultValue":"0","Type":"boolean","Template":"int WS2812B_RIGHTTOLEFT = {0};"}
+int WS2812B_RIGHTTOLEFT = 1; 
 // WS2812b chained RGBLEDS pins
-#define WS2812B_DATAPIN 12 //{"Group":"WS2812B_RGBLED","Name":"WS2812B_DATAPIN","Title":"Data (DIN) digital pin number","DefaultValue":"6","Type":"boolean","Template":"#define WS2812B_DATAPIN {0}"}
+#define WS2812B_DATAPIN 12
 
-#ifdef INCLUDE_WS2812B
 Adafruit_NeoPixel WS2812B_strip = Adafruit_NeoPixel(WS2812B_RGBLEDCOUNT, WS2812B_DATAPIN, NEO_GRB + NEO_KHZ800);
-#endif
 
 // ----------------------- ADDITIONAL BUTTONS ---------------------------------------------------------------
 // https://www.arduino.cc/en/Tutorial/InputPullupSerial
@@ -150,8 +144,8 @@ int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
 int BUTTON_LIMITS[8][4][2] = {{{400, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
                               {{400, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
-                              {{500, 525}, {605, 625}, {665, 695}, {715, 745}},   //A5 Extra 1 - INPUT
-                              {{500, 525}, {600, 625}, {655, 710}, {715, 745}},   //A4 Extra 2 - INPUT                 
+                              {{450, 580}, {590, 650}, {655, 700}, {705, 745}},   //A5 Extra 1 - INPUT
+                              {{450, 580}, {590, 650}, {655, 700}, {705, 745}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
@@ -175,7 +169,7 @@ int lastPos[] = {15000, 15000};
 byte lastState[] = {0, 0};
 long lastRotaryStateChange = 0;
 
-long lastRotaryBounce = 0;
+volatile long lastRotaryBounce = 0;
 long lastSynAck = 0;
 
 bool isConnected = false;
@@ -188,35 +182,57 @@ int asize(byte* b) {
   return sizeof(b) / sizeof(byte);
 }
 
+int acopy(byte* orig, byte* dest, int length) {
+  for(int x = 0; x < length; x++) {
+    dest[x] = orig[x];
+  }
+}
+
+
+byte MAX7221_ByteReorder(byte x)
+{
+  x = ((x >> 1) & 0x55) | ((x << 1) & 0xaa);
+  x = ((x >> 2) & 0x33) | ((x << 2) & 0xcc);
+  x = ((x >> 4) & 0x0f) | ((x << 4) & 0xf0);
+  return (x >> 1) | ((x & 1) << 7);
+}
+
+void sentToTM1637_MAX7221(byte *buffer) {
+  //first char(0) is the command start and second char is the command header 
+  int k = 2;  
+
+  // TM1637
+  for (int i = 0; i < TM1637_ENABLEDMODULES ; i++) {
+    TM1637_screens[i]->setSegments(buffer,2,4,0);
+    k += 4;
+  }
+  
+  // MAX7221
+  for (int i = 0; i < MAX7221_ENABLEDMODULES; i++) {     
+    for (int j = 0; j < 8; j++) {
+      MAX7221.setRow(i, 7 - j, MAX7221_ByteReorder(buffer[k++]));
+    }
+  }
+}
+
 void setup()
 {
-  Serial.begin(19200);
-  
+  //Serial.begin(19200);
+  Serial.begin(38400);
   // TM1637 INIT
-  #ifdef INCLUDE_TM1637
-    for (int i = 0; i < TM1637_ENABLEDMODULES; i++) {
-      TM1637_screens[i]->init();
-      TM1637_screens[i]->set(BRIGHT_TYPICAL);
-      TM1637_screens[i]->clearDisplay();
-    }
-  #endif
+  for (int i = 0; i < TM1637_ENABLEDMODULES; i++) {
+    //TM1637_screens[i]->init();
+    TM1637_screens[i]->setBrightness(0x0f);
+    //TM1637_screens[i]->clearDisplay();
+  }
 
   
-  #ifdef INCLUDE_WS2812B
-    // WS2812B INIT
-    if (WS2812B_RGBLEDCOUNT > 0) {
-      WS2812B_strip.begin();
-      WS2812B_strip.show();
-    }
-  #endif
+  // WS2812B INIT
+  if (WS2812B_RGBLEDCOUNT > 0) {
+    WS2812B_strip.begin();
+    WS2812B_strip.show();
+  }
 
-  // WS2801 INIT
-  #ifdef INCLUDE_WS2801
-    if (WS2801_RGBLEDCOUNT > 0) {
-      WS2801_strip.begin();
-      WS2801_strip.show();
-    }
-  #endif
 
   // MAX7221 7SEG INIT
   for (int i = 0; i < MAX7221_ENABLEDMODULES; i++) {
@@ -328,11 +344,10 @@ int sendAnalogState(int offset, byte *response) {
     for(int x = 0; x < MAXIMUM_BUTTONS_PER_ANALOG; x++) {
       int tmpButtonState = LOW;             // the current reading from the input pin
 
-      if((reading > BUTTON_LIMITS[i][x][0]) && (reading < BUTTON_LIMITS[i][x][1])){
-        //Read switch 1
-        tmpButtonState = 1;               
+      if((reading > BUTTON_LIMITS[i][x][0]) && (reading < BUTTON_LIMITS[i][x][1])){           
+        //Read switch 1       
+        tmpButtonState = 1; 
       }      
-
       if((tmpButtonState != extra_button_last_states[btn]) && (millis() - lastButtonBounce > 50)) {
         extra_button_last_states[btn++] = tmpButtonState; 
         response[offset++] = tmpButtonState;
@@ -341,7 +356,8 @@ int sendAnalogState(int offset, byte *response) {
         response[offset++] = extra_button_last_states[btn++];
       }      
     }      
-  }    
+  }   
+
   return offset;  
 }
 
@@ -354,10 +370,10 @@ int sendButtonState(int offset, byte *response) {
   return offset;
 }
 
-int calculateCrc(int commandLength, byte *response) {
+int calculateCrc(int dataLength, byte *response) {
   int crc = 0;
   
-  for(int i = 0; i < commandLength; i++) {    
+  for(int i = 0; i < dataLength; i++) {    
     crc += response[i];
   }
 
@@ -377,10 +393,10 @@ void sendDataToSerial(int commandLength, byte *response) {
 
 void processCommand(byte *buffer) {  
   //debug
-  switch(buffer[0]) {
+  switch(buffer[1]) {
     case 0x01 :
-      isDebugMode = (buffer[1] == 1);
-      sendDebugModeState(buffer[1]);       
+      isDebugMode = (buffer[2] == 1);
+      sendDebugModeState(buffer[2]);       
       break;
 
     /*case 'D' :
@@ -392,6 +408,10 @@ void processCommand(byte *buffer) {
       isConnected = true;
       lastSynAck = millis();
       sendHandshacking();  
+      break;
+
+    case 'B' :    
+      sentToTM1637_MAX7221(buffer);         
       break;
   }  
   buffer[0] = 0;
@@ -405,13 +425,15 @@ int readline(int readch, byte *buffer, int len)
 
   if (readch > 0) {
     switch (readch) {
-      case '^': // command init found (this is ignored and not appended to the buffer)
+      case '^': // command init found
         pos = 0;
+        buffer[pos++] = readch;
+        buffer[pos] = 0;
         break;        
       case '\n': // End command
         rpos = pos;
         pos = 0;  // Reset position index ready for next time
-        return rpos;
+        return rpos - 1; //last char is the crc
       default:
         if (pos < len-1) {
           buffer[pos++] = readch;
@@ -425,20 +447,24 @@ int readline(int readch, byte *buffer, int len)
 
 
 void processData() {  
-  static byte buffer[50];
+  static byte buffer[100];
   int commandLength = 0;
 
   long startReading = millis();
   while (Serial.available()) {
-    commandLength = readline(Serial.read(), buffer, 50);    
-    if ( commandLength > 0) {   
-      processCommand(buffer);    
+    commandLength = readline(Serial.read(), buffer, 100);       
+ 
+    if (commandLength > 0) {  
+      int crc = calculateCrc(commandLength, buffer); 
+
+      if(crc == buffer[commandLength]) {    
+        processCommand(buffer);     
+      }
     }
     if(millis() - startReading > 10) {
       break;
     }
   }
-  
 }
 
 void sendDebugModeState(byte state) {
@@ -469,7 +495,7 @@ void sendHandshacking() {
 }
 
 void sendButtonStatus() {
-  byte response[50];
+  byte response[100];
   int offset = 0;
   
   //return buttons state      
@@ -481,17 +507,18 @@ void sendButtonStatus() {
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = COMMAND_END;   
   
-  sendDataToSerial(offset, response);   
+  sendDataToSerial(offset, response);
 }
 
 void loop() {  
-   
+//    Serial.print("freeMemory()=");
+//    Serial.println(freeMemory());
   //haven't received Syn Ack from IDash for too long
   if(millis() - lastSynAck > 5000) {
     isConnected = false;    
     sendHandshacking();
-    delay(100);
-  }  
+    delay(300);
+  }
 
   processData();
 
@@ -499,8 +526,3 @@ void loop() {
     sendButtonStatus(); 
   }  
 }
-
-
-
-
-

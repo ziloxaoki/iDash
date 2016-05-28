@@ -22,11 +22,14 @@ namespace iDash
         private SerialManager sm;
         private ButtonHandler bh;
         private VJoyFeeder vf;
+        private IRacingConnector irc;
 
         public delegate void AppendToStatusBarDelegate(String s);
         public AppendToStatusBarDelegate appendToStatusBar;
         public delegate void AppendToDebugDialogDelegate(String s);
         public AppendToDebugDialogDelegate appendToDebugDialog;
+        public static bool stopThreads = false;
+
 
         public MainForm()
         {
@@ -46,15 +49,17 @@ namespace iDash
 
             sm = new SerialManager();
             bh = new ButtonHandler(sm);
-            vf = new VJoyFeeder(bh);
+            vf = new VJoyFeeder(bh);            
             sm.StatusMessageSubscribers += UpdateStatusBar;
             vf.StatusMessageSubscribers += UpdateStatusBar;
             sm.DebugMessageSubscribers += UpdateDebugData;
             sm.Init();
             vf.InitializeJoystick();
+            irc = new IRacingConnector(sm);
         }
+    
 
-            
+
         private void saveAppSettings()
         {
             Properties.Settings.Default.TM1637 = new ArrayList(views.Items);
@@ -69,14 +74,17 @@ namespace iDash
             sm.sendCommand(command);     //transmit data
         }
 
-        protected override void OnFormClosing(FormClosingEventArgs e)
+        protected async override void OnFormClosing(FormClosingEventArgs e)
         {
-            SerialManager.stopThreads = true;
+            stopThreads = true;
             sm.StatusMessageSubscribers -= UpdateStatusBar;
             vf.StatusMessageSubscribers -= UpdateStatusBar;
             sm.DebugMessageSubscribers -= UpdateDebugData;
 
             saveAppSettings();
+
+            //wait all threads to close
+            await Task.Delay(1000);
         }
 
         public void AppendToStatusBar(String s)

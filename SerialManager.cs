@@ -8,6 +8,10 @@ namespace iDash
 {
     class SerialManager
     {
+
+        int bs = 0;
+        private System.Timers.Timer timer1;
+
         private const int BUFFER_SIZE = 40;
         private const int WAIT_TO_RECONNECT = 300;
         private const int WAIT_SERIAL_CONNECT = 3000;
@@ -20,8 +24,7 @@ namespace iDash
         private static long lastArduinoResponse = 0;        
         private object dataLock = new object();
         private object commandLock = new object();
-
-        public static bool stopThreads = false;
+        
         public static DebugMode debugMode = DebugMode.None;
         public static bool isArduinoInDebugMode = false;
 
@@ -38,12 +41,19 @@ namespace iDash
             serialPort.Parity = Parity.None;     //selected parity 
             serialPort.StopBits = StopBits.One;  //selected stopbits
             serialPort.DataBits = 8;                           //selected data bits
-            serialPort.BaudRate = 19200;                             //selected baudrate            
+            serialPort.BaudRate = 38400;                             //selected baudrate            
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler  
 
             new Thread(new ThreadStart(start)).Start();            
             
             this.tryToConnect();
+
+
+            //timer1 = new System.Timers.Timer(1000);
+            //timer1.Elapsed += timer1_Tick;
+            // Set it to go off every five seconds
+            // And start it        
+            //timer1.Enabled = true;
 
         }
 
@@ -94,24 +104,19 @@ namespace iDash
         }
 
 
-        private void start()
+        private async void start()
         {            
-            while (!stopThreads) {
-                this.sendArduinoSynAck();
+            while (!MainForm.stopThreads) {
+                if (isArduinoAlive())
+                {
+                    //if arduino does not receive a SynAck in 5s it will disconnect and start sending ACK commands
+                    this.sendSynAck();
+                    await Task.Delay(WAIT_TO_SEND_SYN_ACK);
+                }                
             }
             if (serialPort.IsOpen)
             {
                 serialPort.Dispose();
-            }
-        }
-
-        //if arduino does not receive a SynAck in 5s it will disconnect and start sending ACK commands
-        private async void sendArduinoSynAck()
-        {            
-            if (isArduinoAlive())
-            {
-                this.sendSynAck();
-                await Task.Delay(WAIT_TO_SEND_SYN_ACK);                
             }
         }
 
@@ -162,14 +167,25 @@ namespace iDash
         {
             try
             {
-                serialPort.Write(command.getRawData(), 0, command.getLength());                            
+                if (serialPort.IsOpen)
+                {
+                   
+                    bs += command.getLength();                  
+                    serialPort.Write(command.getRawData(), 0, command.getLength());
+
+                }
             }
             catch
             {
                 NotifyStatusMessage("com port is not available"); //if there are not is any COM port in PC show message
             }
-        }        
-        
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            Console.WriteLine("{0}/s", bs);
+            bs = 0;
+        }
 
         public void processData(byte[] serialData)
         {
@@ -226,16 +242,17 @@ namespace iDash
             if (serialPort.IsOpen)
             {
                 byte[] data = new byte[serialPort.BytesToRead];
-                serialPort.Read(data, 0, data.Length);
-
-                if (debugMode == DebugMode.Verbose) {
-                    NotifyDebugMessage(Utils.ByteArrayToString(data)+" ");
-                }
+                serialPort.Read(data, 0, data.Length);                
 
                 lock (dataLock)
                 {
                     if(data.Length > 0)
                     {
+                        if (debugMode == DebugMode.Verbose)
+                        {
+                            // NotifyDebugMessage(Utils.ByteArrayToString(data));
+                            Logger.LogMessageToFile(Utils.ByteArrayToString(data));
+                        }
                         processData(data);
                     }
                 }
