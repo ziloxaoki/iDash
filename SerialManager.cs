@@ -15,7 +15,8 @@ namespace iDash
         private const int BUFFER_SIZE = 40;
         private const int WAIT_TO_RECONNECT = 300;
         private const int WAIT_SERIAL_CONNECT = 3000;
-        private const int WAIT_TO_SEND_SYN_ACK = 2000;
+        //arduino will wait 5 secs for a SYN ACK
+        private const int WAIT_TO_SEND_SYN_ACK = 500;
         private const int ARDUINO_TIMED_OUT = 5000;
 
         private int commandLength;        
@@ -152,7 +153,7 @@ namespace iDash
                 }
                 if (debugMode != DebugMode.None || isArduinoInDebugMode)
                 {
-                    NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.ByteArrayToString(command.getRawData()), type));
+                    NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData()), type));
                 }
             }
         }      
@@ -250,8 +251,8 @@ namespace iDash
                     {
                         if (debugMode == DebugMode.Verbose)
                         {
-                            // NotifyDebugMessage(Utils.ByteArrayToString(data));
-                            Logger.LogMessageToFile(Utils.ByteArrayToString(data));
+                            // NotifyDebugMessage(Utils.byteArrayToString(data));
+                            Logger.LogMessageToFile(Utils.byteArrayToString(data));
                         }
                         processData(data);
                     }

@@ -108,54 +108,12 @@ namespace iDash
         public const byte TM1637_CHAR_R_ACCON = 79;
         public const byte TM1637_CHAR_TILDE = 64;
 
-
-        public static string ByteArrayToString(byte[] ba)
-        {
-            if (ba != null && ba.Length > 0)
-            {
-                string hex = BitConverter.ToString(ba);
-                return hex.Replace("-", "");
-            }
-
-            return "empty";
-        }
-
-        public static void resetArray(byte[] array)
-        {
-            for(int i = 0; i < array.Length; i++)
-            {
-                array[i] = 0;
-            }
-        }
-
-        public static T[] getSubArray<T>(T[] array, int from, int length)
-        {
-            T[] result = new T[length];
-            Array.Copy(array, from, result, 0, length);
-
-            return result;
-        }
-
-        public static long getCurrentTimeMillis()
-        {
-            return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        }
-
-        public static bool hasTimedOut(long startTime, long millisec)
-        {
-            return getCurrentTimeMillis() - startTime > millisec; 
-        }
-
-        public static string byteArrayToStr(byte[] array)
-        {
-            return System.Text.Encoding.Default.GetString(array);
-        } 
-
         public static byte convertByteTo7Segment(byte b)
         {
-            switch (b) {
-                //case (byte)':':
-                //    return TM1637_COLON_BIT; // 128
+            switch (b)
+            {
+                case (byte)'.':
+                    return TM1637_COLON_BIT; // 128
                 case (byte)' ':
                     return TM1637_CHAR_SPACE; // 0
                 case (byte)'!':
@@ -184,8 +142,8 @@ namespace iDash
                     return TM1637_CHAR_COMMA; // 16
                 case (byte)'-':
                     return TM1637_CHAR_MIN; // 64
-                case (byte)'.':
-                    return TM1637_CHAR_DOT; // 8
+                //case (byte)'.':
+                //    return TM1637_CHAR_DOT; // 8
                 case (byte)'/':
                     return TM1637_CHAR_F_SLASH; // 6
                 case (byte)'0':
@@ -351,19 +309,89 @@ namespace iDash
             return 0;
         }
 
+
+        public static string byteArrayToString(byte[] ba)
+        {
+            if (ba != null && ba.Length > 0)
+            {
+                string hex = BitConverter.ToString(ba);
+                return hex.Replace("-", "");
+            }
+
+            return "empty";
+        }
+
+        public static void resetArray(byte[] array)
+        {
+            for(int i = 0; i < array.Length; i++)
+            {
+                array[i] = 0;
+            }
+        }
+
+        public static T[] getSubArray<T>(T[] array, int from, int length)
+        {
+            T[] result = new T[length];
+            Array.Copy(array, from, result, 0, length);
+
+            return result;
+        }
+
+        public static long getCurrentTimeMillis()
+        {
+            return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        }
+
+        public static bool hasTimedOut(long startTime, long millisec)
+        {
+            return getCurrentTimeMillis() - startTime > millisec; 
+        }
+
+        public static string byteArrayToStr(byte[] array)
+        {
+            return System.Text.Encoding.Default.GetString(array);
+        }
+
+        public static byte[] getBytes(string str)
+        {
+            return Encoding.ASCII.GetBytes(str);
+        }        
+
+        public static int Count(byte[] array, byte val)
+        {
+            int result = 0;
+            foreach (byte b in array) {
+                if (b == val) result++;
+            }
+
+            return result;
+        }
+
         public static byte[] convertByteTo7Segment(byte[] content, int offset)
         {
-            byte[] result = new byte[content.Length - offset];
-            for(int x = offset; x < content.Length; x++)
-            {
-                result[x] = convertByteTo7Segment(content[x]);
+            byte[] result = null;
+            int pos = 0;
+
+            if (content != null) {
+                var count = Count(content, (byte)'.');
+                result = new byte[content.Length - offset - count];
+                for (int x = offset; x < content.Length; x++)
+                {
+                    if (x < content.Length - 2 && content[x + 1] == (byte)'.')
+                    {
+                        result[pos++] = (byte)(convertByteTo7Segment(content[x++]) + 128);
+                    } else
+                    {
+                        result[pos++] = convertByteTo7Segment(content[x]);
+                    }
+                }
             }
 
             return result;
         }
 
 
-        public static string GetIntBinaryString(int n)
+        public static string getIntBinaryString(int n)
         {
             char[] b = new char[8];
             int pos = 7;

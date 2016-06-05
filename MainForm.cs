@@ -56,10 +56,9 @@ namespace iDash
             sm.Init();
             vf.InitializeJoystick();
             irc = new IRacingConnector(sm);
+            irc.StatusMessageSubscribers += UpdateStatusBar;
         }
-    
-
-
+   
         private void saveAppSettings()
         {
             Properties.Settings.Default.TM1637 = new ArrayList(views.Items);
@@ -80,6 +79,7 @@ namespace iDash
             sm.StatusMessageSubscribers -= UpdateStatusBar;
             vf.StatusMessageSubscribers -= UpdateStatusBar;
             sm.DebugMessageSubscribers -= UpdateDebugData;
+            irc.StatusMessageSubscribers -= UpdateStatusBar;
 
             saveAppSettings();
 
@@ -369,6 +369,8 @@ namespace iDash
                 {
                     selected.Items.Add(selectedValue[i]);
                 }
+
+                irc.UpdateViewSelected(views.GetItemText(views.SelectedIndex));
             }
         }
 
@@ -384,6 +386,29 @@ namespace iDash
                 {
                     selected2.Items.Add(selectedValue[i]);
                 }
+            }
+        }
+
+        public void setNextView()
+        {
+            if (views.SelectedIndex < views.Items.Count - 1)
+            {
+                views.SelectedIndex++;
+            } else
+            {
+                views.SelectedIndex = 0;
+            }
+        }
+
+        public void setPreviousView()
+        {
+            if (views.SelectedIndex > 0)
+            {
+                views.SelectedIndex--;
+            }
+            else
+            {
+                views.SelectedIndex = views.Items.Count - 1;
             }
         }
     }

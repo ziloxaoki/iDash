@@ -1,33 +1,68 @@
-﻿using System;
+﻿using iRSDKSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Management;
 
 namespace iDash
 {
     class IRacingConnector
     {
         private SerialManager sm;
+        private iRacingSDK sdk;
+        private string views;
+
+        public delegate void StatusMessageHandler(string m);
+        public StatusMessageHandler StatusMessageSubscribers;
 
         public IRacingConnector(SerialManager sm)
         {
             this.sm = sm;
-            new Thread(new ThreadStart(sendToArduino)).Start();
+            sdk = new iRacingSDK();
+            new Thread(new ThreadStart(start)).Start();
         }
 
-        private async void sendToArduino()
+        private async void start()
         {
-            int x = 0;
+            StringBuilder msg = new StringBuilder();
             while (!MainForm.stopThreads)
-            {                
-                byte b = (byte)(57 + (x % 2));
-                Command c = new Command((byte)'B', new byte[] { 91, 91, 91, b, 91, 91, 91, 91, 91, 91, 91, b, 91, 91, 91, 91, 91, 91, 91, b});
+            {
+                msg.Clear();
+                if (sdk.IsConnected())
+                {
+                    NotifyStatusMessage("Connected to iRacing.");
+                }
+                else
+                {
+                    msg.Append("-OFF.");
+                    msg.Append(DateTime.Now.ToString("dd.MM.yyyy"));
+                    msg.Append(DateTime.Now.ToString("hh.mm.ss.ff"));                                        
+                }
+
+                byte[] b = Utils.getBytes(msg.ToString());
+                Command c = new Command((byte)'B', Utils.convertByteTo7Segment(b, 0));
                 sm.sendCommand(c);
-                await Task.Delay(100);
-                x++;
+                await Task.Delay(10);
             }
+        }
+
+        //notify subscribers (statusbar) that a message has to be logged
+        public void NotifyStatusMessage(string args)
+        {
+            StatusMessageHandler handler = StatusMessageSubscribers;
+
+            if (handler != null)
+            {
+                handler(args + "\n");
+            }
+        }
+
+        public void UpdateViewSelected(string s)
+        {
+            views = s;
         }
     }
 }

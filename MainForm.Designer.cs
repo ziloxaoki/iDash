@@ -1,4 +1,6 @@
-﻿namespace iDash
+﻿using System;
+
+namespace iDash
 {
     partial class MainForm
     {
@@ -18,7 +20,7 @@
                 components.Dispose();
             }
             base.Dispose(disposing);
-        }
+        }        
 
         #region Windows Form Designer generated code
 
@@ -300,10 +302,9 @@
             this.views.FormattingEnabled = true;
             this.views.Location = new System.Drawing.Point(840, 215);
             this.views.Name = "views";
-            this.views.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.views.Size = new System.Drawing.Size(643, 498);
             this.views.TabIndex = 2;
-            this.views.SelectedIndexChanged += new System.EventHandler(this.views_SelectedIndexChanged);            
+            this.views.SelectedIndexChanged += new System.EventHandler(this.views_SelectedIndexChanged);
             // 
             // selected
             // 

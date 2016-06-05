@@ -144,8 +144,8 @@ int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
 int BUTTON_LIMITS[8][4][2] = {{{400, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
                               {{400, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
-                              {{450, 580}, {590, 650}, {655, 700}, {705, 745}},   //A5 Extra 1 - INPUT
-                              {{450, 580}, {590, 650}, {655, 700}, {705, 745}},   //A4 Extra 2 - INPUT                 
+                              {{450, 510}, {550, 610}, {630, 677}, {678, 745}},   //A5 Extra 1 - INPUT
+                              {{450, 510}, {550, 610}, {630, 677}, {678, 745}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
@@ -195,6 +195,11 @@ byte MAX7221_ByteReorder(byte x)
   x = ((x >> 2) & 0x33) | ((x << 2) & 0xcc);
   x = ((x >> 4) & 0x0f) | ((x << 4) & 0xf0);
   return (x >> 1) | ((x & 1) << 7);
+}
+
+void resetTM1637_MAX7221() {
+  byte v[] = {' ',' ',0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111};
+  sentToTM1637_MAX7221(v);
 }
 
 void sentToTM1637_MAX7221(byte *buffer) {
@@ -340,7 +345,10 @@ int sendAnalogState(int offset, byte *response) {
   for(int i = 0; i < EXTRA_BUTTONS_TOTAL; i++) {
     // read the state of the switch into a local variable:
     int reading = analogRead(EXTRA_BUTTONS_INIT[i][0]); 
-
+/*if(i == 2 || i == 3) {
+  Serial.println(reading);
+  delay(500);    
+}*/
     for(int x = 0; x < MAXIMUM_BUTTONS_PER_ANALOG; x++) {
       int tmpButtonState = LOW;             // the current reading from the input pin
 
@@ -465,6 +473,8 @@ void processData() {
       break;
     }
   }
+  //byte t[] = {'^','B',91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91};
+  //processCommand(t);
 }
 
 void sendDebugModeState(byte state) {
@@ -515,6 +525,7 @@ void loop() {
 //    Serial.println(freeMemory());
   //haven't received Syn Ack from IDash for too long
   if(millis() - lastSynAck > 5000) {
+    resetTM1637_MAX7221();
     isConnected = false;    
     sendHandshacking();
     delay(300);
