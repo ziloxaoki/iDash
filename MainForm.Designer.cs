@@ -458,7 +458,26 @@ namespace iDash
             "CarIdxPosition",
             "CarIdxRPM",
             "CarIdxSteer",
-            "CarIdxTrackSurface"});
+            "CarIdxTrackSurface",
+            "DriverInfo:DriverCarIdx",
+            "DriverInfo:DriverHeadPosX",
+            "DriverInfo:DriverHeadPosY",
+            "DriverInfo:DriverHeadPosZ",
+            "DriverInfo:DriverCarIdleRPM",
+            "DriverInfo:DriverCarRedLine",
+            "DriverInfo:DriverCarFuelKgPerLtr",
+            "DriverInfo:DriverCarFuelMaxLtr",
+            "DriverInfo:DriverCarMaxFuelPct",
+            "DriverInfo:DriverCarSLFirstRPM",
+            "DriverInfo:DriverCarSLShiftRPM",
+            "DriverInfo:DriverCarSLLastRPM",
+            "DriverInfo:DriverCarSLBlinkRPM",
+            "DriverInfo:DriverPitTrkPct",
+            "DriverInfo:DriverCarEstLapTime",
+            "DriverInfo:DriverSetupName",
+            "DriverInfo:DriverSetupIsModified",
+            "DriverInfo:DriverSetupLoadTypeName",
+            "DriverInfo:DriverSetupPassedTech"});
             this.props.Location = new System.Drawing.Point(6, 6);
             this.props.Name = "props";
             this.props.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;

@@ -18,6 +18,7 @@ namespace iDash
         public const byte CMD_SYN = (byte)'A'; //65d 41h
         public const byte CMD_7_SEGS = (byte)'B'; //66d 42h
         public const byte CMD_SYN_ACK = (byte)'a'; //97d 61h
+        public const byte CMD_RGB_SHIFT = (byte)'C'; //67d 43h
         public const byte CMD_BUTTON_STATUS = (byte)'D'; //68d 44h
 
         public Command(byte[] buffer)

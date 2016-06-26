@@ -199,24 +199,49 @@ byte MAX7221_ByteReorder(byte x)
 
 void resetTM1637_MAX7221() {
   byte v[] = {' ',' ',0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111};
-  sentToTM1637_MAX7221(v);
+  sendToTM1637_MAX7221(v);
 }
 
-void sentToTM1637_MAX7221(byte *buffer) {
+void resetWS2812B() {
+  byte v[] = {' ',' ',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; 
+  sendToWS2812B(v);
+}
+
+void sendToTM1637_MAX7221(byte *buffer) {
   //first char(0) is the command start and second char is the command header 
-  int k = 2;  
+  uint8_t k = 2;  
 
   // TM1637
-  for (int i = 0; i < TM1637_ENABLEDMODULES ; i++) {
+  for (uint8_t i = 0; i < TM1637_ENABLEDMODULES ; i++) {
     TM1637_screens[i]->setSegments(buffer,2,4,0);
     k += 4;
   }
   
   // MAX7221
-  for (int i = 0; i < MAX7221_ENABLEDMODULES; i++) {     
-    for (int j = 0; j < 8; j++) {
+  for (uint8_t i = 0; i < MAX7221_ENABLEDMODULES; i++) {     
+    for (uint8_t j = 0; j < 8; j++) {
       MAX7221.setRow(i, 7 - j, MAX7221_ByteReorder(buffer[k++]));
     }
+  }
+}
+
+void sendToWS2812B(byte *buffer) {
+  //first char(0) is the command start and second char is the command header 
+  uint8_t k = 2;
+  for (uint8_t j = 0; j < WS2812B_RGBLEDCOUNT; j++) {
+    uint8_t r = buffer[k++];    
+    uint8_t g = buffer[k++];
+    uint8_t b = buffer[k++];
+    if (WS2812B_RIGHTTOLEFT == 1) {
+      WS2812B_strip.setPixelColor(WS2812B_RGBLEDCOUNT - j - 1, r, g, b);
+    }
+    else {
+      WS2812B_strip.setPixelColor(j, r, g, b);
+    }
+  }
+  
+  if (WS2812B_RGBLEDCOUNT > 0) {
+    WS2812B_strip.show();
   }
 }
 
@@ -234,7 +259,8 @@ void setup()
   
   // WS2812B INIT
   if (WS2812B_RGBLEDCOUNT > 0) {
-    WS2812B_strip.begin();
+    WS2812B_strip.setBrightness(16);
+    WS2812B_strip.begin();    
     WS2812B_strip.show();
   }
 
@@ -391,7 +417,7 @@ int calculateCrc(int dataLength, byte *response) {
 }
 
 void sendDataToSerial(int commandLength, byte *response) {
-  if(!isDebugMode || millis() - lastMessageSent > 1000 || response[1] == 0x01) {
+  if(!isDebugMode || millis() - lastMessageSent > 1000 || response[1] == 0x01 || response[1] == 'C') {
     Serial.write(response, commandLength);
     lastMessageSent = millis();
   }
@@ -399,7 +425,7 @@ void sendDataToSerial(int commandLength, byte *response) {
   Serial.flush();
 }
 
-void processCommand(byte *buffer) {  
+void processCommand(byte *buffer, int commandLength) {  
   //debug
   switch(buffer[1]) {
     case 0x01 :
@@ -419,7 +445,12 @@ void processCommand(byte *buffer) {
       break;
 
     case 'B' :    
-      sentToTM1637_MAX7221(buffer);         
+      sendToTM1637_MAX7221(buffer);         
+      break;
+
+    case 'C' :
+      sendToWS2812B(buffer);
+      //sendDataToSerial(commandLength,buffer);
       break;
   }  
   buffer[0] = 0;
@@ -466,7 +497,7 @@ void processData() {
       int crc = calculateCrc(commandLength, buffer); 
 
       if(crc == buffer[commandLength]) {    
-        processCommand(buffer);     
+        processCommand(buffer, commandLength);     
       }
     }
     if(millis() - startReading > 10) {
@@ -474,7 +505,8 @@ void processData() {
     }
   }
   //byte t[] = {'^','B',91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91};
-  //processCommand(t);
+  //byte s[] = {'^','C',255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,129,10};
+  //processCommand(s);
 }
 
 void sendDebugModeState(byte state) {
@@ -524,13 +556,14 @@ void loop() {
 //    Serial.print("freeMemory()=");
 //    Serial.println(freeMemory());
   //haven't received Syn Ack from IDash for too long
-  if(millis() - lastSynAck > 5000) {
+  if(millis() - lastSynAck > 5000 || !isConnected) {
     resetTM1637_MAX7221();
+    resetWS2812B();
     isConnected = false;    
     sendHandshacking();
-    delay(300);
+    delay(50);
   }
-
+  
   processData();
 
   if(isConnected) {

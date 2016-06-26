@@ -98,7 +98,7 @@ namespace iDash
 
             }  
             //could not find arduino keep trying to find it
-            if(!isArduinoAlive())
+            if(!isArduinoAlive() && !MainForm.stopThreads)
             {
                 this.tryToConnect();
             }

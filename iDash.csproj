@@ -147,6 +147,10 @@
     <None Include="Resources\arrowup.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\iRacingSdkWrapper-master\iRacingSdkWrapper\iRacingSdkWrapper.csproj">
+      <Project>{d6db568b-35b3-49eb-8cb3-e4e5f1424247}</Project>
+      <Name>iRacingSdkWrapper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\iRacingSdkWrapper-master\irsdkSharp\iRSDKSharp.csproj">
       <Project>{72631b85-eb9a-473e-9b4c-65b355a9000d}</Project>
       <Name>iRSDKSharp</Name>
@@ -157,7 +161,8 @@
     <PostBuildEvent>copy $(SolutionDir)\packages\vJoyInterface.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRacingSdkWrapper.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRSDKSharp.dll  $(TargetDir).
-copy $(SolutionDir)\packages\YamlDotNet.dll  $(TargetDir).</PostBuildEvent>
+copy $(SolutionDir)\packages\YamlDotNet.dll  $(TargetDir).
+copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

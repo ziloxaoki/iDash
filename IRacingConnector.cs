@@ -1,4 +1,5 @@
 ﻿using iRSDKSharp;
+using iRacingSdkWrapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,26 +13,36 @@ namespace iDash
     class IRacingConnector
     {
         private SerialManager sm;
-        private iRacingSDK sdk;
         private string views;
 
         public delegate void StatusMessageHandler(string m);
         public StatusMessageHandler StatusMessageSubscribers;
+        // Globally declared SdkWrapper object
+        private readonly SdkWrapper wrapper;
 
         public IRacingConnector(SerialManager sm)
         {
             this.sm = sm;
-            sdk = new iRacingSDK();
+
+            // Create instance
+            wrapper = new SdkWrapper();
+            // Listen to events
+            wrapper.TelemetryUpdated += OnTelemetryUpdated;
+            wrapper.SessionInfoUpdated += OnSessionInfoUpdated;
+            // Start it if Arduino is Connected
+            wrapper.Start();
+
             new Thread(new ThreadStart(start)).Start();
         }
 
         private async void start()
         {
             StringBuilder msg = new StringBuilder();
+            byte[] rpm = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
             while (!MainForm.stopThreads)
             {
                 msg.Clear();
-                if (sdk.IsConnected())
+                if (wrapper.IsConnected)
                 {
                     NotifyStatusMessage("Connected to iRacing.");
                 }
@@ -43,10 +54,28 @@ namespace iDash
                 }
 
                 byte[] b = Utils.getBytes(msg.ToString());
-                Command c = new Command((byte)'B', Utils.convertByteTo7Segment(b, 0));
+                Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
                 sm.sendCommand(c);
+                //c = new Command(Command.CMD_RGB_SHIFT, rpm);
+                //sm.sendCommand(c);
                 await Task.Delay(10);
             }
+
+            wrapper.Stop();
+        }
+
+        private void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
+        {
+            YamlQuery yq = e.SessionInfo["DriverInfo"]["DriverCarSLBlinkRPM"];
+            if (yq != null)
+            {
+                string shift = yq.Value;
+            }
+        }
+
+        private void OnTelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        {
+            string rpm = e.TelemetryInfo.RPM.Value.ToString();
         }
 
         //notify subscribers (statusbar) that a message has to be logged
