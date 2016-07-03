@@ -498,6 +498,11 @@ void processData() {
 
       if(crc == buffer[commandLength]) {    
         processCommand(buffer, commandLength);     
+      } else {
+        if(isDebugMode) {
+          Serial.write(0xEF);
+          sendDataToSerial(commandLength, buffer);
+        }
       }
     }
     if(millis() - startReading > 10) {

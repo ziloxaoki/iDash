@@ -10,7 +10,6 @@ namespace iDash
     {
 
         int bs = 0;
-        private System.Timers.Timer timer1;
 
         private const int BUFFER_SIZE = 40;
         private const int WAIT_TO_RECONNECT = 300;
@@ -41,8 +40,8 @@ namespace iDash
         {
             serialPort.Parity = Parity.None;     //selected parity 
             serialPort.StopBits = StopBits.One;  //selected stopbits
-            serialPort.DataBits = 8;                           //selected data bits
-            serialPort.BaudRate = 38400;                             //selected baudrate            
+            serialPort.DataBits = 8;             //selected data bits
+            serialPort.BaudRate = 38400;         //selected baudrate            
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler  
 
             new Thread(new ThreadStart(start)).Start();            
