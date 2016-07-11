@@ -11,8 +11,12 @@ namespace iDash
 
     class Utils
     {
+        public const char LIST_SEPARATOR = ',';
+        public const char ITEM_SEPARATOR = ';';
+
         public const byte TM1637_COLON_BIT = 128;
-        public const byte TM1637_CHAR_SPACE = 0;
+        //public const byte TM1637_CHAR_SPACE = 0;
+        public const byte TM1637_CHAR_SPACE = TM1637_CHAR_S_COLON;
         public const byte TM1637_CHAR_EXC = 6;
         public const byte TM1637_CHAR_D_QUOTE = 34;
         public const byte TM1637_CHAR_POUND = 118;

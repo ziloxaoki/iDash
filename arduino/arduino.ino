@@ -220,7 +220,13 @@ void sendToTM1637_MAX7221(byte *buffer) {
   // MAX7221
   for (uint8_t i = 0; i < MAX7221_ENABLEDMODULES; i++) {     
     for (uint8_t j = 0; j < 8; j++) {
-      MAX7221.setRow(i, 7 - j, MAX7221_ByteReorder(buffer[k++]));
+      //48 used as white space because 0 is used as end of msg
+      if(buffer[k] == 48) {
+        MAX7221.setRow(i, 7 - j, 0);
+        k++;
+      } else {
+        MAX7221.setRow(i, 7 - j, MAX7221_ByteReorder(buffer[k++]));
+      }
     }
   }
 }

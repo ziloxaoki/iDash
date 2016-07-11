@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using vJoyInterfaceWrap;
 
 namespace iDash
-{    
+{
 
     public partial class MainForm : Form
     {
@@ -29,7 +25,9 @@ namespace iDash
         public delegate void AppendToDebugDialogDelegate(String s);
         public AppendToDebugDialogDelegate appendToDebugDialog;
         public static bool stopThreads = false;
-
+        private static List<string> _7Segment = new List<string>();
+        private static string strFormat = "";
+        private static readonly Object listLock = new Object();
 
         public MainForm()
         {
@@ -48,8 +46,8 @@ namespace iDash
             }
 
             sm = new SerialManager();
-            bh = new ButtonHandler(sm);
-            vf = new VJoyFeeder(bh);            
+            bh = new ButtonHandler(sm, this);
+            vf = new VJoyFeeder(bh);
             sm.StatusMessageSubscribers += UpdateStatusBar;
             vf.StatusMessageSubscribers += UpdateStatusBar;
             sm.DebugMessageSubscribers += UpdateDebugData;
@@ -57,8 +55,37 @@ namespace iDash
             vf.InitializeJoystick();
             irc = new IRacingConnector(sm);
             irc.StatusMessageSubscribers += UpdateStatusBar;
+
+            if (this.views.Items.Count > 0)
+            {
+                this.views.SelectedIndex = 0;
+                this.parseViews();
+            }
         }
-   
+
+        private void parseViews()
+        {
+            if (this.views.Items.Count > 0)
+            {
+                string[] items = this.views.SelectedItem.ToString().Split(Utils.LIST_SEPARATOR);
+                //ignoring "when connected" flag
+                for (int x = 0; x < items.Length - 1; x++)
+                {
+                    if (x == items.Length - 2)
+                    {
+                        strFormat = items[x];
+                    }
+                    else
+                    {
+                        lock (listLock)
+                        {
+                            _7Segment.Add(items[x]);
+                        }
+                    }
+                }
+            }
+        }
+
         private void saveAppSettings()
         {
             Properties.Settings.Default.TM1637 = new ArrayList(views.Items);
@@ -142,11 +169,11 @@ namespace iDash
             {
                 sm.sendCommand(command);     //transmit data
                 await Task.Delay(WAIT_ARDUINO_SET_DEBUG_MODE);
-            }            
+            }
         }
 
         private void debugData_TextChanged(object sender, EventArgs e)
-        {            
+        {
             // set the current caret position to the end
             debugData.SelectionStart = statusBar.Text.Length;
             // scroll it automatically
@@ -170,7 +197,7 @@ namespace iDash
             ms.WriteTo(f);
             f.Close();
             ms.Close();
-            
+
             // Finally Show the Created PDF from resources
             Process.Start("telemetry_11_23_15.pdf");
         }
@@ -179,7 +206,7 @@ namespace iDash
         {
             foreach (string item in props.SelectedItems)
             {
-                if(!selected.Items.Contains(item))
+                if (!selected.Items.Contains(item))
                 {
                     selected.Items.Add(item);
                 }
@@ -249,7 +276,7 @@ namespace iDash
 
             foreach (string item in selected.Items)
             {
-                viewValue += item + ",";                
+                viewValue += item + ",";
             }
             if (viewValue != null && viewValue.Length > 0)
             {
@@ -263,7 +290,7 @@ namespace iDash
 
         private void button6_Click(object sender, EventArgs e)
         {
-            if(views.SelectedIndex > 0)
+            if (views.SelectedIndex > 0)
             {
                 this.MoveItem(views, -1);
             }
@@ -361,7 +388,7 @@ namespace iDash
         {
             if (views.SelectedIndex >= 0)
             {
-                string[] selectedValue = views.SelectedItem.ToString().Split(',');
+                string[] selectedValue = views.SelectedItem.ToString().Split(Utils.LIST_SEPARATOR);
                 isSimConnected.Checked = Convert.ToBoolean(selectedValue[selectedValue.Length - 1]);
                 textFormat.Text = selectedValue[selectedValue.Length - 2];
                 selected.Items.Clear();
@@ -378,7 +405,7 @@ namespace iDash
         {
             if (views2.SelectedIndex >= 0)
             {
-                string[] selectedValue = views2.SelectedItem.ToString().Split(',');
+                string[] selectedValue = views2.SelectedItem.ToString().Split(Utils.LIST_SEPARATOR);
                 isSimConnected2.Checked = Convert.ToBoolean(selectedValue[selectedValue.Length - 1]);
                 textFormat2.Text = selectedValue[selectedValue.Length - 2];
                 selected2.Items.Clear();
@@ -394,10 +421,13 @@ namespace iDash
             if (views.SelectedIndex < views.Items.Count - 1)
             {
                 views.SelectedIndex++;
-            } else
+            }
+            else
             {
                 views.SelectedIndex = 0;
             }
+
+            this.parseViews();
         }
 
         public void setPreviousView()
@@ -410,6 +440,21 @@ namespace iDash
             {
                 views.SelectedIndex = views.Items.Count - 1;
             }
+
+            this.parseViews();
+        }
+
+        public static List<string> get_7SegmentData()
+        {
+            lock (listLock)
+            {
+                return _7Segment;
+            }
+        }
+
+        public static string getStrFormat()
+        {
+            return strFormat;
         }
     }
 }

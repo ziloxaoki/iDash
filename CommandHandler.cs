@@ -8,10 +8,12 @@ namespace iDash
 {
     abstract class CommandHandler
     {
-        SerialManager sm;
+        private MainForm mainForm;
+        private SerialManager sm;
 
-        public CommandHandler(SerialManager sm)
+        public CommandHandler(SerialManager sm, MainForm mainForm)
         {
+            this.mainForm = mainForm;
             this.sm = sm;
         }
     }

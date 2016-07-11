@@ -61,7 +61,7 @@ namespace iDash
         public delegate void ButtonStateHandler(byte[] states);
         public ButtonStateHandler ButtonStateSubscribers;
 
-        public ButtonHandler(SerialManager sm) : base(sm) {
+        public ButtonHandler(SerialManager sm, MainForm mainForm) : base(sm, mainForm) {
             sm.CommandReceivedSubscribers += new SerialManager.CommandReceivedHandler(executeCommand);            
         }
 
