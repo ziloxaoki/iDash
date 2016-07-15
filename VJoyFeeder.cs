@@ -112,7 +112,7 @@ namespace iDash
         {
             for (uint i = 0; i < states.Count; i++)
             {
-                joystick.SetBtn(states[(int)i] == State.KeyUp, jID, i + 1);
+                joystick.SetBtn(states[(int)i] == State.KeyDown || states[(int)i] == State.KeyHold, jID, i + 1);
             }
         }
 
