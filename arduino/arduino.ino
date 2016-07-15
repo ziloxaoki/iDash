@@ -144,8 +144,8 @@ int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
 int BUTTON_LIMITS[8][4][2] = {{{400, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
                               {{400, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
-                              {{450, 510}, {550, 610}, {630, 677}, {678, 745}},   //A5 Extra 1 - INPUT
-                              {{450, 510}, {550, 610}, {630, 677}, {678, 745}},   //A4 Extra 2 - INPUT                 
+                              {{450, 510}, {550, 610}, {615, 650}, {655, 745}},   //A5 Extra 1 - INPUT
+                              {{450, 510}, {550, 610}, {615, 650}, {655, 745}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
@@ -204,6 +204,11 @@ void resetTM1637_MAX7221() {
 
 void resetWS2812B() {
   byte v[] = {' ',' ',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; 
+  sendToWS2812B(v);
+}
+
+void testWS2812B() {
+  byte v[] = {'^','C', 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
   sendToWS2812B(v);
 }
 
@@ -570,9 +575,10 @@ void loop() {
   if(millis() - lastSynAck > 5000 || !isConnected) {
     resetTM1637_MAX7221();
     resetWS2812B();
+    //testWS2812B();
     isConnected = false;  
     isDebugMode = false;  
-    sendHandshacking();
+    sendHandshacking();    
     delay(50);
   }
   
@@ -581,4 +587,5 @@ void loop() {
   if(isConnected) {
     sendButtonStatus(); 
   }  
+
 }
