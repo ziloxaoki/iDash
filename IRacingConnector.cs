@@ -1,22 +1,19 @@
-﻿using iRSDKSharp;
-using iRacingSdkWrapper;
+﻿using iRacingSdkWrapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Management;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace iDash
 {
-    class IRacingConnector
+    public class IRacingConnector
     {
         private SerialManager sm;
         private string views;
-        private byte[] colourPattern = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
+        private readonly byte[] colourPattern = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
         private float firstRpm = 0;
         private float lastRpm = 0;
         private float currentRpm = 0;
@@ -90,28 +87,7 @@ namespace iDash
         }
 
 
-        private string formatString(string text, string pattern) 
-        {
-            string[] index = pattern.Split('=');
-
-            if (index.Length > 1) {
-                if (index[0].StartsWith("pl") || index[0].StartsWith("pr"))
-                {
-                    string[] par = index[1].Split('&');
-                    if (par.Length != 2)
-                        return text;
-                    if(index[0].StartsWith("pl"))
-                        return text.PadLeft(Int32.Parse(par[0]), par[1][0]);
-                    return text.PadRight(Int32.Parse(par[0]), par[1][0]);
-                }
-                if (index[0].StartsWith("@"))
-                {
-                    return Regex.Replace(text, index[0], index[1]);
-                }                              
-            }
-
-            return String.Format(pattern, text);
-        }
+        
 
         //needs to wait until MainForm 7Segment is loaded
         private void send7SegmentMsg()
@@ -229,7 +205,7 @@ namespace iDash
 
                     if (!String.IsNullOrEmpty(value))
                     {                        
-                        value = formatString(value, strPattern);
+                        value = Utils.formatString(value, strPattern);
                     }
                 }
             }          

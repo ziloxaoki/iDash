@@ -570,7 +570,8 @@ void loop() {
   if(millis() - lastSynAck > 5000 || !isConnected) {
     resetTM1637_MAX7221();
     resetWS2812B();
-    isConnected = false;    
+    isConnected = false;  
+    isDebugMode = false;  
     sendHandshacking();
     delay(50);
   }

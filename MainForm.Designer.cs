@@ -55,33 +55,30 @@ namespace iDash
             this.views = new System.Windows.Forms.ListBox();
             this.selected = new System.Windows.Forms.ListBox();
             this.props = new System.Windows.Forms.ListBox();
-            this.max7221 = new System.Windows.Forms.TabPage();
+            this.buttons = new System.Windows.Forms.TabPage();
+            this.button9 = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.button10 = new System.Windows.Forms.Button();
             this.button12 = new System.Windows.Forms.Button();
             this.button13 = new System.Windows.Forms.Button();
             this.button14 = new System.Windows.Forms.Button();
             this.button15 = new System.Windows.Forms.Button();
             this.button16 = new System.Windows.Forms.Button();
-            this.button17 = new System.Windows.Forms.Button();
             this.button18 = new System.Windows.Forms.Button();
-            this.isSimConnected2 = new System.Windows.Forms.CheckBox();
-            this.textFormat2 = new System.Windows.Forms.TextBox();
             this.views2 = new System.Windows.Forms.ListBox();
-            this.selected2 = new System.Windows.Forms.ListBox();
-            this.props2 = new System.Windows.Forms.ListBox();
+            this.buttonActions = new System.Windows.Forms.ListBox();
+            this.buttonsActive = new System.Windows.Forms.ListBox();
             this.debugTab = new System.Windows.Forms.TabPage();
             this.label2 = new System.Windows.Forms.Label();
             this.debugModes = new System.Windows.Forms.ComboBox();
             this.clearData = new System.Windows.Forms.Button();
             this.debugData = new System.Windows.Forms.RichTextBox();
             this.statusBar = new System.Windows.Forms.RichTextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tm1637.SuspendLayout();
-            this.max7221.SuspendLayout();
+            this.buttons.SuspendLayout();
             this.debugTab.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -137,7 +134,7 @@ namespace iDash
             // 
             this.tabControl1.Alignment = System.Windows.Forms.TabAlignment.Left;
             this.tabControl1.Controls.Add(this.tm1637);
-            this.tabControl1.Controls.Add(this.max7221);
+            this.tabControl1.Controls.Add(this.buttons);
             this.tabControl1.Location = new System.Drawing.Point(-4, 0);
             this.tabControl1.Multiline = true;
             this.tabControl1.Name = "tabControl1";
@@ -145,6 +142,7 @@ namespace iDash
             this.tabControl1.Size = new System.Drawing.Size(1568, 733);
             this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.tabControl1.TabIndex = 0;
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // tm1637
             // 
@@ -205,7 +203,7 @@ namespace iDash
             // button7
             // 
             this.button7.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.button7.Location = new System.Drawing.Point(1312, 144);
+            this.button7.Location = new System.Drawing.Point(1328, 144);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(33, 48);
             this.button7.TabIndex = 13;
@@ -214,10 +212,10 @@ namespace iDash
             // 
             // button8
             // 
-            this.button8.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.button8.Location = new System.Drawing.Point(1254, 144);
+            this.button8.Image = global::iDash.Properties.Resources.bin;
+            this.button8.Location = new System.Drawing.Point(1489, 664);
             this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(33, 48);
+            this.button8.Size = new System.Drawing.Size(46, 48);
             this.button8.TabIndex = 12;
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
@@ -285,7 +283,7 @@ namespace iDash
             // isSimConnected
             // 
             this.isSimConnected.AutoSize = true;
-            this.isSimConnected.Location = new System.Drawing.Point(1085, 161);
+            this.isSimConnected.Location = new System.Drawing.Point(1389, 162);
             this.isSimConnected.Name = "isSimConnected";
             this.isSimConnected.Size = new System.Drawing.Size(109, 17);
             this.isSimConnected.TabIndex = 5;
@@ -296,7 +294,7 @@ namespace iDash
             // 
             this.textFormat.Location = new System.Drawing.Point(906, 159);
             this.textFormat.Name = "textFormat";
-            this.textFormat.Size = new System.Drawing.Size(162, 20);
+            this.textFormat.Size = new System.Drawing.Size(400, 20);
             this.textFormat.TabIndex = 4;
             // 
             // label3
@@ -585,30 +583,37 @@ namespace iDash
             this.props.Size = new System.Drawing.Size(695, 706);
             this.props.TabIndex = 0;
             // 
-            // max7221
+            // buttons
             // 
-            this.max7221.Controls.Add(this.label5);
-            this.max7221.Controls.Add(this.label4);
-            this.max7221.Controls.Add(this.button10);
-            this.max7221.Controls.Add(this.button12);
-            this.max7221.Controls.Add(this.button13);
-            this.max7221.Controls.Add(this.button14);
-            this.max7221.Controls.Add(this.button15);
-            this.max7221.Controls.Add(this.button16);
-            this.max7221.Controls.Add(this.button17);
-            this.max7221.Controls.Add(this.button18);
-            this.max7221.Controls.Add(this.isSimConnected2);
-            this.max7221.Controls.Add(this.textFormat2);
-            this.max7221.Controls.Add(this.views2);
-            this.max7221.Controls.Add(this.selected2);
-            this.max7221.Controls.Add(this.props2);
-            this.max7221.Location = new System.Drawing.Point(23, 4);
-            this.max7221.Name = "max7221";
-            this.max7221.Padding = new System.Windows.Forms.Padding(3);
-            this.max7221.Size = new System.Drawing.Size(1541, 725);
-            this.max7221.TabIndex = 1;
-            this.max7221.Text = "MAX7221";
-            this.max7221.UseVisualStyleBackColor = true;
+            this.buttons.Controls.Add(this.label4);
+            this.buttons.Controls.Add(this.button9);
+            this.buttons.Controls.Add(this.label5);
+            this.buttons.Controls.Add(this.button12);
+            this.buttons.Controls.Add(this.button13);
+            this.buttons.Controls.Add(this.button14);
+            this.buttons.Controls.Add(this.button15);
+            this.buttons.Controls.Add(this.button16);
+            this.buttons.Controls.Add(this.button18);
+            this.buttons.Controls.Add(this.views2);
+            this.buttons.Controls.Add(this.buttonActions);
+            this.buttons.Controls.Add(this.buttonsActive);
+            this.buttons.Location = new System.Drawing.Point(23, 4);
+            this.buttons.Name = "buttons";
+            this.buttons.Padding = new System.Windows.Forms.Padding(3);
+            this.buttons.Size = new System.Drawing.Size(1541, 725);
+            this.buttons.TabIndex = 1;
+            this.buttons.Text = "Buttons";
+            this.buttons.UseVisualStyleBackColor = true;
+            // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(913, 204);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(170, 48);
+            this.button9.TabIndex = 32;
+            this.button9.Text = "Map to Key";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // label5
             // 
@@ -616,35 +621,16 @@ namespace iDash
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.Location = new System.Drawing.Point(705, 617);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(132, 31);
+            this.label5.Size = new System.Drawing.Size(107, 31);
             this.label5.TabIndex = 31;
-            this.label5.Text = "MAX7221";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(832, 159);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(66, 13);
-            this.label4.TabIndex = 30;
-            this.label4.Text = "Text Format:";
-            // 
-            // button10
-            // 
-            this.button10.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.button10.Location = new System.Drawing.Point(1310, 141);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(33, 48);
-            this.button10.TabIndex = 29;
-            this.button10.UseVisualStyleBackColor = true;
-            this.button10.Click += new System.EventHandler(this.button10_Click);
+            this.label5.Text = "Buttons";
             // 
             // button12
             // 
-            this.button12.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.button12.Location = new System.Drawing.Point(1252, 141);
+            this.button12.Image = global::iDash.Properties.Resources.bin;
+            this.button12.Location = new System.Drawing.Point(1487, 661);
             this.button12.Name = "button12";
-            this.button12.Size = new System.Drawing.Size(33, 48);
+            this.button12.Size = new System.Drawing.Size(48, 48);
             this.button12.TabIndex = 28;
             this.button12.UseVisualStyleBackColor = true;
             this.button12.Click += new System.EventHandler(this.button12_Click);
@@ -689,211 +675,40 @@ namespace iDash
             this.button16.UseVisualStyleBackColor = true;
             this.button16.Click += new System.EventHandler(this.button16_Click);
             // 
-            // button17
-            // 
-            this.button17.Image = global::iDash.Properties.Resources._112_LeftArrowShort_Grey_32x32_72;
-            this.button17.Location = new System.Drawing.Point(750, 71);
-            this.button17.Name = "button17";
-            this.button17.Size = new System.Drawing.Size(48, 34);
-            this.button17.TabIndex = 23;
-            this.button17.UseVisualStyleBackColor = true;
-            this.button17.Click += new System.EventHandler(this.button17_Click);
-            // 
             // button18
             // 
             this.button18.Image = global::iDash.Properties.Resources._112_RightArrowShort_Grey_32x32_72;
-            this.button18.Location = new System.Drawing.Point(750, 17);
+            this.button18.Location = new System.Drawing.Point(746, 417);
             this.button18.Name = "button18";
             this.button18.Size = new System.Drawing.Size(48, 34);
             this.button18.TabIndex = 22;
             this.button18.UseVisualStyleBackColor = true;
             this.button18.Click += new System.EventHandler(this.button18_Click);
             // 
-            // isSimConnected2
-            // 
-            this.isSimConnected2.AutoSize = true;
-            this.isSimConnected2.Location = new System.Drawing.Point(1083, 158);
-            this.isSimConnected2.Name = "isSimConnected2";
-            this.isSimConnected2.Size = new System.Drawing.Size(109, 17);
-            this.isSimConnected2.TabIndex = 21;
-            this.isSimConnected2.Text = "When connected";
-            this.isSimConnected2.UseVisualStyleBackColor = true;
-            // 
-            // textFormat2
-            // 
-            this.textFormat2.Location = new System.Drawing.Point(904, 156);
-            this.textFormat2.Name = "textFormat2";
-            this.textFormat2.Size = new System.Drawing.Size(162, 20);
-            this.textFormat2.TabIndex = 20;
-            // 
             // views2
             // 
             this.views2.FormattingEnabled = true;
-            this.views2.Location = new System.Drawing.Point(838, 212);
+            this.views2.Location = new System.Drawing.Point(838, 277);
             this.views2.Name = "views2";
             this.views2.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.views2.Size = new System.Drawing.Size(643, 498);
+            this.views2.Size = new System.Drawing.Size(643, 433);
             this.views2.TabIndex = 19;
-            this.views2.SelectedIndexChanged += new System.EventHandler(this.views2_SelectedIndexChanged);
             // 
-            // selected2
+            // buttonActions
             // 
-            this.selected2.FormattingEnabled = true;
-            this.selected2.Location = new System.Drawing.Point(838, 2);
-            this.selected2.Name = "selected2";
-            this.selected2.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.selected2.Size = new System.Drawing.Size(643, 121);
-            this.selected2.TabIndex = 18;
+            this.buttonActions.FormattingEnabled = true;
+            this.buttonActions.Location = new System.Drawing.Point(838, 2);
+            this.buttonActions.Name = "buttonActions";
+            this.buttonActions.Size = new System.Drawing.Size(643, 173);
+            this.buttonActions.TabIndex = 18;
             // 
-            // props2
+            // buttonsActive
             // 
-            this.props2.FormattingEnabled = true;
-            this.props2.Items.AddRange(new object[] {
-            "AirDensity",
-            "AirPressure",
-            "AirTemp",
-            "Alt",
-            "Brake",
-            "BrakeRaw",
-            "CamCameraNumber",
-            "CamCameraState",
-            "CamCarIdx",
-            "CamGroupNumber",
-            "Clutch",
-            "CpuUsageBG",
-            "DCDriversSoFar",
-            "DCLapStatus",
-            "DisplayUnits",
-            "DriverMarker",
-            "EngineWarnings",
-            "EnterExitReset",
-            "FogLevel",
-            "FrameRate",
-            "FuelLevel",
-            "FuelLevelPct",
-            "FuelPress",
-            "FuelUsePerHour",
-            "Gear",
-            "IsDiskLoggingActive",
-            "IsDiskLoggingEnabled",
-            "IsInGarage",
-            "IsOnTrack",
-            "IsOnTrackCar",
-            "IsReplayPlaying",
-            "Lap",
-            "LapBestLap",
-            "LapBestLapTime",
-            "LapBestNLapLap",
-            "LapBestNLapTime",
-            "LapCurrentLapTime",
-            "LapDeltaToBestLap",
-            "LapDeltaToBestLap_DD",
-            "LapDeltaToBestLap_OK",
-            "LapDeltaToOptimalLap",
-            "LapDeltaToOptimalLap_DD",
-            "LapDeltaToOptimalLap_OK",
-            "LapDeltaToSessionBestLap",
-            "LapDeltaToSessionBestLap_DD",
-            "LapDeltaToSessionBestLap_OK",
-            "LapDeltaToSessionLastlLap",
-            "LapDeltaToSessionLastlLap_DD",
-            "LapDeltaToSessionLastlLap_OK",
-            "LapDeltaToSessionOptimalLap",
-            "LapDeltaToSessionOptimalLap_DD",
-            "LapDeltaToSessionOptimalLap_OK",
-            "LapDist",
-            "LapDistPct",
-            "LapLasNLapSeq",
-            "LapLastLapTime",
-            "LapLastNLapTime",
-            "Lat",
-            "LatAccel",
-            "Lon",
-            "LongAccel",
-            "ManifoldPress",
-            "OilLevel",
-            "OilPress",
-            "OilTemp",
-            "OnPitRoad",
-            "Pitch",
-            "PitchRate",
-            "PitOptRepairLeft",
-            "PitRepairLeft",
-            "PitSvFlags",
-            "PitSvFuel",
-            "PitSvLFP",
-            "PitSvLRP",
-            "PitSvRFP",
-            "PitSvRRP",
-            "PlayerCarClassPosition",
-            "PlayerCarPosition",
-            "RaceLaps",
-            "RadioTransmitCarIdx",
-            "RadioTransmitFrequencyIdx",
-            "RadioTransmitRadioIdx",
-            "RelativeHumidity",
-            "ReplayFrameNum",
-            "ReplayFrameNumEnd",
-            "ReplayPlaySlowMotion",
-            "ReplayPlaySpeed",
-            "ReplaySessionNum",
-            "ReplaySessionTime",
-            "Roll",
-            "RollRate",
-            "RPM",
-            "SessionFlags",
-            "SessionLapsRemain",
-            "SessionNum",
-            "SessionState",
-            "SessionTime",
-            "SessionTimeRemain",
-            "SessionUniqueID",
-            "ShiftGrindRPM",
-            "ShiftIndicatorPct",
-            "ShiftPowerPct",
-            "Skies",
-            "Speed",
-            "SteeringWheelAngle",
-            "SteeringWheelAngleMax",
-            "SteeringWheelPctDamper",
-            "SteeringWheelPctTorque",
-            "SteeringWheelPctTorqueSign",
-            "SteeringWheelPctTorqueSignStops",
-            "SteeringWheelPeakForceNm",
-            "SteeringWheelTorque",
-            "Throttle",
-            "ThrottleRaw",
-            "TrackTemp",
-            "TrackTempCrew",
-            "VelocityX",
-            "VelocityY",
-            "VelocityZ",
-            "VertAccel",
-            "Voltage",
-            "WaterLevel",
-            "WaterTemp",
-            "WeatherType",
-            "WindDir",
-            "WindVel",
-            "Yaw",
-            "YawNorth",
-            "YawRate",
-            "CarIdxClassPosition",
-            "CarIdxEstTime",
-            "CarIdxF2Time",
-            "CarIdxGear",
-            "CarIdxLap",
-            "CarIdxLapDistPct",
-            "CarIdxOnPitRoad",
-            "CarIdxPosition",
-            "CarIdxRPM",
-            "CarIdxSteer",
-            "CarIdxTrackSurface"});
-            this.props2.Location = new System.Drawing.Point(4, 3);
-            this.props2.Name = "props2";
-            this.props2.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.props2.Size = new System.Drawing.Size(695, 706);
-            this.props2.TabIndex = 17;
+            this.buttonsActive.FormattingEnabled = true;
+            this.buttonsActive.Location = new System.Drawing.Point(4, 3);
+            this.buttonsActive.Name = "buttonsActive";
+            this.buttonsActive.Size = new System.Drawing.Size(695, 706);
+            this.buttonsActive.TabIndex = 17;
             // 
             // debugTab
             // 
@@ -963,6 +778,17 @@ namespace iDash
             this.statusBar.Text = "";
             this.statusBar.TextChanged += new System.EventHandler(this.statusBar_TextChanged);
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(1111, 213);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(176, 33);
+            this.label4.TabIndex = 33;
+            this.label4.Text = "Press a key.";
+            this.label4.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -971,15 +797,18 @@ namespace iDash
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.mainTab);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Name = "MainForm";
             this.Text = "iDash";
+            this.Load += new System.EventHandler(this.MainForm_Load);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);
             this.mainTab.ResumeLayout(false);
             this.settingsTab.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tm1637.ResumeLayout(false);
             this.tm1637.PerformLayout();
-            this.max7221.ResumeLayout(false);
-            this.max7221.PerformLayout();
+            this.buttons.ResumeLayout(false);
+            this.buttons.PerformLayout();
             this.debugTab.ResumeLayout(false);
             this.debugTab.PerformLayout();
             this.ResumeLayout(false);
@@ -1002,7 +831,7 @@ namespace iDash
         private System.Windows.Forms.ComboBox debugModes;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tm1637;
-        private System.Windows.Forms.TabPage max7221;
+        private System.Windows.Forms.TabPage buttons;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox textFormat;
         private System.Windows.Forms.Label label3;
@@ -1017,24 +846,21 @@ namespace iDash
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button11;
-        private System.Windows.Forms.Button button10;
-        private System.Windows.Forms.Button button12;
         private System.Windows.Forms.Button button13;
         private System.Windows.Forms.Button button14;
         private System.Windows.Forms.Button button15;
         private System.Windows.Forms.Button button16;
-        private System.Windows.Forms.Button button17;
-        private System.Windows.Forms.Button button18;
-        private System.Windows.Forms.CheckBox isSimConnected2;
-        private System.Windows.Forms.TextBox textFormat2;
         private System.Windows.Forms.ListBox views2;
-        private System.Windows.Forms.ListBox selected2;
-        private System.Windows.Forms.ListBox props2;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ListBox buttonActions;
+        private System.Windows.Forms.ListBox buttonsActive;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox isSimConnected;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button12;
+        private System.Windows.Forms.Button button18;
+        private System.Windows.Forms.Label label4;
     }
 }
 

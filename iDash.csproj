@@ -63,6 +63,9 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="InputSimulator">
+      <HintPath>packages\InputSimulator.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -84,6 +87,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionHandler.cs" />
+    <Compile Include="ActionHandlerFactory.cs" />
+    <Compile Include="ActionNextView.cs" />
+    <Compile Include="ActionPreviousView.cs" />
+    <Compile Include="ActionSendInput.cs" />
     <Compile Include="ButtonHandler.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CommandHandler.cs" />
@@ -134,6 +142,8 @@
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
     <Content Include="icon.ico" />
+    <None Include="Resources\bin.png" />
+    <None Include="Resources\images.png" />
     <None Include="Resources\PrintEntireDocument.png" />
     <None Include="Resources\112_UpArrowShort_Grey_32x42_72.png" />
     <None Include="Resources\112_RightArrowShort_Grey_32x32_72.png" />
@@ -162,7 +172,8 @@
 copy $(SolutionDir)\packages\iRacingSdkWrapper.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRSDKSharp.dll  $(TargetDir).
 copy $(SolutionDir)\packages\YamlDotNet.dll  $(TargetDir).
-copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).</PostBuildEvent>
+copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).
+copy $(SolutionDir)\packages\InputSimulator.dll  $(TargetDir).</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

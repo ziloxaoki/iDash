@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +13,9 @@ namespace iDash
 
     public partial class MainForm : Form
     {
-        private int WAIT_ARDUINO_SET_DEBUG_MODE = 100;
+        private const int WAIT_ARDUINO_SET_DEBUG_MODE = 100;
+        private const int WAIT_UI_FREQUENCY = 1000;
+        private const int WAIT_THREADS_TO_CLOSE = 2000;
 
         private SerialManager sm;
         private ButtonHandler bh;
@@ -28,6 +30,13 @@ namespace iDash
         private static List<string> _7Segment = new List<string>();
         private static string strFormat = "";
         private static readonly Object listLock = new Object();
+        private bool isSearchingButton = false;
+        private const string BUTTON_PREFIX = "Button_";
+        private bool isWaitingForKey = false;
+
+        public delegate void HandleButtonActions(List<State> states);
+        public HandleButtonActions handleButtonActions;                
+
 
         public MainForm()
         {
@@ -35,32 +44,22 @@ namespace iDash
             this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
             InitializeComponent();
 
-            //save TM1637 and MAX7221 settings
-            if (Properties.Settings.Default.TM1637 != null)
-            {
-                this.views.Items.AddRange(Properties.Settings.Default.TM1637.ToArray());
-            }
-            if (Properties.Settings.Default.MAX7221 != null)
-            {
-                this.views2.Items.AddRange(Properties.Settings.Default.MAX7221.ToArray());
-            }
+            handleButtonActions = new HandleButtonActions(handleButtons);            
 
             sm = new SerialManager();
-            bh = new ButtonHandler(sm, this);
+            bh = new ButtonHandler(sm);
             vf = new VJoyFeeder(bh);
             sm.StatusMessageSubscribers += UpdateStatusBar;
             vf.StatusMessageSubscribers += UpdateStatusBar;
             sm.DebugMessageSubscribers += UpdateDebugData;
+            bh.buttonStateHandler += ButtonStateReceived;
+
             sm.Init();
             vf.InitializeJoystick();
+
             irc = new IRacingConnector(sm);
             irc.StatusMessageSubscribers += UpdateStatusBar;
-
-            if (this.views.Items.Count > 0)
-            {
-                this.views.SelectedIndex = 0;
-                this.parseViews();
-            }
+                        
         }
 
         private void parseViews()
@@ -89,7 +88,7 @@ namespace iDash
         private void saveAppSettings()
         {
             Properties.Settings.Default.TM1637 = new ArrayList(views.Items);
-            Properties.Settings.Default.MAX7221 = new ArrayList(views2.Items);
+            Properties.Settings.Default.BUTTONS = new ArrayList(views2.Items);
             Properties.Settings.Default.Save();
         }
 
@@ -111,7 +110,7 @@ namespace iDash
             saveAppSettings();
 
             //wait all threads to close
-            await Task.Delay(1000);
+            await Task.Delay(WAIT_THREADS_TO_CLOSE);
         }
 
         public void AppendToStatusBar(String s)
@@ -274,13 +273,12 @@ namespace iDash
         {
             string viewValue = null;
 
-            foreach (string item in selected.Items)
-            {
-                viewValue += item + ",";
+            for (int i = 0; i < selected.SelectedItems.Count; i++) {             
+                viewValue += (string)selected.SelectedItems[i] + Utils.LIST_SEPARATOR;
             }
             if (viewValue != null && viewValue.Length > 0)
             {
-                viewValue += textFormat.Text + "," + isSimConnected.Checked;
+                viewValue += textFormat.Text + Utils.LIST_SEPARATOR + isSimConnected.Checked;
                 if (!views.Items.Contains(viewValue))
                 {
                     views.Items.Add(viewValue);
@@ -304,66 +302,19 @@ namespace iDash
             }
         }
 
-        private void button18_Click(object sender, EventArgs e)
-        {
-            foreach (string item in props2.SelectedItems)
-            {
-                if (!selected2.Items.Contains(item))
-                {
-                    selected2.Items.Add(item);
-                }
-            }
-        }
-
-        private void button17_Click(object sender, EventArgs e)
-        {
-            if (selected2.SelectedIndex != -1)
-            {
-                for (int i = selected2.SelectedItems.Count - 1; i >= 0; i--)
-                    selected2.Items.Remove(selected2.SelectedItems[i]);
-            }
-        }
-
         private void button16_Click(object sender, EventArgs e)
         {
-            if (selected2.SelectedIndex > 0)
+            if (buttonActions.SelectedIndex > 0)
             {
-                this.MoveItem(selected2, -1);
+                this.MoveItem(buttonActions, -1);
             }
         }
 
         private void button15_Click(object sender, EventArgs e)
         {
-            if (selected2.SelectedIndex < selected2.Items.Count - 1)
+            if (buttonActions.SelectedIndex < buttonActions.Items.Count - 1)
             {
-                this.MoveItem(selected2, 1);
-            }
-        }
-
-        private void button12_Click(object sender, EventArgs e)
-        {
-            if (views2.SelectedIndex != -1)
-            {
-                for (int i = views2.SelectedItems.Count - 1; i >= 0; i--)
-                    views2.Items.Remove(views2.SelectedItems[i]);
-            }
-        }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-            string viewValue = null;
-
-            foreach (string item in selected2.Items)
-            {
-                viewValue += item + ",";
-            }
-            if (viewValue != null && viewValue.Length > 0)
-            {
-                viewValue += textFormat2.Text + "," + isSimConnected2.Checked;
-                if (!views2.Items.Contains(viewValue))
-                {
-                    views2.Items.Add(viewValue);
-                }
+                this.MoveItem(buttonActions, 1);
             }
         }
 
@@ -398,21 +349,6 @@ namespace iDash
                 }
 
                 irc.UpdateViewSelected(views.GetItemText(views.SelectedIndex));
-            }
-        }
-
-        private void views2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (views2.SelectedIndex >= 0)
-            {
-                string[] selectedValue = views2.SelectedItem.ToString().Split(Utils.LIST_SEPARATOR);
-                isSimConnected2.Checked = Convert.ToBoolean(selectedValue[selectedValue.Length - 1]);
-                textFormat2.Text = selectedValue[selectedValue.Length - 2];
-                selected2.Items.Clear();
-                for (int i = 0; i < selectedValue.Length - 2; i++)
-                {
-                    selected2.Items.Add(selectedValue[i]);
-                }
             }
         }
 
@@ -455,6 +391,206 @@ namespace iDash
         public static string getStrFormat()
         {
             return strFormat;
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            isSearchingButton = tabControl1.SelectedIndex == 1;
+        }
+
+        private void addButtonToList(int index)
+        {
+            if (buttonsActive != null)
+            {
+                if (!buttonsActive.Items.Contains(BUTTON_PREFIX + index))
+                {
+                    buttonsActive.Items.Add(BUTTON_PREFIX + index);
+                    buttonsActive.SelectedIndex = buttonsActive.Items.Count - 1;
+                }
+                else
+                {
+                    for (int x = 0; x < buttonsActive.Items.Count; x++)
+                    {
+                        if (buttonsActive.Items[x].ToString() == BUTTON_PREFIX + index)
+                        {
+                            buttonsActive.SelectedIndex = x;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void processButton(string actionId)
+        {
+            ActionHandler actionHandler = (new ActionHandlerFactory(this)).getInstance(actionId);
+            
+            if (actionHandler != null)
+                actionHandler.process();
+        }
+
+        private void handleButtons(List<State> states)
+        {
+            if (states != null)
+            {
+                for (int x = 0; x < states.Count; x++)
+                {
+                    if (states[x] == State.KeyUp)
+                    {
+                        if (isSearchingButton)
+                        {
+                            this.addButtonToList(x);
+                        }
+
+                        for (int y = 0; y < views2.Items.Count; y++)
+                        {
+                            string[] actions = views2.Items[y].ToString().Split(Utils.SIGN_EQUALS);
+                            if (actions[0] == BUTTON_PREFIX + x)
+                            {
+                                this.processButton(actions[1]);
+                            }
+                        }
+                    }
+                }
+            }            
+        }
+
+        public void ButtonStateReceived(List<State> states)
+        {
+            if (this.views2.InvokeRequired)
+            {
+                this.BeginInvoke
+                    (handleButtonActions, states);
+            }
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            if(views2.SelectedIndex > -1)
+            {
+                views.Items.Remove(views2.SelectedIndex);
+            }
+        }
+
+        private bool isButtonBinded(string buttonId)
+        {
+            foreach(string s in views2.Items) {
+                string id = s.Split(Utils.SIGN_EQUALS)[0];
+                if (buttonId.Equals(id))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void button18_Click(object sender, EventArgs e)
+        {
+            if(buttonsActive.SelectedIndex > -1 && buttonActions.SelectedIndex > -1)
+            {
+                string buttonId = buttonsActive.SelectedItem.ToString();
+                
+                if(isButtonBinded(buttonId))
+                {
+                    MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
+                                "Important Note",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error,
+                                MessageBoxDefaultButton.Button1);
+                    return;
+                }
+
+                string value = buttonId + Utils.SIGN_EQUALS + buttonActions.SelectedItem.ToString();
+                if (!views2.Items.Contains(value))
+                    views2.Items.Add(value);
+            }
+            else
+            {
+                MessageBox.Show("Please select a buttons and one action.",
+                                "Important Note",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error,
+                                MessageBoxDefaultButton.Button1);
+            }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            if (views2.SelectedIndex != -1)
+            {
+                for (int i = views2.SelectedItems.Count - 1; i >= 0; i--)
+                    views2.Items.Remove(views2.SelectedItems[i]);
+            }
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            //restore TM1637 and Buttons settings
+            if (Properties.Settings.Default.TM1637 != null)
+            {
+                this.views.Items.AddRange(Properties.Settings.Default.TM1637.ToArray());
+            }
+            if (Properties.Settings.Default.BUTTONS != null)
+            {
+                this.views2.Items.AddRange(Properties.Settings.Default.BUTTONS.ToArray());
+            }
+
+            if (this.views.Items.Count > 0)
+            {
+                this.views.SelectedIndex = 0;
+                this.parseViews();
+            }
+
+            foreach (string s in ActionHandler.ACTIONS) {
+                buttonActions.Items.Add(s);
+            }
+        }
+
+        private async void button9_Click(object sender, EventArgs e)
+        {
+            if (buttonsActive.SelectedIndex > -1)
+            {                
+                isWaitingForKey = true;
+                label4.Visible = true;
+                while(isWaitingForKey)
+                {
+                    if (label4.ForeColor == Color.Black)
+                        label4.ForeColor = Color.Red;
+                    else
+                        label4.ForeColor = Color.Black;
+                    await Task.Delay(250);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a buttons.",
+                                "Important Note",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error,
+                                MessageBoxDefaultButton.Button1);
+            }
+        }
+
+        private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (isWaitingForKey)
+            {
+                isWaitingForKey = false;
+                label4.Visible = false;
+                string buttonId = buttonsActive.SelectedItem.ToString();
+
+                if (isButtonBinded(buttonId))
+                {
+                    MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
+                                "Important Note",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error,
+                                MessageBoxDefaultButton.Button1);
+                    return;
+                }
+
+                string value = buttonId + Utils.SIGN_EQUALS + e.KeyChar;
+                if (!views2.Items.Contains(value))
+                    views2.Items.Add(value);
+            }
         }
     }
 }

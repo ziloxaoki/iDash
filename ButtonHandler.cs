@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace iDash
 {
 
-    enum State
+    public enum State
     {
         None,
         KeyDown,
@@ -53,15 +50,15 @@ namespace iDash
 
     }
 
-    class ButtonHandler : CommandHandler
+    public class ButtonHandler : CommandHandler
     {
         List<State> currentStates = new List<State>();
 
         //----------------------------------------- Events
-        public delegate void ButtonStateHandler(byte[] states);
-        public ButtonStateHandler ButtonStateSubscribers;
+        public delegate void ButtonStateHandler(List<State> states);
+        public ButtonStateHandler buttonStateHandler;
 
-        public ButtonHandler(SerialManager sm, MainForm mainForm) : base(sm, mainForm) {
+        public ButtonHandler(SerialManager sm) : base(sm) {
             sm.CommandReceivedSubscribers += new SerialManager.CommandReceivedHandler(executeCommand);            
         }
 
@@ -69,10 +66,10 @@ namespace iDash
         {
             for (int i = 0; i < bStates.Length; i++)
             {
-                //if button is not pressed
+                //button is not pressed or was released
                 if (bStates[i] == 0)
                 {
-                    //if button states is stored in the list
+                    //if button is valid update the state to the next up state
                     if (i < currentStates.Count)
                     {
                         currentStates[i] = currentStates[i].NextUpState();
@@ -85,7 +82,7 @@ namespace iDash
                 }
                 else
                 {
-                    //if button states is stored in the list
+                    //if button is valid update the state to the next down state
                     if (i < currentStates.Count)
                     {
                         currentStates[i] = currentStates[i].NextDownState();
@@ -98,10 +95,10 @@ namespace iDash
                 }
             }
             
-            NotifyButtonStateReceived(bStates);
+            NotifyButtonStateReceived(currentStates);
         } 
 
-        public void executeCommand(Command command)
+        public override void executeCommand(Command command)
         {
             //is the command a status button command
             if(command.getData()[0] == Command.CMD_BUTTON_STATUS)
@@ -112,9 +109,9 @@ namespace iDash
 
         //----------------------------------------- Events
         //notify subscribers about button state received event
-        public void NotifyButtonStateReceived(byte[] args)
+        public void NotifyButtonStateReceived(List<State> args)
         {
-            ButtonStateHandler handler = ButtonStateSubscribers;
+            ButtonStateHandler handler = buttonStateHandler;
 
             if (handler != null)
             {

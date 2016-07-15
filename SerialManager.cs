@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO.Ports;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace iDash
 {
-    class SerialManager
+    public class SerialManager
     {
 
         int bs = 0;
@@ -44,7 +43,9 @@ namespace iDash
             serialPort.BaudRate = 38400;         //selected baudrate            
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler  
 
-            new Thread(new ThreadStart(start)).Start();            
+            Thread t = new Thread(new ThreadStart(start));
+            t.IsBackground = true;
+            t.Start();            
             
             this.tryToConnect();
 
@@ -116,7 +117,7 @@ namespace iDash
             }
             if (serialPort.IsOpen)
             {
-                serialPort.Dispose();
+                serialPort.Close();
             }
         }
 

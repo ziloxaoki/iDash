@@ -36,12 +36,12 @@ namespace iDash.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.ArrayList MAX7221 {
+        public global::System.Collections.ArrayList BUTTONS {
             get {
-                return ((global::System.Collections.ArrayList)(this["MAX7221"]));
+                return ((global::System.Collections.ArrayList)(this["BUTTONS"]));
             }
             set {
-                this["MAX7221"] = value;
+                this["BUTTONS"] = value;
             }
         }
     }

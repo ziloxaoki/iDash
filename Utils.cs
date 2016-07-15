@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
+using System.Text.RegularExpressions;
 
 namespace iDash
 {
 
-    class Utils
+    public class Utils
     {
         public const char LIST_SEPARATOR = ',';
         public const char ITEM_SEPARATOR = ';';
+        public const char SIGN_EQUALS = '=';
 
         public const byte TM1637_COLON_BIT = 128;
         //public const byte TM1637_CHAR_SPACE = 0;
@@ -415,6 +412,30 @@ namespace iDash
                 i++;
             }
             return new string(b);
+        }
+
+        public static string formatString(string text, string pattern)
+        {
+            string[] index = pattern.Split('=');
+
+            if (index.Length > 1)
+            {
+                if (index[0].StartsWith("pl") || index[0].StartsWith("pr"))
+                {
+                    string[] par = index[1].Split('&');
+                    if (par.Length != 2)
+                        return text;
+                    if (index[0].StartsWith("pl"))
+                        return text.PadLeft(Int32.Parse(par[0]), par[1][0]);
+                    return text.PadRight(Int32.Parse(par[0]), par[1][0]);
+                }
+                if (index[0].StartsWith("@"))
+                {
+                    return Regex.Replace(text, index[0], index[1]);
+                }
+            }
+
+            return String.Format(pattern, text);
         }
     }
 

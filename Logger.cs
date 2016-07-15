@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace iDash
 {
-    class Logger
+    public class Logger
     {
         public static string GetTempPath()
         {

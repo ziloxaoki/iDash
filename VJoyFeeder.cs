@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using vJoyInterfaceWrap;
 
 namespace iDash
 {
-    class VJoyFeeder
+    public class VJoyFeeder
     {
         // Declaring one joystick (Device id 1) and a position structure. 
         public vJoy joystick;
@@ -21,7 +17,7 @@ namespace iDash
 
         public VJoyFeeder(ButtonHandler bh)
         {
-            bh.ButtonStateSubscribers += new ButtonHandler.ButtonStateHandler(ButtonStateReceived);
+            bh.buttonStateHandler += ButtonStateReceived;
         }        
 
         public void InitializeJoystick()
@@ -112,11 +108,11 @@ namespace iDash
             }
         }
 
-        public void ButtonStateReceived(byte[] states)
+        public void ButtonStateReceived(List<State> states)
         {
-            for (uint i = 0; i < states.Length; i++)
+            for (uint i = 0; i < states.Count; i++)
             {
-                joystick.SetBtn(states[i] == 1, jID, i + 1);
+                joystick.SetBtn(states[(int)i] == State.KeyUp, jID, i + 1);
             }
         }
 

@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace iDash
+﻿namespace iDash
 {
-    abstract class CommandHandler
+    public abstract class CommandHandler : ICommandHandler
     {
-        private MainForm mainForm;
         private SerialManager sm;
 
-        public CommandHandler(SerialManager sm, MainForm mainForm)
+        public CommandHandler(SerialManager sm)
         {
-            this.mainForm = mainForm;
             this.sm = sm;
         }
+
+        public abstract void executeCommand(Command command);
     }
 }
