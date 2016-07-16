@@ -10,6 +10,7 @@ namespace iDash
         public const char LIST_SEPARATOR = ',';
         public const char ITEM_SEPARATOR = ';';
         public const char SIGN_EQUALS = '=';
+        public const char SIGN_AMPERSAND = '&';
 
         public const byte TM1637_COLON_BIT = 128;
         //public const byte TM1637_CHAR_SPACE = 0;
@@ -416,13 +417,13 @@ namespace iDash
 
         public static string formatString(string text, string pattern)
         {
-            string[] index = pattern.Split('=');
+            string[] index = pattern.Split(SIGN_EQUALS);
 
             if (index.Length > 1)
             {
                 if (index[0].StartsWith("pl") || index[0].StartsWith("pr"))
                 {
-                    string[] par = index[1].Split('&');
+                    string[] par = index[1].Split(SIGN_AMPERSAND);
                     if (par.Length != 2)
                         return text;
                     if (index[0].StartsWith("pl"))
@@ -431,7 +432,8 @@ namespace iDash
                 }
                 if (index[0].StartsWith("@"))
                 {
-                    return Regex.Replace(text, index[0], index[1]);
+                    string value = Regex.Replace(text, index[0], index[1]);
+                    return value;
                 }
             }
 

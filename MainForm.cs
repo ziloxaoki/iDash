@@ -27,7 +27,7 @@ namespace iDash
         public delegate void AppendToDebugDialogDelegate(String s);
         public AppendToDebugDialogDelegate appendToDebugDialog;
         public static bool stopThreads = false;
-        private static List<string> _7Segment = new List<string>();
+        private static List<string> _7Segment;
         private static string strFormat = "";
         private static readonly Object listLock = new Object();
         private bool isSearchingButton = false;
@@ -67,16 +67,18 @@ namespace iDash
             if (this.views.Items.Count > 0)
             {
                 string[] items = this.views.SelectedItem.ToString().Split(Utils.LIST_SEPARATOR);
-                //ignoring "when connected" flag
-                for (int x = 0; x < items.Length - 1; x++)
+                lock (listLock)
                 {
-                    if (x == items.Length - 2)
+                    _7Segment = new List<string>();
+
+                    //ignoring "when connected" flag
+                    for (int x = 0; x < items.Length - 1; x++)
                     {
-                        strFormat = items[x];
-                    }
-                    else
-                    {
-                        lock (listLock)
+                        if (x == items.Length - 2)
+                        {
+                            strFormat = items[x];
+                        }
+                        else
                         {
                             _7Segment.Add(items[x]);
                         }
@@ -339,6 +341,7 @@ namespace iDash
         {
             if (views.SelectedIndex >= 0)
             {
+                string temp = views.SelectedItem.ToString();
                 string[] selectedValue = views.SelectedItem.ToString().Split(Utils.LIST_SEPARATOR);
                 isSimConnected.Checked = Convert.ToBoolean(selectedValue[selectedValue.Length - 1]);
                 textFormat.Text = selectedValue[selectedValue.Length - 2];
@@ -348,7 +351,8 @@ namespace iDash
                     selected.Items.Add(selectedValue[i]);
                 }
 
-                irc.UpdateViewSelected(views.GetItemText(views.SelectedIndex));
+                //irc.UpdateViewSelected(views.GetItemText(views.SelectedIndex));
+                this.parseViews();
             }
         }
 
@@ -380,7 +384,7 @@ namespace iDash
             this.parseViews();
         }
 
-        public static List<string> get_7SegmentData()
+        public static List<string> get7SegmentData()
         {
             lock (listLock)
             {

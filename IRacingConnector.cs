@@ -93,7 +93,7 @@ namespace iDash
         private void send7SegmentMsg()
         {
             StringBuilder msg = new StringBuilder();
-            List<string> _7SegmentData = MainForm.get_7SegmentData();
+            List<string> _7SegmentData = MainForm.get7SegmentData();
             string[] strPatterns = MainForm.getStrFormat().Split(Utils.ITEM_SEPARATOR);
 
             if (_7SegmentData.Count > 0)
@@ -105,7 +105,7 @@ namespace iDash
 
                     if(strPatterns.Length > 0) {
                         if(x < strPatterns.Length)
-                            pattern = String.IsNullOrEmpty(strPatterns[x]) ? "{0}" : strPatterns[x];
+                            pattern = string.IsNullOrEmpty(strPatterns[x]) ? "{0}" : strPatterns[x];
                     }
 
                     msg.Append(this.getTelemetryData(name, pattern));
@@ -250,9 +250,9 @@ namespace iDash
             }
         }
 
-        public void UpdateViewSelected(string s)
+        /*public void UpdateViewSelected(string s)
         {
             views = s;
-        }
+        }*/
     }
 }
