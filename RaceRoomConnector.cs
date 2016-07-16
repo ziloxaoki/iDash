@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace iDash
 {
-    public class RaceRoomConnector : IDisposable
+    public class RaceRoomConnector : ISimConnector
     {        
         private bool Mapped
         {
@@ -21,22 +21,45 @@ namespace iDash
         public delegate void StatusMessageHandler(string m);
         public StatusMessageHandler StatusMessageSubscribers;
 
-        private SerialManager sm;
         private MemoryMappedFile _file;
         private MemoryMappedViewAccessor _view;
 
-        public RaceRoomConnector(SerialManager sm)
+        private float firstRpm = 0;
+        private float lastRpm = 0;
+        private float currentRpm = 0;
+
+        private bool disposed = false;
+
+        public RaceRoomConnector(SerialManager sm) : base(sm)
         {
             this.sm = sm;
 
             new Thread(new ThreadStart(start)).Start();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
-            _view.Dispose();
-            _file.Dispose();
-        }        
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    if(_view != null)
+                        _view.Dispose();
+                    if (_file != null)
+                        _file.Dispose();
+                }
+                // Release unmanaged resources.
+                disposed = true;
+            }
+        }
+
+        ~RaceRoomConnector() { Dispose(false); }
 
         public void start()
         {
@@ -65,7 +88,13 @@ namespace iDash
                         Shared data;
                         _view.Read(0, out data);
 
-                        if (data.Gear >= -1)
+                        lastRpm = RpsToRpm(data.MaxEngineRps);
+                        firstRpm = FIRST_RPM * lastRpm;
+                        currentRpm = RpsToRpm(data.EngineRps);
+
+                        sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
+
+                        /*if (data.Gear >= -1)
                         {
                             Console.WriteLine("Gear: {0}", data.Gear);
                         }
@@ -74,7 +103,7 @@ namespace iDash
                         {
                             //Console.WriteLine("RPM: {0}", Utilities.RpsToRpm(data.EngineRps));
                             //Console.WriteLine("Speed: {0}", Utilities.MpsToKph(data.CarSpeed));
-                        }
+                        }*/
                     }
                 }
                 else
@@ -88,6 +117,8 @@ namespace iDash
                     sm.sendCommand(c);
                 }
             }
+
+            Dispose();
         }
 
         private bool Map()
@@ -104,6 +135,7 @@ namespace iDash
             }
         }
 
+
         //notify subscribers (statusbar) that a message has to be logged
         public void NotifyStatusMessage(string args)
         {
@@ -113,6 +145,11 @@ namespace iDash
             {
                 handler(args + "\n");
             }
+        }
+
+        private Single RpsToRpm(Single rps)
+        {
+            return rps * (60 / (2 * (Single)Math.PI));
         }
     }
 }

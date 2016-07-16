@@ -13,6 +13,8 @@ namespace iDash
         public const char SIGN_EQUALS = '=';
         public const char SIGN_AMPERSAND = '&';
 
+        public static readonly byte[] colourPattern = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
+
         public const byte TM1637_COLON_BIT = 128;
         //public const byte TM1637_CHAR_SPACE = 0;
         public const byte TM1637_CHAR_SPACE = TM1637_CHAR_S_COLON;

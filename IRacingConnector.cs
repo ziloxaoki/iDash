@@ -9,23 +9,21 @@ using System.Globalization;
 
 namespace iDash
 {
-    public class IRacingConnector
-    {
-        private SerialManager sm;
-        private string views;
-        private readonly byte[] colourPattern = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
-        private float firstRpm = 0;
-        private float lastRpm = 0;
-        private float currentRpm = 0;
-        private const int LED_NUM_TOTAL = 16;
-        private const float FIRST_RPM = 0.7f;
+    public class IRacingConnector : ISimConnector
+    {             
         public delegate void StatusMessageHandler(string m);
         public StatusMessageHandler StatusMessageSubscribers;
         // Globally declared SdkWrapper object
         private readonly SdkWrapper wrapper;
         private SdkWrapper.TelemetryUpdatedEventArgs telemetryInfo;
 
-        public IRacingConnector(SerialManager sm)
+        private float firstRpm = 0;
+        private float lastRpm = 0;
+        private float currentRpm = 0;
+
+        private bool disposed = false;
+
+        public IRacingConnector(SerialManager sm) : base(sm)
         {
             this.sm = sm;
 
@@ -40,54 +38,7 @@ namespace iDash
 
             new Thread(new ThreadStart(start)).Start();
         }
-
-        private void sendRPMShiftMsg()
-        {
-            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }; // 1, 1, 1 = black
-            float rpmPerLed = (lastRpm - firstRpm) / LED_NUM_TOTAL; //rpm range per led                
-            int milSec = DateTime.Now.Millisecond;
-            Command rgbShift = null;
-            if (rpmPerLed > 0 && currentRpm > firstRpm - 2000)
-            {
-                if (currentRpm > firstRpm)
-                {
-                    int numActiveLeds = (int)(Math.Ceiling((currentRpm - firstRpm) / rpmPerLed));
-
-                    if (numActiveLeds < LED_NUM_TOTAL)
-                    {
-                        Array.Copy(colourPattern, 0, rpmLed, 0, numActiveLeds * 3); //each led colour has 3 bytes
-
-                        rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
-                    }
-                    else //blink
-                    {
-                        /*if (milSec < 50 || (milSec > 100 && milSec < 150) ||
-                        (milSec > 200 && milSec < 250) || (milSec > 300 && milSec < 350) ||
-                        (milSec > 400 && milSec < 450) || (milSec > 500 && milSec < 550) ||
-                        (milSec > 600 && milSec < 650) || (milSec > 700 && milSec < 750) ||
-                        (milSec > 800 && milSec < 850) || (milSec > 900))*/
-                        if (milSec < 100 || (milSec > 200 && milSec < 300) ||
-                        (milSec > 400 && milSec < 500) || (milSec > 600 && milSec < 700) ||
-                        (milSec > 800 && milSec < 900) || (milSec > 900))
-                        {
-                            rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
-                        }
-                        else
-                        {
-                            rgbShift = new Command(Command.CMD_RGB_SHIFT, colourPattern);
-                        }
-                    }
-                } else {
-                    //clear shift lights
-                    rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
-                }
-          
-                sm.sendCommand(rgbShift);
-            }
-        }
-
-
-        
+               
 
         //needs to wait until MainForm 7Segment is loaded
         private void send7SegmentMsg()
@@ -140,7 +91,7 @@ namespace iDash
                     }
                     isConnected = true;
 
-                    sendRPMShiftMsg();
+                    sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
                     send7SegmentMsg();
                 }
                 else
@@ -160,7 +111,7 @@ namespace iDash
                 await Task.Delay(5);
             }
 
-            wrapper.Stop();
+            Dispose();
         }
 
 
@@ -251,5 +202,29 @@ namespace iDash
                 handler(args + "\n");
             }
         }
+
+        public override void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    if (wrapper != null)
+                    {
+                        wrapper.Stop();
+                    }
+                }
+                // Release unmanaged resources.
+                disposed = true;
+            }
+        }
+
+        ~IRacingConnector() { Dispose(false); }
     }
 }

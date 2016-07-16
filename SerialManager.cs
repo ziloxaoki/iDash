@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace iDash
 {
-    public class SerialManager
+    public class SerialManager : IDisposable
     {
 
         int bs = 0;
@@ -34,6 +34,8 @@ namespace iDash
         public StatusMessageHandler StatusMessageSubscribers;
         public delegate void DebugMessageHandler(string m);
         public DebugMessageHandler DebugMessageSubscribers;
+
+        private bool disposed = false;
 
         public void Init()
         {
@@ -115,10 +117,8 @@ namespace iDash
                     await Task.Delay(WAIT_TO_SEND_SYN_ACK);
                 }                
             }
-            if (serialPort.IsOpen)
-            {
-                serialPort.Close();
-            }
+
+            Dispose();
         }
 
         private void sendSynAck()
@@ -292,6 +292,30 @@ namespace iDash
                 handler(args);
             }
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    if (serialPort != null && serialPort.IsOpen)
+                    {
+                        serialPort.Close();
+                    }
+                }
+                // Release unmanaged resources.
+                disposed = true;
+            }
+        }
+
+        ~SerialManager() { Dispose(false); }
 
     }
 }
