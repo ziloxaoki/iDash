@@ -56,6 +56,7 @@ namespace iDash
             this.selected = new System.Windows.Forms.ListBox();
             this.props = new System.Windows.Forms.ListBox();
             this.buttons = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
             this.button9 = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.button12 = new System.Windows.Forms.Button();
@@ -73,13 +74,17 @@ namespace iDash
             this.clearData = new System.Windows.Forms.Button();
             this.debugData = new System.Windows.Forms.RichTextBox();
             this.statusBar = new System.Windows.Forms.RichTextBox();
-            this.label4 = new System.Windows.Forms.Label();
+            this.mainmenu = new System.Windows.Forms.MenuStrip();
+            this.simulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.iRacingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.raceroomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tm1637.SuspendLayout();
             this.buttons.SuspendLayout();
             this.debugTab.SuspendLayout();
+            this.mainmenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonSend
@@ -113,7 +118,7 @@ namespace iDash
             // 
             this.mainTab.Controls.Add(this.settingsTab);
             this.mainTab.Controls.Add(this.debugTab);
-            this.mainTab.Location = new System.Drawing.Point(2, 12);
+            this.mainTab.Location = new System.Drawing.Point(3, 27);
             this.mainTab.Name = "mainTab";
             this.mainTab.SelectedIndex = 0;
             this.mainTab.Size = new System.Drawing.Size(1572, 760);
@@ -605,6 +610,17 @@ namespace iDash
             this.buttons.Text = "Buttons";
             this.buttons.UseVisualStyleBackColor = true;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(1111, 213);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(176, 33);
+            this.label4.TabIndex = 33;
+            this.label4.Text = "Press a key.";
+            this.label4.Visible = false;
+            // 
             // button9
             // 
             this.button9.Location = new System.Drawing.Point(913, 204);
@@ -770,7 +786,7 @@ namespace iDash
             // 
             // statusBar
             // 
-            this.statusBar.Location = new System.Drawing.Point(2, 771);
+            this.statusBar.Location = new System.Drawing.Point(3, 793);
             this.statusBar.Name = "statusBar";
             this.statusBar.ReadOnly = true;
             this.statusBar.Size = new System.Drawing.Size(1568, 187);
@@ -778,26 +794,50 @@ namespace iDash
             this.statusBar.Text = "";
             this.statusBar.TextChanged += new System.EventHandler(this.statusBar_TextChanged);
             // 
-            // label4
+            // mainmenu
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(1111, 213);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(176, 33);
-            this.label4.TabIndex = 33;
-            this.label4.Text = "Press a key.";
-            this.label4.Visible = false;
+            this.mainmenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.simulatorToolStripMenuItem});
+            this.mainmenu.Location = new System.Drawing.Point(0, 0);
+            this.mainmenu.Name = "mainmenu";
+            this.mainmenu.Size = new System.Drawing.Size(1575, 24);
+            this.mainmenu.TabIndex = 11;
+            this.mainmenu.Text = "menuStrip1";
+            // 
+            // simulatorToolStripMenuItem
+            // 
+            this.simulatorToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.iRacingToolStripMenuItem,
+            this.raceroomToolStripMenuItem});
+            this.simulatorToolStripMenuItem.Name = "simulatorToolStripMenuItem";
+            this.simulatorToolStripMenuItem.Size = new System.Drawing.Size(70, 20);
+            this.simulatorToolStripMenuItem.Text = "Simulator";
+            // 
+            // iRacingToolStripMenuItem
+            // 
+            this.iRacingToolStripMenuItem.Name = "iRacingToolStripMenuItem";
+            this.iRacingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.iRacingToolStripMenuItem.Text = "IRacing";
+            this.iRacingToolStripMenuItem.Click += new System.EventHandler(this.iRacingToolStripMenuItem_Click);
+            // 
+            // raceroomToolStripMenuItem
+            // 
+            this.raceroomToolStripMenuItem.Name = "raceroomToolStripMenuItem";
+            this.raceroomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.raceroomToolStripMenuItem.Text = "Raceroom";
+            this.raceroomToolStripMenuItem.Click += new System.EventHandler(this.raceroomToolStripMenuItem_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1575, 961);
+            this.ClientSize = new System.Drawing.Size(1575, 1017);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.mainTab);
+            this.Controls.Add(this.mainmenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
+            this.MainMenuStrip = this.mainmenu;
             this.Name = "MainForm";
             this.Text = "iDash";
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -811,7 +851,10 @@ namespace iDash
             this.buttons.PerformLayout();
             this.debugTab.ResumeLayout(false);
             this.debugTab.PerformLayout();
+            this.mainmenu.ResumeLayout(false);
+            this.mainmenu.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -861,6 +904,10 @@ namespace iDash
         private System.Windows.Forms.Button button12;
         private System.Windows.Forms.Button button18;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.MenuStrip mainmenu;
+        private System.Windows.Forms.ToolStripMenuItem simulatorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem iRacingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem raceroomToolStripMenuItem;
     }
 }
 

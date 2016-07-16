@@ -36,7 +36,7 @@ namespace iDash
             wrapper.TelemetryUpdated += OnTelemetryUpdated;
             wrapper.SessionInfoUpdated += OnSessionInfoUpdated;
             // Start it if Arduino is Connected
-            wrapper.Start();
+            wrapper.Start();            
 
             new Thread(new ThreadStart(start)).Start();
         }
@@ -126,7 +126,9 @@ namespace iDash
             StringBuilder msg = new StringBuilder();
             bool isConnected = false;
 
-            while (!MainForm.stopThreads)
+            NotifyStatusMessage("Looking for IRacing...");
+
+            while (!MainForm.stopThreads && !MainForm.stopIRacingThreads)
             {
                 msg.Clear();
                 if (wrapper.IsConnected)
@@ -249,10 +251,5 @@ namespace iDash
                 handler(args + "\n");
             }
         }
-
-        /*public void UpdateViewSelected(string s)
-        {
-            views = s;
-        }*/
     }
 }

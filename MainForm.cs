@@ -15,21 +15,25 @@ namespace iDash
     {
         private const int WAIT_ARDUINO_SET_DEBUG_MODE = 100;
         private const int WAIT_UI_FREQUENCY = 1000;
-        private const int WAIT_THREADS_TO_CLOSE = 2000;
+        private const int WAIT_THREADS_TO_CLOSE = 3500;
 
         private SerialManager sm;
         private ButtonHandler bh;
         private VJoyFeeder vf;
         private IRacingConnector irc;
+        private RaceRoomConnector rrc;
+
+        public static bool stopThreads = false;
+        public static bool stopIRacingThreads = false;
+        public static bool stopRaceRoomThreads = false;
+        private static List<string> _7Segment;
+        private static string strFormat = "";
+        private static readonly Object listLock = new Object();
 
         public delegate void AppendToStatusBarDelegate(String s);
         public AppendToStatusBarDelegate appendToStatusBar;
         public delegate void AppendToDebugDialogDelegate(String s);
-        public AppendToDebugDialogDelegate appendToDebugDialog;
-        public static bool stopThreads = false;
-        private static List<string> _7Segment;
-        private static string strFormat = "";
-        private static readonly Object listLock = new Object();
+        public AppendToDebugDialogDelegate appendToDebugDialog;        
         private bool isSearchingButton = false;
         private const string BUTTON_PREFIX = "Button_";
         private bool isWaitingForKey = false;
@@ -55,11 +59,7 @@ namespace iDash
             bh.buttonStateHandler += ButtonStateReceived;
 
             sm.Init();
-            vf.InitializeJoystick();
-
-            irc = new IRacingConnector(sm);
-            irc.StatusMessageSubscribers += UpdateStatusBar;
-                        
+            vf.InitializeJoystick();                                    
         }
 
         private void parseViews()
@@ -107,7 +107,10 @@ namespace iDash
             sm.StatusMessageSubscribers -= UpdateStatusBar;
             vf.StatusMessageSubscribers -= UpdateStatusBar;
             sm.DebugMessageSubscribers -= UpdateDebugData;
-            irc.StatusMessageSubscribers -= UpdateStatusBar;
+            if (irc != null)
+                irc.StatusMessageSubscribers -= UpdateStatusBar;
+            if (rrc != null)
+                rrc.StatusMessageSubscribers -= UpdateStatusBar;
 
             saveAppSettings();
 
@@ -594,6 +597,45 @@ namespace iDash
                 string value = buttonId + Utils.SIGN_EQUALS + e.KeyChar;
                 if (!views2.Items.Contains(value))
                     views2.Items.Add(value);
+            }
+        }
+
+        private void resetAllConnectors()
+        {
+            irc = null;
+            rrc = null;
+            ToolStripMenuItem menu = (ToolStripMenuItem)mainmenu.Items[0];
+            foreach (ToolStripMenuItem mItem in menu.DropDownItems)
+            {
+                mItem.CheckState = CheckState.Unchecked;
+            }
+        }
+
+        private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            resetAllConnectors();
+            stopIRacingThreads = false;
+            stopRaceRoomThreads = true;
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;            
+            if (irc == null)
+            {
+                irc = new IRacingConnector(sm);
+                irc.StatusMessageSubscribers += UpdateStatusBar;
+            }
+        }
+
+        private void raceroomToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            resetAllConnectors();
+            stopIRacingThreads = true;
+            stopRaceRoomThreads = false;
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+            ToolStripMenuItem iRacingMenu = (ToolStripMenuItem)((ToolStripMenuItem)mainmenu.Items[0]).DropDownItems[0];
+            iRacingMenu.CheckState = CheckState.Unchecked;
+            if (rrc == null)
+            {
+                rrc = new RaceRoomConnector(sm);
+                rrc.StatusMessageSubscribers += UpdateStatusBar;
             }
         }
     }

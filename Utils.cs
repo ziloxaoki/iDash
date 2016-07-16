@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -439,7 +440,12 @@ namespace iDash
 
             return String.Format(pattern, text);
         }
-    }
+
+        public static bool isRrreRunning()
+        {
+            return Process.GetProcessesByName("RRRE").Length > 0;
+        }
+    }    
 
     public enum DebugMode
     {
