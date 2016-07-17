@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace iDash
 {
@@ -446,6 +447,20 @@ namespace iDash
         public static bool isRrreRunning()
         {
             return Process.GetProcessesByName("RRRE").Length > 0;
+        }
+
+        public static string[] convertObjectCollectionToStringArray(ListBox.ObjectCollection origin)
+        {
+            string[] result = null;
+            if (origin != null) {
+                result = new string[origin.Count];
+                for (int x = 0; x < origin.Count; x++)
+                {
+                    result[x] = origin[x].ToString();
+                }
+            }
+
+            return result;
         }
     }    
 

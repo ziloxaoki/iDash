@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -23,6 +24,9 @@ namespace iDash
         private IRacingConnector irc;
         private RaceRoomConnector rrc;
 
+        private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>();
+        private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>();
+
         public static bool stopThreads = false;
         public static bool stopIRacingThreads = false;
         public static bool stopRaceRoomThreads = false;
@@ -33,7 +37,8 @@ namespace iDash
         public delegate void AppendToStatusBarDelegate(String s);
         public AppendToStatusBarDelegate appendToStatusBar;
         public delegate void AppendToDebugDialogDelegate(String s);
-        public AppendToDebugDialogDelegate appendToDebugDialog;        
+        public AppendToDebugDialogDelegate appendToDebugDialog;      
+          
         private bool isSearchingButton = false;
         private const string BUTTON_PREFIX = "Button_";
         private bool isWaitingForKey = false;
@@ -57,6 +62,8 @@ namespace iDash
             vf.StatusMessageSubscribers += UpdateStatusBar;
             sm.DebugMessageSubscribers += UpdateDebugData;
             bh.buttonStateHandler += ButtonStateReceived;
+
+            this.iRacingToolStripMenuItem1.PerformClick();
 
             sm.Init();
             vf.InitializeJoystick();                                    
@@ -87,10 +94,107 @@ namespace iDash
             }
         }
 
+        private void syncViews()
+        {
+            for (int x = 0; x < settingsToolStripMenuItem.DropDownItems.Count; x++)
+            {
+                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)settingsToolStripMenuItem.DropDownItems[x];
+                //search for selected simulator settings
+                if (dropDownItem.Checked)
+                {
+                    ArrayList objCollection = new ArrayList();
+                    objCollection.AddRange(Utils.convertObjectCollectionToStringArray(views.Items));
+                    TM1637ListBoxItems.Insert(x, objCollection);
+
+                    ArrayList objCollection2 = new ArrayList();
+                    objCollection2.AddRange(Utils.convertObjectCollectionToStringArray(views2.Items));
+                    ButtonsListBoxItems.Insert(x, objCollection2);
+                }
+            }
+        }
+
+        private void loadViewProperties()
+        {
+            this.views.Items.Clear();
+            this.views2.Items.Clear();
+            this.selected.Items.Clear();
+            this.textFormat.Clear();
+
+            for (int x = 0; x < settingsToolStripMenuItem.DropDownItems.Count; x++)
+            {
+                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)settingsToolStripMenuItem.DropDownItems[x];
+                if (dropDownItem.Checked)
+                {
+                    if (x < TM1637ListBoxItems.Count)
+                    {
+                        this.views.Items.AddRange(TM1637ListBoxItems[x].ToArray());
+                    }
+                    if (x < ButtonsListBoxItems.Count)
+                    {
+                        this.views2.Items.Add(ButtonsListBoxItems[x].ToArray());
+                    }
+                }
+            }
+
+            if (views.Items.Count > 0)
+                views.SelectedIndex = 0;
+
+            if (views2.Items.Count > 0)
+                views2.SelectedIndex = 0;
+        }
+
+        private void restoreViewProperties()
+        {           
+            using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(Properties.Settings.Default.TM1637)))
+            {
+                if (ms.Length > 0)
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    TM1637ListBoxItems = (List<ArrayList>)bf.Deserialize(ms);
+                }
+            }
+
+            using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(Properties.Settings.Default.BUTTONS)))
+            {
+                if (ms.Length > 0)
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    ButtonsListBoxItems = (List<ArrayList>)bf.Deserialize(ms);
+                }
+            }
+
+            loadViewProperties();
+        }
+
         private void saveAppSettings()
         {
-            Properties.Settings.Default.TM1637 = new ArrayList(views.Items);
-            Properties.Settings.Default.BUTTONS = new ArrayList(views2.Items);
+            using (MemoryStream ms = new MemoryStream())
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                byte[] buffer = null;
+
+                //serialize TM1637 to Base64 to be saved
+                if (TM1637ListBoxItems.Count > 0)
+                {
+                    bf.Serialize(ms, TM1637ListBoxItems);
+                    ms.Position = 0;
+                    buffer = new byte[(int)ms.Length];
+                    ms.Read(buffer, 0, buffer.Length);
+                    Properties.Settings.Default.TM1637 = Convert.ToBase64String(buffer);
+                }
+
+                //serialize Buttons to Base64 to be saved
+                if (ButtonsListBoxItems.Count > 0)
+                {
+                    bf = new BinaryFormatter();
+                    bf.Serialize(ms, ButtonsListBoxItems);
+                    ms.Position = 0;
+                    buffer = new byte[(int)ms.Length];
+                    ms.Read(buffer, 0, buffer.Length);
+                    Properties.Settings.Default.BUTTONS = Convert.ToBase64String(buffer);
+                }
+            }
+
             Properties.Settings.Default.Save();
         }
 
@@ -272,6 +376,11 @@ namespace iDash
                 for (int i = views.SelectedItems.Count - 1; i >= 0; i--)
                     views.Items.Remove(views.SelectedItems[i]);
             }
+
+            if (views.Items.Count > 0)
+                views.SelectedIndex = 0;
+
+            syncViews();
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -289,6 +398,8 @@ namespace iDash
                     views.Items.Add(viewValue);
                 }
             }
+
+            syncViews();
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -517,6 +628,8 @@ namespace iDash
                                 MessageBoxIcon.Error,
                                 MessageBoxDefaultButton.Button1);
             }
+
+            syncViews();
         }
 
         private void button12_Click(object sender, EventArgs e)
@@ -526,19 +639,19 @@ namespace iDash
                 for (int i = views2.SelectedItems.Count - 1; i >= 0; i--)
                     views2.Items.Remove(views2.SelectedItems[i]);
             }
-        }
+
+            if (views.Items.Count > 0)
+                views.SelectedIndex = 0;
+
+            syncViews();
+        }        
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            this.iRacingToolStripMenuItem1.CheckState = CheckState.Checked;
+
             //restore TM1637 and Buttons settings
-            if (Properties.Settings.Default.TM1637 != null)
-            {
-                this.views.Items.AddRange(Properties.Settings.Default.TM1637.ToArray());
-            }
-            if (Properties.Settings.Default.BUTTONS != null)
-            {
-                this.views2.Items.AddRange(Properties.Settings.Default.BUTTONS.ToArray());
-            }
+            restoreViewProperties();
 
             if (this.views.Items.Count > 0)
             {
@@ -600,7 +713,7 @@ namespace iDash
             }
         }
 
-        private void resetAllConnectors()
+        private void resetConnectionUI()
         {
             irc = null;
             rrc = null;
@@ -611,32 +724,72 @@ namespace iDash
             }
         }
 
+        private void resetAllSettings()
+        {
+            props.Items.Clear();
+            selected.Items.Clear();
+
+            ToolStripMenuItem menu = (ToolStripMenuItem)mainmenu.Items[1];
+            foreach (ToolStripMenuItem mItem in menu.DropDownItems)
+            {
+                mItem.CheckState = CheckState.Unchecked;
+            }
+        }
+
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            resetAllConnectors();
+            //update connection menu state
+            resetConnectionUI();
+            //stop iRacing threads
             stopIRacingThreads = false;
+            //keep RaceRoom threads alive
             stopRaceRoomThreads = true;
-            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;            
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked; 
+                       
             if (irc == null)
             {
                 irc = new IRacingConnector(sm);
                 irc.StatusMessageSubscribers += UpdateStatusBar;
             }
+
+            this.iRacingToolStripMenuItem1.PerformClick();
         }
 
         private void raceroomToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            resetAllConnectors();
+            //update connection menu state
+            resetConnectionUI();
+            //keep iRacing threads alive
             stopIRacingThreads = true;
+            //stop RaceRoom threads
             stopRaceRoomThreads = false;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
-            ToolStripMenuItem iRacingMenu = (ToolStripMenuItem)((ToolStripMenuItem)mainmenu.Items[0]).DropDownItems[0];
-            iRacingMenu.CheckState = CheckState.Unchecked;
+
             if (rrc == null)
             {
                 rrc = new RaceRoomConnector(sm);
                 rrc.StatusMessageSubscribers += UpdateStatusBar;
             }
+
+            this.raceRoomToolStripMenuItem1.PerformClick();            
+        }
+
+        private void iRacingToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            resetAllSettings();
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+            this.props.Items.AddRange(Constants.IRacingTelemetryData);
+
+            loadViewProperties();
+        }
+
+        private void raceRoomToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            resetAllSettings();
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+            this.props.Items.AddRange(Constants.RaceRoomTelemetryData);
+
+            loadViewProperties();
         }
     }
 }

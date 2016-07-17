@@ -76,11 +76,6 @@ namespace iDash
                     {
                         string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to RaceRoom.";
                         NotifyStatusMessage(s);
-
-                        if (Map())
-                        {
-                            Console.WriteLine("Memory mapped successfully");
-                        }
                     }
                     else
                     {

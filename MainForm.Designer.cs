@@ -78,6 +78,9 @@ namespace iDash
             this.simulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.iRacingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.raceroomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.iRacingToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.raceRoomToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -132,7 +135,7 @@ namespace iDash
             this.settingsTab.Padding = new System.Windows.Forms.Padding(3);
             this.settingsTab.Size = new System.Drawing.Size(1564, 734);
             this.settingsTab.TabIndex = 0;
-            this.settingsTab.Text = "Settings";
+            this.settingsTab.Text = "Dashboard";
             this.settingsTab.UseVisualStyleBackColor = true;
             // 
             // tabControl1
@@ -332,256 +335,6 @@ namespace iDash
             // props
             // 
             this.props.FormattingEnabled = true;
-            this.props.Items.AddRange(new object[] {
-            "AirDensity.float",
-            "AirPressure.float",
-            "AirTemp.float",
-            "Alt.float",
-            "Brake.float",
-            "BrakeRaw.float",
-            "CamCameraNumber.int",
-            "CamCameraState.bitfield",
-            "CamCarIdx.int",
-            "CamGroupNumber.int",
-            "Clutch.float",
-            "CpuUsageBG.float",
-            "DCDriversSoFar.int",
-            "DCLapStatus.int",
-            "DisplayUnits.int",
-            "DriverMarker.bool",
-            "EngineWarnings.bitfield",
-            "EnterExitReset.int",
-            "FogLevel.float",
-            "FrameRate.float",
-            "FuelLevel.float",
-            "FuelLevelPct.float",
-            "FuelPress.float",
-            "FuelUsePerHour.float",
-            "Gear.int",
-            "IsDiskLoggingActive.bool",
-            "IsDiskLoggingEnabled.bool",
-            "IsInGarage.bool",
-            "IsOnTrack.bool",
-            "IsOnTrackCar.bool",
-            "IsReplayPlaying.bool",
-            "Lap.int",
-            "LapBestLap.int",
-            "LapBestLapTime.time",
-            "LapBestNLapLap.int",
-            "LapBestNLapTime.time",
-            "LapCurrentLapTime.time",
-            "LapDeltaToBestLap.time",
-            "LapDeltaToBestLap_DD.float",
-            "LapDeltaToBestLap_OK.bool",
-            "LapDeltaToOptimalLap.time",
-            "LapDeltaToOptimalLap_DD.float",
-            "LapDeltaToOptimalLap_OK.bool",
-            "LapDeltaToSessionBestLap.time",
-            "LapDeltaToSessionBestLap_DD.float",
-            "LapDeltaToSessionBestLap_OK.bool",
-            "LapDeltaToSessionLastlLap.time",
-            "LapDeltaToSessionLastlLap_DD.float",
-            "LapDeltaToSessionLastlLap_OK.bool",
-            "LapDeltaToSessionOptimalLap.time",
-            "LapDeltaToSessionOptimalLap_DD.float",
-            "LapDeltaToSessionOptimalLap_OK.bool",
-            "LapDist.float",
-            "LapDistPct.float",
-            "LapLasNLapSeq.int",
-            "LapLastLapTime.time",
-            "LapLastNLapTime.time",
-            "Lat.double",
-            "LatAccel.float",
-            "Lon.double",
-            "LongAccel.float",
-            "ManifoldPress.float",
-            "OilLevel.float",
-            "OilPress.float",
-            "OilTemp.float",
-            "OnPitRoad.bool",
-            "Pitch.float",
-            "PitchRate.float",
-            "PitOptRepairLeft.time",
-            "PitRepairLeft.float",
-            "PitSvFlags.bitfield",
-            "PitSvFuel.float",
-            "PitSvLFP.float",
-            "PitSvLRP.float",
-            "PitSvRFP.float",
-            "PitSvRRP.float",
-            "PlayerCarClassPosition.int",
-            "PlayerCarPosition.int",
-            "RaceLaps.int",
-            "RadioTransmitCarIdx.int",
-            "RadioTransmitFrequencyIdx.int",
-            "RadioTransmitRadioIdx.int",
-            "RelativeHumidity.float",
-            "ReplayFrameNum.int",
-            "ReplayFrameNumEnd.int",
-            "ReplayPlaySlowMotion.bool",
-            "ReplayPlaySpeed.int",
-            "ReplaySessionNum.int",
-            "ReplaySessionTime.double",
-            "Roll.float",
-            "RollRate.float",
-            "RPM.float",
-            "SessionFlags.bitfield",
-            "SessionLapsRemain.int",
-            "SessionNum.int",
-            "SessionState.int",
-            "SessionTime.dtime",
-            "SessionTimeRemain.dtime",
-            "SessionUniqueID.int",
-            "ShiftGrindRPM.float",
-            "ShiftIndicatorPct.float",
-            "ShiftPowerPct.float",
-            "Skies.int",
-            "Speed.kmh",
-            "SteeringWheelAngle.float",
-            "SteeringWheelAngleMax.float",
-            "SteeringWheelPctDamper.float",
-            "SteeringWheelPctTorque.float",
-            "SteeringWheelPctTorqueSign.float",
-            "SteeringWheelPctTorqueSignStops.float",
-            "SteeringWheelPeakForceNm.float",
-            "SteeringWheelTorque.float",
-            "Throttle.float",
-            "ThrottleRaw.float",
-            "TrackTemp.float",
-            "TrackTempCrew.float",
-            "VelocityX.float",
-            "VelocityY.float",
-            "VelocityZ.float",
-            "VertAccel.float",
-            "Voltage.float",
-            "WaterLevel.float",
-            "WaterTemp.float",
-            "WeatherType.int",
-            "WindDir.float",
-            "WindVel.float",
-            "Yaw.float",
-            "YawNorth.float",
-            "YawRate.float",
-            "CFrideHeight.float",
-            "CFshockDefl.float",
-            "CFshockVel.float",
-            "CFSRrideHeight.float",
-            "CRrideHeight.float",
-            "CRshockDefl.float",
-            "CRshockVel.float",
-            "dcABS.float",
-            "dcAntiRollFront.float",
-            "dcAntiRollRear.float",
-            "dcBoostLevel.float",
-            "dcBrakeBias.float",
-            "dcBrakeBias.float",
-            "dcDiffEntry.float",
-            "dcDiffExit.float",
-            "dcDiffMiddle.float",
-            "dcEngineBraking.float",
-            "dcEnginePower.float",
-            "dcFuelMixture.float",
-            "dcRevLimiter.float",
-            "dcThrottleShape.float",
-            "dcTractionControl.float",
-            "dcTractionControl2.float",
-            "dcTractionControlToggle.bool",
-            "dcWeightJackerLeft.float",
-            "dcWeightJackerRight.float",
-            "dcWingFront.float",
-            "dcWingRear.float",
-            "dpFNOMKnobSetting.float",
-            "dpFUFangleIndex.float",
-            "dpFWingAngle.float",
-            "dpFWingIndex.float",
-            "dpLrWedgeAdj.float",
-            "dpPSSetting.float",
-            "dpQtape.float",
-            "dpRBarSetting.float",
-            "dpRFTruckarmP1Dz.float",
-            "dpRRDamperPerchOffsetm.float",
-            "dpRrPerchOffsetm.float",
-            "dpRrWedgeAdj.float",
-            "dpRWingAngle.float",
-            "dpRWingIndex.float",
-            "dpRWingSetting.float",
-            "dpTruckarmP1Dz.float",
-            "dpWedgeAdj.float",
-            "LFbrakeLinePress.float",
-            "LFcoldPressure.float",
-            "LFpressure.float",
-            "LFrideHeight.float",
-            "LFshockDefl.float",
-            "LFshockVel.float",
-            "LFspeed.float",
-            "LFtempCL.float",
-            "LFtempCM.float",
-            "LFtempCR.float",
-            "LFtempL.float",
-            "LFtempM.float",
-            "LFtempR.float",
-            "LFwearL.float",
-            "LFwearM.float",
-            "LFwearR.float",
-            "LRbrakeLinePress.float",
-            "LRcoldPressure.float",
-            "LRpressure.float",
-            "LRrideHeight.float",
-            "LRshockDefl.float",
-            "LRshockVel.float",
-            "LRspeed.float",
-            "LRtempCL.float",
-            "LRtempCM.float",
-            "LRtempCR.float",
-            "LRtempL.float",
-            "LRtempM.float",
-            "LRtempR.float",
-            "LRwearL.float",
-            "LRwearM.float",
-            "LRwearR.float",
-            "RFbrakeLinePress.float",
-            "RFcoldPressure.float",
-            "RFpressure.float",
-            "RFrideHeight.float",
-            "RFshockDefl.float",
-            "RFshockVel.float",
-            "RFspeed.float",
-            "RFtempCL.float",
-            "RFtempCM.float",
-            "RFtempCR.float",
-            "RFtempL.float",
-            "RFtempM.float",
-            "RFtempR.float",
-            "RFwearL.float",
-            "RFwearM.float",
-            "RFwearR.float",
-            "RRbrakeLinePress.float",
-            "RRcoldPressure.float",
-            "RRpressure.float",
-            "RRrideHeight.float",
-            "RRshockDefl.float",
-            "RRshockVel.float",
-            "RRspeed.float",
-            "RRtempCL.float",
-            "RRtempCM.float",
-            "RRtempCR.float",
-            "RRtempL.float",
-            "RRtempM.float",
-            "RRtempR.float",
-            "RRwearL.float",
-            "RRwearM.float",
-            "RRwearR.float",
-            "CarIdxClassPosition.aint",
-            "CarIdxEstTime.afloat",
-            "CarIdxF2Time.afloat",
-            "CarIdxGear.aint",
-            "CarIdxLap.aint",
-            "CarIdxLapDistPct.afloat",
-            "CarIdxOnPitRoad.abool",
-            "CarIdxPosition.aint",
-            "CarIdxRPM.afloat",
-            "CarIdxSteer.afloat",
-            "CarIdxTrackSurface.aint"});
             this.props.Location = new System.Drawing.Point(6, 6);
             this.props.Name = "props";
             this.props.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
@@ -797,7 +550,8 @@ namespace iDash
             // mainmenu
             // 
             this.mainmenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.simulatorToolStripMenuItem});
+            this.simulatorToolStripMenuItem,
+            this.settingsToolStripMenuItem});
             this.mainmenu.Location = new System.Drawing.Point(0, 0);
             this.mainmenu.Name = "mainmenu";
             this.mainmenu.Size = new System.Drawing.Size(1575, 24);
@@ -810,22 +564,45 @@ namespace iDash
             this.iRacingToolStripMenuItem,
             this.raceroomToolStripMenuItem});
             this.simulatorToolStripMenuItem.Name = "simulatorToolStripMenuItem";
-            this.simulatorToolStripMenuItem.Size = new System.Drawing.Size(70, 20);
-            this.simulatorToolStripMenuItem.Text = "Simulator";
+            this.simulatorToolStripMenuItem.Size = new System.Drawing.Size(64, 20);
+            this.simulatorToolStripMenuItem.Text = "Connect";
             // 
             // iRacingToolStripMenuItem
             // 
             this.iRacingToolStripMenuItem.Name = "iRacingToolStripMenuItem";
-            this.iRacingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.iRacingToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.iRacingToolStripMenuItem.Text = "IRacing";
             this.iRacingToolStripMenuItem.Click += new System.EventHandler(this.iRacingToolStripMenuItem_Click);
             // 
             // raceroomToolStripMenuItem
             // 
             this.raceroomToolStripMenuItem.Name = "raceroomToolStripMenuItem";
-            this.raceroomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.raceroomToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.raceroomToolStripMenuItem.Text = "Raceroom";
             this.raceroomToolStripMenuItem.Click += new System.EventHandler(this.raceroomToolStripMenuItem_Click);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.iRacingToolStripMenuItem1,
+            this.raceRoomToolStripMenuItem1});
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // iRacingToolStripMenuItem1
+            // 
+            this.iRacingToolStripMenuItem1.Name = "iRacingToolStripMenuItem1";
+            this.iRacingToolStripMenuItem1.Size = new System.Drawing.Size(131, 22);
+            this.iRacingToolStripMenuItem1.Text = "iRacing";
+            this.iRacingToolStripMenuItem1.Click += new System.EventHandler(this.iRacingToolStripMenuItem1_Click);
+            // 
+            // raceRoomToolStripMenuItem1
+            // 
+            this.raceRoomToolStripMenuItem1.Name = "raceRoomToolStripMenuItem1";
+            this.raceRoomToolStripMenuItem1.Size = new System.Drawing.Size(131, 22);
+            this.raceRoomToolStripMenuItem1.Text = "RaceRoom";
+            this.raceRoomToolStripMenuItem1.Click += new System.EventHandler(this.raceRoomToolStripMenuItem1_Click);
             // 
             // MainForm
             // 
@@ -908,6 +685,9 @@ namespace iDash
         private System.Windows.Forms.ToolStripMenuItem simulatorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem iRacingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem raceroomToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem iRacingToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem raceRoomToolStripMenuItem1;
     }
 }
 

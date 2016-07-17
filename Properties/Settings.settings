@@ -2,10 +2,10 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="iDash.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="TM1637" Type="System.Collections.ArrayList" Scope="User">
+    <Setting Name="TM1637" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="BUTTONS" Type="System.Collections.ArrayList" Scope="User">
+    <Setting Name="BUTTONS" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

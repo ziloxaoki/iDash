@@ -93,6 +93,7 @@
     <Compile Include="ActionPreviousView.cs" />
     <Compile Include="ActionSendInput.cs" />
     <Compile Include="ButtonHandler.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="ISimConnector.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CommandHandler.cs" />

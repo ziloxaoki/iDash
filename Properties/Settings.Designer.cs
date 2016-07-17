@@ -25,9 +25,10 @@ namespace iDash.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.ArrayList TM1637 {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TM1637 {
             get {
-                return ((global::System.Collections.ArrayList)(this["TM1637"]));
+                return ((string)(this["TM1637"]));
             }
             set {
                 this["TM1637"] = value;
@@ -36,9 +37,10 @@ namespace iDash.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.ArrayList BUTTONS {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BUTTONS {
             get {
-                return ((global::System.Collections.ArrayList)(this["BUTTONS"]));
+                return ((string)(this["BUTTONS"]));
             }
             set {
                 this["BUTTONS"] = value;
