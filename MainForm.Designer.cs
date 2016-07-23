@@ -81,6 +81,7 @@ namespace iDash
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.iRacingToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.raceRoomToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -562,7 +563,8 @@ namespace iDash
             // 
             this.simulatorToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.iRacingToolStripMenuItem,
-            this.raceroomToolStripMenuItem});
+            this.raceroomToolStripMenuItem,
+            this.noneToolStripMenuItem});
             this.simulatorToolStripMenuItem.Name = "simulatorToolStripMenuItem";
             this.simulatorToolStripMenuItem.Size = new System.Drawing.Size(64, 20);
             this.simulatorToolStripMenuItem.Text = "Connect";
@@ -570,14 +572,14 @@ namespace iDash
             // iRacingToolStripMenuItem
             // 
             this.iRacingToolStripMenuItem.Name = "iRacingToolStripMenuItem";
-            this.iRacingToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.iRacingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.iRacingToolStripMenuItem.Text = "IRacing";
             this.iRacingToolStripMenuItem.Click += new System.EventHandler(this.iRacingToolStripMenuItem_Click);
             // 
             // raceroomToolStripMenuItem
             // 
             this.raceroomToolStripMenuItem.Name = "raceroomToolStripMenuItem";
-            this.raceroomToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.raceroomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.raceroomToolStripMenuItem.Text = "Raceroom";
             this.raceroomToolStripMenuItem.Click += new System.EventHandler(this.raceroomToolStripMenuItem_Click);
             // 
@@ -603,6 +605,13 @@ namespace iDash
             this.raceRoomToolStripMenuItem1.Size = new System.Drawing.Size(131, 22);
             this.raceRoomToolStripMenuItem1.Text = "RaceRoom";
             this.raceRoomToolStripMenuItem1.Click += new System.EventHandler(this.raceRoomToolStripMenuItem1_Click);
+            // 
+            // noneToolStripMenuItem
+            // 
+            this.noneToolStripMenuItem.Name = "noneToolStripMenuItem";
+            this.noneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.noneToolStripMenuItem.Text = "None";
+            this.noneToolStripMenuItem.Click += new System.EventHandler(this.noneToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -688,6 +697,7 @@ namespace iDash
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem iRacingToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem raceRoomToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem noneToolStripMenuItem;
     }
 }
 

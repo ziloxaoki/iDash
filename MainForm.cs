@@ -26,6 +26,7 @@ namespace iDash
 
         private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>();
         private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>();
+        private ArrayList bActions = new ArrayList();
 
         public static bool stopThreads = false;
         public static bool stopIRacingThreads = false;
@@ -109,6 +110,8 @@ namespace iDash
                     ArrayList objCollection2 = new ArrayList();
                     objCollection2.AddRange(Utils.convertObjectCollectionToStringArray(views2.Items));
                     ButtonsListBoxItems.Insert(x, objCollection2);
+
+                    break;
                 }
             }
         }
@@ -131,7 +134,7 @@ namespace iDash
                     }
                     if (x < ButtonsListBoxItems.Count)
                     {
-                        this.views2.Items.Add(ButtonsListBoxItems[x].ToArray());
+                        this.views2.Items.AddRange(ButtonsListBoxItems[x].ToArray());
                     }
                 }
             }
@@ -166,6 +169,7 @@ namespace iDash
             loadViewProperties();
         }
 
+
         private void saveAppSettings()
         {
             using (MemoryStream ms = new MemoryStream())
@@ -181,7 +185,14 @@ namespace iDash
                     buffer = new byte[(int)ms.Length];
                     ms.Read(buffer, 0, buffer.Length);
                     Properties.Settings.Default.TM1637 = Convert.ToBase64String(buffer);
-                }
+                    ms.Close();
+                }                             
+            }
+                        
+            using (MemoryStream ms = new MemoryStream())
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                byte[] buffer = null;
 
                 //serialize Buttons to Base64 to be saved
                 if (ButtonsListBoxItems.Count > 0)
@@ -192,6 +203,7 @@ namespace iDash
                     buffer = new byte[(int)ms.Length];
                     ms.Read(buffer, 0, buffer.Length);
                     Properties.Settings.Default.BUTTONS = Convert.ToBase64String(buffer);
+                    ms.Close();
                 }
             }
 
@@ -514,6 +526,7 @@ namespace iDash
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             isSearchingButton = tabControl1.SelectedIndex == 1;
+            loadViewProperties();
         }
 
         private void addButtonToList(int index)
@@ -538,33 +551,34 @@ namespace iDash
             }
         }
 
-        private void processButton(string actionId)
+        private void processButton(string actionId, State state)
         {
             ActionHandler actionHandler = (new ActionHandlerFactory(this)).getInstance(actionId);
             
             if (actionHandler != null)
-                actionHandler.process();
+                actionHandler.process(actionId, state);
         }
 
         private void handleButtons(List<State> states)
         {
             if (states != null)
-            {
+            {                                
                 for (int x = 0; x < states.Count; x++)
                 {
-                    if (states[x] == State.KeyUp)
+                    if (states[x] != State.None)
                     {
                         if (isSearchingButton)
                         {
                             this.addButtonToList(x);
                         }
 
-                        for (int y = 0; y < views2.Items.Count; y++)
+                        for (int y = 0; y < bActions.Count; y++)
                         {
-                            string[] actions = views2.Items[y].ToString().Split(Utils.SIGN_EQUALS);
-                            if (actions[0] == BUTTON_PREFIX + x)
+                            string[] split = bActions[y].ToString().Split(Utils.SIGN_EQUALS);
+                            if (split[0] == BUTTON_PREFIX + x)
                             {
-                                this.processButton(actions[1]);
+                                this.processButton(split[1], states[x]);
+                                break;
                             }
                         }
                     }
@@ -640,8 +654,8 @@ namespace iDash
                     views2.Items.Remove(views2.SelectedItems[i]);
             }
 
-            if (views.Items.Count > 0)
-                views.SelectedIndex = 0;
+            if (views2.Items.Count > 0)
+                views2.SelectedIndex = 0;
 
             syncViews();
         }        
@@ -681,12 +695,12 @@ namespace iDash
             }
             else
             {
-                MessageBox.Show("Please select a buttons.",
+                MessageBox.Show("Please select a button.",
                                 "Important Note",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error,
                                 MessageBoxDefaultButton.Button1);
-            }
+            }            
         }
 
         private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
@@ -710,6 +724,8 @@ namespace iDash
                 string value = buttonId + Utils.SIGN_EQUALS + e.KeyChar;
                 if (!views2.Items.Contains(value))
                     views2.Items.Add(value);
+
+                syncViews();
             }
         }
 
@@ -736,6 +752,23 @@ namespace iDash
             }
         }
 
+        private void setButtonHandler()
+        {
+            for (int x = 0; x < settingsToolStripMenuItem.DropDownItems.Count; x++)
+            {
+                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)simulatorToolStripMenuItem.DropDownItems[x];
+                if (dropDownItem.Checked)
+                {
+                    if (x < ButtonsListBoxItems.Count)
+                    {
+                        bActions = ButtonsListBoxItems[x];
+                    }
+
+                    break;
+                }
+            }
+        }
+
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //update connection menu state
@@ -753,6 +786,8 @@ namespace iDash
             }
 
             this.iRacingToolStripMenuItem1.PerformClick();
+
+            setButtonHandler();
         }
 
         private void raceroomToolStripMenuItem_Click(object sender, EventArgs e)
@@ -771,7 +806,9 @@ namespace iDash
                 rrc.StatusMessageSubscribers += UpdateStatusBar;
             }
 
-            this.raceRoomToolStripMenuItem1.PerformClick();            
+            this.raceRoomToolStripMenuItem1.PerformClick();
+
+            setButtonHandler();
         }
 
         private void iRacingToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -790,6 +827,17 @@ namespace iDash
             this.props.Items.AddRange(Constants.RaceRoomTelemetryData);
 
             loadViewProperties();
+        }
+
+        private void noneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //update connection menu state
+            resetConnectionUI();
+            //stop iRacing threads
+            stopIRacingThreads = true;
+            //keep RaceRoom threads alive
+            stopRaceRoomThreads = true;
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
         }
     }
 }

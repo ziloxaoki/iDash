@@ -28,6 +28,9 @@ namespace iDash
         private float lastRpm = 0;
         private float currentRpm = 0;
 
+        private readonly TimeSpan _timeAlive = TimeSpan.FromMinutes(10);
+        private readonly TimeSpan _timeInterval = TimeSpan.FromMilliseconds(100);
+
         private bool disposed = false;
 
         public RaceRoomConnector(SerialManager sm) : base(sm)
@@ -64,18 +67,47 @@ namespace iDash
         public void start()
         {
             StringBuilder msg = new StringBuilder();
+            bool isConnected = false;
+            var timeReset = DateTime.UtcNow;
+            var timeLast = timeReset;
 
             NotifyStatusMessage("Looking for RRRE.exe...");
 
             while (!MainForm.stopThreads && !MainForm.stopRaceRoomThreads)
             {
                 msg.Clear();
+
+                var timeNow = DateTime.UtcNow;
+
+                if (timeNow.Subtract(timeReset) > _timeAlive)
+                {
+                    break;
+                }
+
+                if (timeNow.Subtract(timeLast) < _timeInterval)
+                {
+                    Thread.Sleep(1);
+                    continue;
+                }
+
+                timeLast = timeNow;
+
                 if (Utils.isRrreRunning())
                 {
                     if (!Mapped)
                     {
-                        string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to RaceRoom.";
-                        NotifyStatusMessage(s);
+                        if (!isConnected)
+                        {
+                            string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to RaceRoom.";
+                            NotifyStatusMessage(s);
+                            isConnected = true;
+                        }
+
+                        if (Map())
+                        {
+                            NotifyStatusMessage("Memory mapped successfully");
+                            timeReset = DateTime.UtcNow;
+                        }
                     }
                     else
                     {

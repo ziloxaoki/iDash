@@ -21,11 +21,11 @@ namespace iDash
             switch (action)
             {
                 case ActionHandler.ACT_NEXT_VIEW:
-                    return new ActionNextView(mainForm, action);
+                    return new ActionNextView(mainForm);
                 case ActionHandler.ACT_PREVIOUS_VIEW:
-                    return new ActionPreviousView(mainForm, action);
+                    return new ActionPreviousView(mainForm);
                 default:
-                    return new ActionSendInput(mainForm, action);
+                    return new ActionSendInput(mainForm);
             }
         }
     }

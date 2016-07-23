@@ -8,15 +8,15 @@ namespace iDash
 {
     public class ActionPreviousView : ActionHandler
     {
-        public ActionPreviousView(MainForm mainForm, string action) : base(mainForm, action)
+        public ActionPreviousView(MainForm mainForm) : base(mainForm)
         {
             this.mainForm = mainForm;
-            this.action = action;
         }
 
-        public override void process()
+        public override void process(string action, State state)
         {
-            mainForm.setPreviousView();
+            if(state == State.KeyDown)
+                mainForm.setPreviousView();
         }
     }
 }

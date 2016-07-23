@@ -63,9 +63,6 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="InputSimulator">
-      <HintPath>packages\InputSimulator.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -99,6 +96,7 @@
     <Compile Include="CommandHandler.cs" />
     <Compile Include="ICommandHandler.cs" />
     <Compile Include="IRacingConnector.cs" />
+    <Compile Include="KeySim.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -176,8 +174,7 @@
 copy $(SolutionDir)\packages\iRacingSdkWrapper.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRSDKSharp.dll  $(TargetDir).
 copy $(SolutionDir)\packages\YamlDotNet.dll  $(TargetDir).
-copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).
-copy $(SolutionDir)\packages\InputSimulator.dll  $(TargetDir).</PostBuildEvent>
+copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
