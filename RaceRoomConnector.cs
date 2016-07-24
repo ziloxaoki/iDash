@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using iDash.Data;
 using System.IO;
 using System.Threading;
+using System.Reflection;
 
 namespace iDash
 {
@@ -28,9 +29,6 @@ namespace iDash
         private float lastRpm = 0;
         private float currentRpm = 0;
 
-        private readonly TimeSpan _timeAlive = TimeSpan.FromMinutes(10);
-        private readonly TimeSpan _timeInterval = TimeSpan.FromMilliseconds(100);
-
         private bool disposed = false;
 
         public RaceRoomConnector(SerialManager sm) : base(sm)
@@ -38,59 +36,18 @@ namespace iDash
             this.sm = sm;
 
             new Thread(new ThreadStart(start)).Start();
-        }
+        }        
 
-        public override void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    if(_view != null)
-                        _view.Dispose();
-                    if (_file != null)
-                        _file.Dispose();
-                }
-                // Release unmanaged resources.
-                disposed = true;
-            }
-        }
-
-        ~RaceRoomConnector() { Dispose(false); }
-
-        public void start()
+        public async void start()
         {
             StringBuilder msg = new StringBuilder();
             bool isConnected = false;
-            var timeReset = DateTime.UtcNow;
-            var timeLast = timeReset;
 
             NotifyStatusMessage("Looking for RRRE.exe...");
 
             while (!MainForm.stopThreads && !MainForm.stopRaceRoomThreads)
             {
                 msg.Clear();
-
-                var timeNow = DateTime.UtcNow;
-
-                if (timeNow.Subtract(timeReset) > _timeAlive)
-                {
-                    break;
-                }
-
-                if (timeNow.Subtract(timeLast) < _timeInterval)
-                {
-                    Thread.Sleep(1);
-                    continue;
-                }
-
-                timeLast = timeNow;
 
                 if (Utils.isRrreRunning())
                 {
@@ -101,13 +58,11 @@ namespace iDash
                             string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to RaceRoom.";
                             NotifyStatusMessage(s);
                             isConnected = true;
+
+                            new Thread(new ThreadStart(Map)).Start();
                         }
 
-                        if (Map())
-                        {
-                            NotifyStatusMessage("Memory mapped successfully");
-                            timeReset = DateTime.UtcNow;
-                        }
+                        sm.sendCommand(Utils.getDisconnectedMsgCmd());
                     }
                     else
                     {
@@ -115,50 +70,150 @@ namespace iDash
                         Shared data;
                         _view.Read(0, out data);
 
-                        lastRpm = RpsToRpm(data.MaxEngineRps);
-                        firstRpm = FIRST_RPM * lastRpm;
-                        currentRpm = RpsToRpm(data.EngineRps);
+                        int sessionType = data.SessionType;
 
-                        sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
-
-                        /*if (data.Gear >= -1)
+                        if (sessionType >= 0)
                         {
-                            Console.WriteLine("Gear: {0}", data.Gear);
+                            lastRpm = RpsToRpm(data.MaxEngineRps);
+                            firstRpm = FIRST_RPM * lastRpm;
+                            currentRpm = RpsToRpm(data.EngineRps);
+
+                            sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
+                            send7SegmentMsg(data);
                         }
-
-                        if (data.EngineRps > -1.0f)
+                        else
                         {
-                            //Console.WriteLine("RPM: {0}", Utilities.RpsToRpm(data.EngineRps));
-                            //Console.WriteLine("Speed: {0}", Utilities.MpsToKph(data.CarSpeed));
-                        }*/
+                            sm.sendCommand(Utils.getDisconnectedMsgCmd());
+                        }
                     }
                 }
                 else
                 {
-                    msg.Append("-OFF.");
-                    msg.Append(DateTime.Now.ToString("dd.MM.yyyy"));
-                    msg.Append(DateTime.Now.ToString("hh.mm.ss.ff"));
-
-                    byte[] b = Utils.getBytes(msg.ToString());
-                    Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
-                    sm.sendCommand(c);
+                    sm.sendCommand(Utils.getDisconnectedMsgCmd());
                 }
+
+                await Task.Delay(5);
             }
 
             Dispose();
         }
 
-        private bool Map()
+        
+
+        private async void Map()
         {
-            try
+            while (!Mapped)
             {
-                _file = MemoryMappedFile.OpenExisting(Constant.SharedMemoryName);
-                _view = _file.CreateViewAccessor(0, Marshal.SizeOf(typeof(Shared)));
-                return true;
+                try
+                {
+                    _file = MemoryMappedFile.OpenExisting(Constant.SharedMemoryName);
+                    _view = _file.CreateViewAccessor(0, Marshal.SizeOf(typeof(Shared)));
+                    NotifyStatusMessage("Memory mapped successfully");
+                }
+                catch (FileNotFoundException)
+                {
+                }
+                await Task.Delay(1);
             }
-            catch (FileNotFoundException)
+        }        
+
+        private string getTelemetryValue(string name, string type, Shared data)
+        {
+            String result = "";
+
+            //retrieve field by name
+            FieldInfo prop = data.GetType().GetField(name);
+
+            if (prop != null)
             {
-                return false;
+                //pType = real field type
+                string pType = prop.FieldType.Name;
+                //type = expected field type, has to match to pType otherwise abort
+                try
+                {
+                    switch (type)
+                    {
+                        case "Int32":
+                            if (type.Equals(pType))
+                                result = ((int)prop.GetValue(data)).ToString();
+                            break;
+                        case "Single":
+                            if (type.Equals(pType))
+                                result = ((Single)prop.GetValue(data)).ToString();
+                            break;
+                        case "kmh":
+                            if (pType.Equals("Single"))
+                                result = ((int)Math.Floor((Single)prop.GetValue(data) * 3.6)).ToString();
+                            break;
+                        case "time":
+                            if (pType.Equals("Single"))
+                            {
+                                float seconds = (Single)prop.GetValue(data);
+                                TimeSpan interval = TimeSpan.FromSeconds(seconds);
+                                result = interval.ToString(@"mm\.ss\.fff");
+                            }
+                            break;
+                    }
+                }
+                catch { }              
+            }
+
+            return result;
+        }
+
+        private string getTelemetryData(string name, string strPattern, Shared data)
+        {
+
+            string result = "";
+
+            if (!String.IsNullOrEmpty(name))
+            {
+                string[] type = name.Split('.');
+
+                if (type.Length > 1)
+                {
+                    //type[0] = property name, type[1] = property type
+                    result = this.getTelemetryValue(type[0], type[1], data);    
+                }
+
+                if (!String.IsNullOrEmpty(result))
+                {
+                    result = Utils.formatString(result, strPattern);
+                }
+            }
+
+            return result;
+        }
+
+        //needs to wait until MainForm 7Segment is loaded
+        private void send7SegmentMsg(Shared data)
+        {
+            StringBuilder msg = new StringBuilder();
+            List<string> _7SegmentData = MainForm.get7SegmentData();
+            string[] strPatterns = MainForm.getStrFormat().Split(Utils.ITEM_SEPARATOR);
+
+            if (_7SegmentData.Count > 0)
+            {
+                for (int x = 0; x < _7SegmentData.Count; x++)
+                {
+                    string name = _7SegmentData.ElementAt(x);
+                    string pattern = "{0}";
+
+                    if (strPatterns.Length > 0)
+                    {
+                        if (x < strPatterns.Length)
+                            pattern = string.IsNullOrEmpty(strPatterns[x]) ? "{0}" : strPatterns[x];
+                    }
+
+                    msg.Append(this.getTelemetryData(name, pattern, data));
+                }
+
+                if (msg.Length > 0)
+                {
+                    byte[] b = Utils.getBytes(msg.ToString());
+                    Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
+                    sm.sendCommand(c);
+                }
             }
         }
 
@@ -178,5 +233,29 @@ namespace iDash
         {
             return rps * (60 / (2 * (Single)Math.PI));
         }
+
+        public override void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    if (_view != null)
+                        _view.Dispose();
+                    if (_file != null)
+                        _file.Dispose();
+                }
+                // Release unmanaged resources.
+                disposed = true;
+            }
+        }
+
+        ~RaceRoomConnector() { Dispose(false); }
     }
 }

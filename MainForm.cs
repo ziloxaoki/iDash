@@ -70,6 +70,31 @@ namespace iDash
             vf.InitializeJoystick();                                    
         }
 
+
+        private int getSelectedSimulator()
+        {
+            for (int x = 0; x < simulatorToolStripMenuItem.DropDownItems.Count - 1; x++)
+            {
+                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)simulatorToolStripMenuItem.DropDownItems[x];
+                if (dropDownItem.Checked)
+                    return x;
+            }
+
+            return -1;
+        }
+
+        private int getSelectedConfiguration()
+        {
+            for (int x = 0; x < settingsToolStripMenuItem.DropDownItems.Count; x++)
+            {
+                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)settingsToolStripMenuItem.DropDownItems[x];
+                if (dropDownItem.Checked)
+                    return x;
+            }
+
+            return -1;
+        }
+
         private void parseViews()
         {
             if (this.views.Items.Count > 0)
@@ -97,22 +122,16 @@ namespace iDash
 
         private void syncViews()
         {
-            for (int x = 0; x < settingsToolStripMenuItem.DropDownItems.Count; x++)
+            int selectedSimulator = getSelectedConfiguration();
+            if (selectedSimulator < settingsToolStripMenuItem.DropDownItems.Count)
             {
-                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)settingsToolStripMenuItem.DropDownItems[x];
-                //search for selected simulator settings
-                if (dropDownItem.Checked)
-                {
-                    ArrayList objCollection = new ArrayList();
-                    objCollection.AddRange(Utils.convertObjectCollectionToStringArray(views.Items));
-                    TM1637ListBoxItems.Insert(x, objCollection);
+                ArrayList objCollection = new ArrayList();
+                objCollection.AddRange(Utils.convertObjectCollectionToStringArray(views.Items));
+                TM1637ListBoxItems.Insert(selectedSimulator, objCollection);
 
-                    ArrayList objCollection2 = new ArrayList();
-                    objCollection2.AddRange(Utils.convertObjectCollectionToStringArray(views2.Items));
-                    ButtonsListBoxItems.Insert(x, objCollection2);
-
-                    break;
-                }
+                ArrayList objCollection2 = new ArrayList();
+                objCollection2.AddRange(Utils.convertObjectCollectionToStringArray(views2.Items));
+                ButtonsListBoxItems.Insert(selectedSimulator, objCollection2);
             }
         }
 
@@ -123,20 +142,15 @@ namespace iDash
             this.selected.Items.Clear();
             this.textFormat.Clear();
 
-            for (int x = 0; x < settingsToolStripMenuItem.DropDownItems.Count; x++)
+            int selectedSimulator = getSelectedConfiguration();
+
+            if (selectedSimulator < TM1637ListBoxItems.Count)
             {
-                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)settingsToolStripMenuItem.DropDownItems[x];
-                if (dropDownItem.Checked)
-                {
-                    if (x < TM1637ListBoxItems.Count)
-                    {
-                        this.views.Items.AddRange(TM1637ListBoxItems[x].ToArray());
-                    }
-                    if (x < ButtonsListBoxItems.Count)
-                    {
-                        this.views2.Items.AddRange(ButtonsListBoxItems[x].ToArray());
-                    }
-                }
+                this.views.Items.AddRange(TM1637ListBoxItems[selectedSimulator].ToArray());
+            }
+            if (selectedSimulator < ButtonsListBoxItems.Count)
+            {
+                this.views2.Items.AddRange(ButtonsListBoxItems[selectedSimulator].ToArray());
             }
 
             if (views.Items.Count > 0)
@@ -738,6 +752,8 @@ namespace iDash
             {
                 mItem.CheckState = CheckState.Unchecked;
             }
+
+            this.settingsToolStripMenuItem.Enabled = true;
         }
 
         private void resetAllSettings()
@@ -754,19 +770,13 @@ namespace iDash
 
         private void setButtonHandler()
         {
-            for (int x = 0; x < settingsToolStripMenuItem.DropDownItems.Count; x++)
-            {
-                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)simulatorToolStripMenuItem.DropDownItems[x];
-                if (dropDownItem.Checked)
-                {
-                    if (x < ButtonsListBoxItems.Count)
-                    {
-                        bActions = ButtonsListBoxItems[x];
-                    }
+            int selectedSimulator = getSelectedSimulator();
 
-                    break;
-                }
+            if (selectedSimulator < ButtonsListBoxItems.Count)
+            {
+                bActions = ButtonsListBoxItems[selectedSimulator];
             }
+              
         }
 
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
@@ -786,6 +796,8 @@ namespace iDash
             }
 
             this.iRacingToolStripMenuItem1.PerformClick();
+
+            this.settingsToolStripMenuItem.Enabled = false;
 
             setButtonHandler();
         }
@@ -807,6 +819,8 @@ namespace iDash
             }
 
             this.raceRoomToolStripMenuItem1.PerformClick();
+
+            this.settingsToolStripMenuItem.Enabled = false;
 
             setButtonHandler();
         }

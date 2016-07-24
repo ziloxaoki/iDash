@@ -96,14 +96,8 @@ namespace iDash
                 }
                 else
                 {
-                    msg.Append("-OFF.");
-                    msg.Append(DateTime.Now.ToString("dd.MM.yyyy"));
-                    msg.Append(DateTime.Now.ToString("hh.mm.ss.ff"));
                     isConnected = false;
-
-                    byte[] b = Utils.getBytes(msg.ToString());
-                    Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
-                    sm.sendCommand(c);
+                    sm.sendCommand(Utils.getDisconnectedMsgCmd());
                 }
 
                 //c = new Command(Command.CMD_RGB_SHIFT, colourPattern);
@@ -117,53 +111,53 @@ namespace iDash
 
         private string getTelemetryData(string name, string strPattern)
         {
-            string value = "";
+            string result = "";
             if (!String.IsNullOrEmpty(name))
             {
                 string[] type = name.Split('.');
                 
-                if (type.Length == 2) {
+                if (type.Length > 1) {
                     switch(type[1])
                     {
                         case "int":
-                            value = wrapper.GetTelemetryValue<int>(type[0]).Value.ToString();
+                            result = wrapper.GetTelemetryValue<int>(type[0]).Value.ToString();
                             break;
                         case "float":
-                            value = ((int)Math.Floor(wrapper.GetTelemetryValue<float>(type[0]).Value)).ToString();
+                            result = (wrapper.GetTelemetryValue<float>(type[0]).Value).ToString();
                             break;
                         case "bool":
-                            value = wrapper.GetTelemetryValue<bool>(type[0]).Value.ToString();
+                            result = wrapper.GetTelemetryValue<bool>(type[0]).Value.ToString();
                             break;
                         case "double":
-                            value = wrapper.GetTelemetryValue<double>(type[0]).Value.ToString();
+                            result = wrapper.GetTelemetryValue<double>(type[0]).Value.ToString();
                             break;
                         case "bitfield":
-                            value = wrapper.GetTelemetryValue<byte>(type[0]).Value.ToString();
+                            result = wrapper.GetTelemetryValue<byte>(type[0]).Value.ToString();
                             break;
                         //todo: add handler for arrays
                         case "kmh":
-                            value = ((int)Math.Floor(wrapper.GetTelemetryValue<float>(type[0]).Value * 3.6)).ToString();
+                            result = ((int)Math.Floor(wrapper.GetTelemetryValue<float>(type[0]).Value * 3.6)).ToString();
                             break;
                         case "time":
                             float seconds = wrapper.GetTelemetryValue<float>(type[0]).Value;
                             TimeSpan interval = TimeSpan.FromSeconds(seconds);
-                            value = interval.ToString(@"mm\.ss\.fff");
+                            result = interval.ToString(@"mm\.ss\.fff");
                             break;
                         case "dtime":
                             double dseconds = wrapper.GetTelemetryValue<double>(type[0]).Value;
                             TimeSpan dinterval = TimeSpan.FromSeconds(dseconds);
-                            value = dinterval.ToString(@"mm\.ss\.fff");
+                            result = dinterval.ToString(@"mm\.ss\.fff");
                             break;
                     }
 
-                    if (!String.IsNullOrEmpty(value))
-                    {                        
-                        value = Utils.formatString(value, strPattern);
+                    if (!String.IsNullOrEmpty(result))
+                    {
+                        result = Utils.formatString(result, strPattern);
                     }
                 }
             }          
 
-            return value;
+            return result;
         }              
 
         private void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)

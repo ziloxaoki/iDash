@@ -477,6 +477,14 @@ namespace iDash
             if ((modifiers & 4) != 0) retval |= Keys.Alt;
             return retval;
         }
+
+        public static Command getDisconnectedMsgCmd()
+        {
+            string msg = "-OFF." + DateTime.Now.ToString("dd.MM.yyyy") + DateTime.Now.ToString("hh.mm.ss.ff");
+
+            byte[] b = Utils.getBytes(msg);
+            return new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
+        }
     }    
 
     public enum DebugMode
