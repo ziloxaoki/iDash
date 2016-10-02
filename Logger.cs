@@ -8,9 +8,9 @@ namespace iDash
 {
     public class Logger
     {
-        public static string GetTempPath()
+        public static string GetAppPath()
         {
-            string path = System.Environment.GetEnvironmentVariable("TEMP");
+            string path = AppDomain.CurrentDomain.BaseDirectory;
             if (!path.EndsWith("\\")) path += "\\";
             return path;
         }
@@ -18,12 +18,12 @@ namespace iDash
         public static void LogMessageToFile(string msg)
         {
             System.IO.StreamWriter sw = System.IO.File.AppendText(
-                GetTempPath() + "log.log");
+                GetAppPath() + "log.log");
             try
             {
-                /*string logLine = System.String.Format(
-                    "{0:G}: {1}.", System.DateTime.Now, msg);*/
-                sw.Write(msg);
+                string logLine = System.String.Format(
+                    "[{0:G}]: {1}", System.DateTime.Now, msg);
+                sw.WriteLine(logLine);
             }
             finally
             {

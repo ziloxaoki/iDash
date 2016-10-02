@@ -584,8 +584,8 @@ void loop() {
   
   processData();
 
-  if(isConnected) {
+  //if(isConnected) {
     sendButtonStatus(); 
-  }  
+  //}  
 
 }

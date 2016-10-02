@@ -138,29 +138,35 @@ namespace iDash
         {
             lock(commandLock)
             {
-                String type = "undefined";   
-                byte c = command.getData()[0];
-                switch (c)
+                try {
+                    String type = "undefined";
+                    byte c = command.getData()[0];
+                    switch (c)
+                    {
+                        //ACK message sent by Arduino
+                        case Command.CMD_SYN:
+                            lastArduinoResponse = Utils.getCurrentTimeMillis();
+                            type = "CMD_SYN";
+                            break;
+                        //Arduino response to a set debug mode message
+                        case Command.CMD_SET_DEBUG_MODE:
+                            isArduinoInDebugMode = command.getData()[1] == 1;
+                            type = "CMD_SET_DEBUG_MODE";
+                            break;
+                        //Arduino buttons state message
+                        case Command.CMD_BUTTON_STATUS:
+                            NotifyCommandReceived(command);
+                            type = "CMD_BUTTON_STATUS";
+                            break;
+                    }
+                    if (debugMode != DebugMode.None || isArduinoInDebugMode)
+                    {
+                        NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData()), type));
+                    }
+                } 
+                catch(Exception e)
                 {
-                    //ACK message sent by Arduino
-                    case Command.CMD_SYN:
-                        lastArduinoResponse = Utils.getCurrentTimeMillis();
-                        type = "CMD_SYN";
-                        break;
-                    //Arduino response to a set debug mode message
-                    case Command.CMD_SET_DEBUG_MODE:                        
-                        isArduinoInDebugMode = command.getData()[1] == 1;
-                        type = "CMD_SET_DEBUG_MODE";
-                        break;
-                    //Arduino buttons state message
-                    case Command.CMD_BUTTON_STATUS:                        
-                        NotifyCommandReceived(command);
-                        type = "CMD_BUTTON_STATUS";
-                        break;    
-                }
-                if (debugMode != DebugMode.None || isArduinoInDebugMode)
-                {
-                    NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData()), type));
+                    Logger.LogMessageToFile(e.Source + ": " + e.Message);
                 }
             }
         }      

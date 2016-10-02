@@ -50,6 +50,7 @@ namespace iDash
 
         public MainForm()
         {
+            Logger.LogMessageToFile("Init app.");
             this.appendToStatusBar = new AppendToStatusBarDelegate(UpdateStatusBar);
             this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
             InitializeComponent();
