@@ -43,14 +43,9 @@ namespace iDash
             serialPort.StopBits = StopBits.One;  //selected stopbits
             serialPort.DataBits = 8;             //selected data bits
             serialPort.BaudRate = 38400;         //selected baudrate            
-            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler  
-
-            Thread t = new Thread(new ThreadStart(start));
-            t.IsBackground = true;
-            t.Start();            
+            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                         
             
             this.tryToConnect();
-
 
             //timer1 = new System.Timers.Timer(1000);
             //timer1.Elapsed += timer1_Tick;
@@ -66,44 +61,50 @@ namespace iDash
         }
 
         private async void tryToConnect()
-        {
-            foreach (string port in this.getportnames())
-            {                                
+        {            
 
-                if (serialPort.IsOpen)  //if port is  open 
-                {
-                    serialPort.Close();  //close port
-                }
-
-                serialPort.PortName = port;    //selected name of port
-                NotifyStatusMessage("Searching for Arduino at " + port + "...");
-
-                try
-                {
-                    serialPort.Open();        //open serial port                
-                }
-                catch
-                {
-                    Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...
-                    serialPort.Open();        //try again
-                }
-
-                //wait for arduino ACK message
-                await Task.Delay(WAIT_SERIAL_CONNECT);
-
-                //is arduino ack was received this method returns true
+            while (!MainForm.stopThreads)
+            {
                 if (isArduinoAlive())
                 {
-                    NotifyStatusMessage("Arduino found at port " + port + "...");
-                    break;
+                    //if arduino does not receive a SynAck in 5s it will disconnect and start sending ACK commands
+                    this.sendSynAck();
+                    await Task.Delay(WAIT_TO_SEND_SYN_ACK);
                 }
+                else
+                {
+                    foreach (string port in this.getportnames())
+                    {
+                        if (serialPort.IsOpen)  //if port is  open 
+                        {
+                            serialPort.Close();  //close port
+                        }
 
-            }  
-            //could not find arduino keep trying to find it
-            if(!isArduinoAlive() && !MainForm.stopThreads)
-            {
-                this.tryToConnect();
+                        serialPort.PortName = port;    //selected name of port
+                        NotifyStatusMessage("Searching for Arduino at " + port + "...");
+
+                        try
+                        {
+                            serialPort.Open();        //open serial port                
+                        }
+                        catch
+                        {
+                            Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...
+                            serialPort.Open();        //try again
+                        }
+
+                        //wait for arduino ACK message
+                        await Task.Delay(WAIT_SERIAL_CONNECT);
+
+                        if (isArduinoAlive())
+                        {
+                            NotifyStatusMessage("Arduino found at port " + port + "...");
+                            break;
+                        }
+                    }
+                }
             }
+
         }
 
 
@@ -115,7 +116,13 @@ namespace iDash
                     //if arduino does not receive a SynAck in 5s it will disconnect and start sending ACK commands
                     this.sendSynAck();
                     await Task.Delay(WAIT_TO_SEND_SYN_ACK);
-                }                
+                }
+                else
+                {
+                    tryToConnect();
+                    //wait for arduino ACK message
+                    await Task.Delay(WAIT_SERIAL_CONNECT);
+                }                     
             }
 
             Dispose();

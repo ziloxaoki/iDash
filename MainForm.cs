@@ -31,7 +31,7 @@ namespace iDash
         public static bool stopThreads = false;
         public static bool stopIRacingThreads = false;
         public static bool stopRaceRoomThreads = false;
-        private static List<string> _7Segment;
+        private static List<string> _7Segment = new List<string>();
         private static string strFormat = "";
         private static readonly Object listLock = new Object();
 
@@ -255,10 +255,9 @@ namespace iDash
 
         public void UpdateStatusBar(string s)
         {
-            if (InvokeRequired)
+            if (this.statusBar.InvokeRequired)
                 this.statusBar.BeginInvoke(this.appendToStatusBar, new Object[] { s });
             else this.AppendToStatusBar(s);
-
         }
 
         public void AppendToDebugDialog(String s)
@@ -268,10 +267,9 @@ namespace iDash
 
         public void UpdateDebugData(string s)
         {
-            if (InvokeRequired)
+            if (this.debugData.InvokeRequired)
                 this.debugData.BeginInvoke(this.appendToDebugDialog, new Object[] { s });
             else this.AppendToDebugDialog(s);
-
         }
 
         private void statusBar_TextChanged(object sender, EventArgs e)
