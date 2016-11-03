@@ -58,12 +58,18 @@ namespace iDash
             handleButtonActions = new HandleButtonActions(handleButtons);            
 
             sm = new SerialManager();
-            bh = new ButtonHandler(sm);
-            vf = new VJoyFeeder(bh);
             sm.StatusMessageSubscribers += UpdateStatusBar;
-            vf.StatusMessageSubscribers += UpdateStatusBar;
             sm.DebugMessageSubscribers += UpdateDebugData;
+
+            bh = new ButtonHandler(sm);
             bh.buttonStateHandler += ButtonStateReceived;
+            //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
+            System.Threading.Thread.Sleep(1000);
+
+            vf = new VJoyFeeder(bh);            
+            vf.StatusMessageSubscribers += UpdateStatusBar;
+            
+            
 
             this.iRacingToolStripMenuItem1.PerformClick();
 

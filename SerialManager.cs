@@ -206,45 +206,47 @@ namespace iDash
 
             lock (dataLock)
             {
-
-                foreach (byte b in serialData) { 
-                    switch (b)
+                if (serialData != null) { 
+                    foreach (byte b in serialData)
                     {
-                        //command init char found
-                        case Command.CMD_INIT:
-                            serialCommand[0] = b;
-                            commandLength = 1;
-                            break;
+                        switch (b)
+                        {
+                            //command init char found
+                            case Command.CMD_INIT:
+                                serialCommand[0] = b;
+                                commandLength = 1;
+                                break;
 
-                        //command end char found, send it to be processed
-                        case Command.CMD_END:
-                            serialCommand[commandLength] = b;
+                            //command end char found, send it to be processed
+                            case Command.CMD_END:
+                                serialCommand[commandLength] = b;
 
-                            Command command = new Command(serialCommand);
+                                Command command = new Command(serialCommand);
 
-                            if (command != null && command.getLength() > 0)
-                            {
-                                lock (commandLock)
+                                if (command != null && command.getLength() > 0)
                                 {
-                                    processCommand(command);
+                                    lock (commandLock)
+                                    {
+                                        processCommand(command);
+                                    }
                                 }
-                            }
-                            commandLength = 0;
-                            Utils.resetArray(serialCommand);
-                            break;
-
-                        //command init char already found, start adding the command data to buffer
-                        default:
-                            if (commandLength > 0)
-                            {
-                                serialCommand[commandLength++] = b;
-                            }
-                            if (commandLength == BUFFER_SIZE - 1)
-                            {
                                 commandLength = 0;
                                 Utils.resetArray(serialCommand);
-                            }
-                            break;
+                                break;
+
+                            //command init char already found, start adding the command data to buffer
+                            default:
+                                if (commandLength > 0)
+                                {
+                                    serialCommand[commandLength++] = b;
+                                }
+                                if (commandLength == BUFFER_SIZE - 1)
+                                {
+                                    commandLength = 0;
+                                    Utils.resetArray(serialCommand);
+                                }
+                                break;
+                        }
                     }
                 }
             }
