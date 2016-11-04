@@ -28,6 +28,7 @@ namespace iDash
         private float firstRpm = 0;
         private float lastRpm = 0;
         private float currentRpm = 0;
+        private Shared data;
 
         private bool disposed = false;
 
@@ -59,15 +60,14 @@ namespace iDash
                             NotifyStatusMessage(s);
                             isConnected = true;
 
-                            new Thread(new ThreadStart(Map)).Start();
+                            //new Thread(new ThreadStart(Map)).Start();
+                            Map();
                         }
 
                         sm.sendCommand(Utils.getDisconnectedMsgCmd());
                     }
                     else
-                    {
-
-                        Shared data;
+                    {                        
                         _view.Read(0, out data);
 
                         int sessionType = data.SessionType;
@@ -79,7 +79,7 @@ namespace iDash
                             currentRpm = RpsToRpm(data.EngineRps);
 
                             sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
-                            send7SegmentMsg(data);
+                            send7SegmentMsg();
                         }
                         else
                         {
@@ -98,9 +98,22 @@ namespace iDash
             Dispose();
         }
 
-        
+        private bool Map()
+        {
+            try
+            {
+                _file = MemoryMappedFile.OpenExisting(Constant.SharedMemoryName);
+                _view = _file.CreateViewAccessor(0, Marshal.SizeOf(typeof(Shared)));
+                NotifyStatusMessage("Memory mapped successfully");
+                return true;
+            }
+            catch (FileNotFoundException)
+            {
+                return false;
+            }            
+        }
 
-        private async void Map()
+        /*private async void Map()
         {
             while (!Mapped)
             {
@@ -115,16 +128,16 @@ namespace iDash
                 }
                 await Task.Delay(1);
             }
-        }        
+        }*/
 
-        private string getTelemetryValue(string name, string type, Shared data)
+        protected override string getTelemetryValue(string name, string type, string clazz)
         {
             String result = "";
 
             //retrieve field by name
             FieldInfo prop = data.GetType().GetField(name);
 
-            if (prop != null)
+            if (prop != null && !String.IsNullOrEmpty(type))
             {
                 //pType = real field type
                 string pType = prop.FieldType.Name;
@@ -134,16 +147,27 @@ namespace iDash
                     switch (type)
                     {
                         case "Int32":
-                            if (type.Equals(pType))
-                                result = ((int)prop.GetValue(data)).ToString();
+                            if (type.Equals(pType)) {
+                                int val = ((int)prop.GetValue(data));
+                                if (name.Equals("Gear", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    //return reverse symbol
+                                    if (val < 0) return "R";
+                                }                                
+                                result = val.ToString();
+                            }
                             break;
                         case "Single":
                             if (type.Equals(pType))
+                            {
                                 result = ((Single)prop.GetValue(data)).ToString();
+                            }
                             break;
                         case "kmh":
                             if (pType.Equals("Single"))
+                            {
                                 result = ((int)Math.Floor((Single)prop.GetValue(data) * 3.6)).ToString();
+                            }
                             break;
                         case "time":
                             if (pType.Equals("Single"))
@@ -155,67 +179,14 @@ namespace iDash
                             break;
                     }
                 }
-                catch { }              
-            }
-
-            return result;
-        }
-
-        private string getTelemetryData(string name, string strPattern, Shared data)
-        {
-
-            string result = "";
-
-            if (!String.IsNullOrEmpty(name))
-            {
-                string[] type = name.Split('.');
-
-                if (type.Length > 1)
+                catch (Exception e)
                 {
-                    //type[0] = property name, type[1] = property type
-                    result = this.getTelemetryValue(type[0], type[1], data);    
-                }
-
-                if (!String.IsNullOrEmpty(result))
-                {
-                    result = Utils.formatString(result, strPattern);
+                    Logger.LogMessageToFile(e.Source + ": " + e.Message);
                 }
             }
 
             return result;
-        }
-
-        //needs to wait until MainForm 7Segment is loaded
-        private void send7SegmentMsg(Shared data)
-        {
-            StringBuilder msg = new StringBuilder();
-            List<string> _7SegmentData = MainForm.get7SegmentData();
-            string[] strPatterns = MainForm.getStrFormat().Split(Utils.ITEM_SEPARATOR);
-
-            if (_7SegmentData.Count > 0)
-            {
-                for (int x = 0; x < _7SegmentData.Count; x++)
-                {
-                    string name = _7SegmentData.ElementAt(x);
-                    string pattern = "{0}";
-
-                    if (strPatterns.Length > 0)
-                    {
-                        if (x < strPatterns.Length)
-                            pattern = string.IsNullOrEmpty(strPatterns[x]) ? "{0}" : strPatterns[x];
-                    }
-
-                    msg.Append(this.getTelemetryData(name, pattern, data));
-                }
-
-                if (msg.Length > 0)
-                {
-                    byte[] b = Utils.getBytes(msg.ToString());
-                    Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
-                    sm.sendCommand(c);
-                }
-            }
-        }
+        }               
 
 
         //notify subscribers (statusbar) that a message has to be logged

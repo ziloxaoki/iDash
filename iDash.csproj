@@ -63,6 +63,9 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AssettoCorsaSharedMemory">
+      <HintPath>packages\AssettoCorsaSharedMemory.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -89,6 +92,7 @@
     <Compile Include="ActionNextView.cs" />
     <Compile Include="ActionPreviousView.cs" />
     <Compile Include="ActionSendInput.cs" />
+    <Compile Include="AssettoCorsaConnector.cs" />
     <Compile Include="ButtonHandler.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="ISimConnector.cs" />
@@ -174,7 +178,8 @@
 copy $(SolutionDir)\packages\iRacingSdkWrapper.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRSDKSharp.dll  $(TargetDir).
 copy $(SolutionDir)\packages\YamlDotNet.dll  $(TargetDir).
-copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).</PostBuildEvent>
+copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).
+copy $(SolutionDir)\packages\AssettoCorsaSharedMemory.dll  $(TargetDir).</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

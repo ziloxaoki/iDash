@@ -63,6 +63,70 @@ namespace iDash
                 sm.sendCommand(rgbShift);
             }
         }
+        
+        protected abstract string getTelemetryValue(string name, string type, string clazz);
+
+        protected string getTelemetryData(string name, string strPattern)
+        {
+
+            string result = "";
+
+            if (!String.IsNullOrEmpty(name))
+            {
+                string[] type = name.Split('.');
+
+                if (type.Length > 1)
+                {
+                    string clazz = null;
+                    if(type.Length > 2)
+                    {
+                        clazz = type[2];
+                    }
+
+                    //type[0] = property name, type[1] = property type
+                    result = this.getTelemetryValue(type[0], type[1], clazz);
+                }
+
+                if (!String.IsNullOrEmpty(result))
+                {
+                    result = Utils.formatString(result, strPattern);
+                }
+            }
+
+            return result;
+        }
+
+        //needs to wait until MainForm 7Segment is loaded
+        protected void send7SegmentMsg()
+        {
+            StringBuilder msg = new StringBuilder();
+            List<string> _7SegmentData = MainForm.get7SegmentData();
+            string[] strPatterns = MainForm.getStrFormat().Split(Utils.ITEM_SEPARATOR);
+
+            if (_7SegmentData.Count > 0)
+            {
+                for (int x = 0; x < _7SegmentData.Count; x++)
+                {
+                    string name = _7SegmentData.ElementAt(x);
+                    string pattern = "{0}";
+
+                    if (strPatterns.Length > 0)
+                    {
+                        if (x < strPatterns.Length)
+                            pattern = string.IsNullOrEmpty(strPatterns[x]) ? "{0}" : strPatterns[x];
+                    }
+
+                    msg.Append(this.getTelemetryData(name, pattern));
+                }
+
+                if (msg.Length > 0)
+                {
+                    byte[] b = Utils.getBytes(msg.ToString());
+                    Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
+                    sm.sendCommand(c);
+                }
+            }
+        }
 
         public abstract void Dispose();        
     }

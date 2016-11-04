@@ -23,14 +23,16 @@ namespace iDash
         private VJoyFeeder vf;
         private IRacingConnector irc;
         private RaceRoomConnector rrc;
+        private AssettoCorsaConnector acc;
 
-        private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>();
-        private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>();
+        private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>(3);
+        private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>(3);
         private ArrayList bActions = new ArrayList();
 
         public static bool stopThreads = false;
         public static bool stopIRacingThreads = false;
         public static bool stopRaceRoomThreads = false;
+        public static bool stopAssettoThreads = false;
         private static List<string> _7Segment = new List<string>();
         private static string strFormat = "";
         private static readonly Object listLock = new Object();
@@ -67,9 +69,7 @@ namespace iDash
             System.Threading.Thread.Sleep(1000);
 
             vf = new VJoyFeeder(bh);            
-            vf.StatusMessageSubscribers += UpdateStatusBar;
-            
-            
+            vf.StatusMessageSubscribers += UpdateStatusBar;                       
 
             this.iRacingToolStripMenuItem1.PerformClick();
 
@@ -102,6 +102,7 @@ namespace iDash
             return -1;
         }
 
+        //parse the view dialog so 7 segment display nows which properties to show
         private void parseViews()
         {
             if (this.views.Items.Count > 0)
@@ -127,6 +128,7 @@ namespace iDash
             }
         }
 
+        //update the temporary array where the settings changes are stored. i.e when a new view is added
         private void syncViews()
         {
             int selectedSimulator = getSelectedConfiguration();
@@ -655,7 +657,7 @@ namespace iDash
             }
             else
             {
-                MessageBox.Show("Please select a buttons and one action.",
+                MessageBox.Show("Please select a button and one action.",
                                 "Important Note",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error,
@@ -788,10 +790,12 @@ namespace iDash
         {
             //update connection menu state
             resetConnectionUI();
-            //stop iRacing threads
+            //keep iRacing threads alive
             stopIRacingThreads = false;
-            //keep RaceRoom threads alive
+            //stop RaceRoom threads
             stopRaceRoomThreads = true;
+            //stop Assetto threads
+            stopAssettoThreads = true;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked; 
                        
             if (irc == null)
@@ -811,10 +815,12 @@ namespace iDash
         {
             //update connection menu state
             resetConnectionUI();
-            //keep iRacing threads alive
+            //stop iRacing threads
             stopIRacingThreads = true;
-            //stop RaceRoom threads
+            //keep RaceRoom threads alive
             stopRaceRoomThreads = false;
+            //stop Assetto threads
+            stopAssettoThreads = true;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
 
             if (rrc == null)
@@ -824,6 +830,31 @@ namespace iDash
             }
 
             this.raceRoomToolStripMenuItem1.PerformClick();
+
+            this.settingsToolStripMenuItem.Enabled = false;
+
+            setButtonHandler();
+        }
+
+        private void assettoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //update connection menu state
+            resetConnectionUI();
+            //stop iRacing threads
+            stopIRacingThreads = true;
+            //stop RaceRoom threads
+            stopRaceRoomThreads = true;
+            //keep Assetto threads alive
+            stopAssettoThreads = false;
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+
+            if (rrc == null)
+            {
+                acc = new AssettoCorsaConnector(sm);
+                acc.StatusMessageSubscribers += UpdateStatusBar;
+            }
+
+            this.assettoToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
 
@@ -848,15 +879,27 @@ namespace iDash
             loadViewProperties();
         }
 
+        private void assettoToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            resetAllSettings();
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+            this.props.Items.AddRange(Constants.AssettoTelemetryData);
+
+            loadViewProperties();
+        }
+
         private void noneToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //update connection menu state
             resetConnectionUI();
             //stop iRacing threads
             stopIRacingThreads = true;
-            //keep RaceRoom threads alive
+            //stop RaceRoom threads
             stopRaceRoomThreads = true;
+            //stop Assetto threads
+            stopAssettoThreads = true;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+            statusBar.AppendText("Simulator disconnected.");
         }
     }
 }

@@ -37,39 +37,7 @@ namespace iDash
             wrapper.Start();            
 
             new Thread(new ThreadStart(start)).Start();
-        }
-               
-
-        //needs to wait until MainForm 7Segment is loaded
-        private void send7SegmentMsg()
-        {
-            StringBuilder msg = new StringBuilder();
-            List<string> _7SegmentData = MainForm.get7SegmentData();
-            string[] strPatterns = MainForm.getStrFormat().Split(Utils.ITEM_SEPARATOR);
-
-            if (_7SegmentData.Count > 0)
-            {                
-                for (int x = 0; x < _7SegmentData.Count; x++)
-                {
-                    string name = _7SegmentData.ElementAt(x);
-                    string pattern = "{0}";                    
-
-                    if(strPatterns.Length > 0) {
-                        if(x < strPatterns.Length)
-                            pattern = string.IsNullOrEmpty(strPatterns[x]) ? "{0}" : strPatterns[x];
-                    }
-
-                    msg.Append(this.getTelemetryData(name, pattern));
-                }
-
-                if (msg.Length > 0)
-                {
-                    byte[] b = Utils.getBytes(msg.ToString());
-                    Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
-                    sm.sendCommand(c);
-                }
-            }
-        }
+        }              
 
 
         private async void start()
@@ -108,54 +76,51 @@ namespace iDash
             Dispose();
         }
 
-
-        private string getTelemetryData(string name, string strPattern)
+        protected override string getTelemetryValue(string name, string type, string clazz)
         {
             string result = "";
-            if (!String.IsNullOrEmpty(name))
-            {
-                string[] type = name.Split('.');
-                
-                if (type.Length > 1) {
-                    switch(type[1])
+
+            try {
+                if (!String.IsNullOrEmpty(name) && !String.IsNullOrEmpty(type))
+                {
+                    switch (type)
                     {
                         case "int":
-                            result = wrapper.GetTelemetryValue<int>(type[0]).Value.ToString();
+                            result = wrapper.GetTelemetryValue<int>(name).Value.ToString();
                             break;
                         case "float":
-                            result = (wrapper.GetTelemetryValue<float>(type[0]).Value).ToString();
+                            result = (wrapper.GetTelemetryValue<float>(name).Value).ToString();
                             break;
                         case "bool":
-                            result = wrapper.GetTelemetryValue<bool>(type[0]).Value.ToString();
+                            result = wrapper.GetTelemetryValue<bool>(name).Value.ToString();
                             break;
                         case "double":
-                            result = wrapper.GetTelemetryValue<double>(type[0]).Value.ToString();
+                            result = wrapper.GetTelemetryValue<double>(name).Value.ToString();
                             break;
                         case "bitfield":
-                            result = wrapper.GetTelemetryValue<byte>(type[0]).Value.ToString();
+                            result = wrapper.GetTelemetryValue<byte>(name).Value.ToString();
                             break;
                         //todo: add handler for arrays
                         case "kmh":
-                            result = ((int)Math.Floor(wrapper.GetTelemetryValue<float>(type[0]).Value * 3.6)).ToString();
+                            result = ((int)Math.Floor(wrapper.GetTelemetryValue<float>(name).Value * 3.6)).ToString();
                             break;
                         case "time":
-                            float seconds = wrapper.GetTelemetryValue<float>(type[0]).Value;
+                            float seconds = wrapper.GetTelemetryValue<float>(name).Value;
                             TimeSpan interval = TimeSpan.FromSeconds(seconds);
                             result = interval.ToString(@"mm\.ss\.fff");
                             break;
                         case "dtime":
-                            double dseconds = wrapper.GetTelemetryValue<double>(type[0]).Value;
+                            double dseconds = wrapper.GetTelemetryValue<double>(name).Value;
                             TimeSpan dinterval = TimeSpan.FromSeconds(dseconds);
                             result = dinterval.ToString(@"mm\.ss\.fff");
                             break;
                     }
-
-                    if (!String.IsNullOrEmpty(result))
-                    {
-                        result = Utils.formatString(result, strPattern);
-                    }
                 }
-            }          
+            }
+            catch(Exception e)
+            {
+                Logger.LogMessageToFile(e.Source + ": " + e.Message);
+            }
 
             return result;
         }              
@@ -217,7 +182,7 @@ namespace iDash
                 // Release unmanaged resources.
                 disposed = true;
             }
-        }
+        }        
 
         ~IRacingConnector() { Dispose(false); }
     }

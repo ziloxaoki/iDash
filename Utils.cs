@@ -387,8 +387,10 @@ namespace iDash
                 result = new byte[content.Length - offset - count];
                 for (int x = offset; x < content.Length; x++)
                 {
+                    //. has to be converted as this is the cmd se
                     if (x < content.Length - 2 && content[x + 1] == (byte)'.')
                     {
+                        //. is the most significant byte in a char
                         result[pos++] = (byte)(convertByteTo7Segment(content[x++]) + 128);
                     } else
                     {
