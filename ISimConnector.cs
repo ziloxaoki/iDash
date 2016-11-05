@@ -38,14 +38,14 @@ namespace iDash
                     }
                     else //blink
                     {
-                        /*if (milSec < 50 || (milSec > 100 && milSec < 150) ||
+                        if (milSec < 50 || (milSec > 100 && milSec < 150) ||
                         (milSec > 200 && milSec < 250) || (milSec > 300 && milSec < 350) ||
                         (milSec > 400 && milSec < 450) || (milSec > 500 && milSec < 550) ||
                         (milSec > 600 && milSec < 650) || (milSec > 700 && milSec < 750) ||
-                        (milSec > 800 && milSec < 850) || (milSec > 900))*/
-                        if (milSec < 100 || (milSec > 200 && milSec < 300) ||
+                        (milSec > 800 && milSec < 850) || (milSec > 900 && milSec > 950))
+                        /*if (milSec < 100 || (milSec > 200 && milSec < 300) ||
                         (milSec > 400 && milSec < 500) || (milSec > 600 && milSec < 700) ||
-                        (milSec > 800 && milSec < 900) || (milSec > 900))
+                        (milSec > 800 && milSec < 900) || (milSec > 900))*/
                         {
                             rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
                         }
