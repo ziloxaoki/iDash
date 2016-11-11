@@ -89,10 +89,10 @@ void TM1637Display::setSegments(const uint8_t segments[], uint8_t  offset, uint8
 	
 	// Write the data bytes
 	for (uint8_t k=offset; k < length + offset; k++) {
-	  if(segments[k] == 255)
+	  if(segments[k] == 255 || segments[k] == 48)
 		writeByte(0);
 	  else
-	    writeByte(segments[k]);
+		writeByte(segments[k]);
 	}
 	  
 	stop();
