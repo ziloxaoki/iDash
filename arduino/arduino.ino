@@ -165,6 +165,7 @@ const int encoderPinA[] = {2,3};
 const int encoderPinB[] = {4,5};
 
 volatile int encoderPos[] = {15000, 15000};
+volatile int orientation[] = {0, 0};
 int lastPos[] = {15000, 15000};
 byte lastState[] = {0, 0};
 long lastRotaryStateChange = 0;
@@ -307,31 +308,66 @@ void setup()
 
 }
 
+bool isValidSignal(bool isHigh, int offset) {
+  if(isHigh) {    
+    if(orientation[offset] > 0) {      
+      return true;
+    }
+    orientation[offset]+=1;
+  } else {
+    if(orientation[offset] < 0) {      
+      return true;
+    }
+    orientation[offset]-=1;
+  }
+
+  return false;
+}
 
 void rotEncoder1(){
-  int pinB = digitalState(encoderPinB[0]);
+  //cli(); //stop interrupts happening before we read pin values  
+  int pinOffset = 0;
   if(millis() - lastRotaryBounce > 10) {
-    if (pinB == LOW) {
-      encoderPos[0]--;  
-    } else {
-      encoderPos[0]++;
+    int pinB = digitalState(encoderPinB[pinOffset]);
+
+    //anti bounce incorrect reading. First reading is lost but prevent incorrect reading.
+    if (isValidSignal(pinB, pinOffset)) {  
+      if(pinB == HIGH) {    
+        encoderPos[pinOffset]++;  
+        Serial.println("Anticlockwise");
+        Serial.flush();
+      } else{
+        encoderPos[pinOffset]--;
+        Serial.println("Clockwise");
+        Serial.flush();
+      }
     }
-  }
-  
+  }  
   lastRotaryBounce = millis();
+  //sei(); //restart interrupts
 }
 
 void rotEncoder2(){
-  int pinB = digitalState(encoderPinB[1]);
+  //cli(); //stop interrupts happening before we read pin values  
+  int pinOffset = 1;
   if(millis() - lastRotaryBounce > 10) {
-    if (pinB == LOW) {
-      encoderPos[1]--;  
-    } else {
-      encoderPos[1]++;
+    int pinB = digitalState(encoderPinB[pinOffset]);
+
+    //anti bounce incorrect reading. First reading is lost but prevent incorrect reading.
+    if (isValidSignal(pinB, pinOffset)) {  
+      if(pinB == HIGH) {    
+        encoderPos[pinOffset]++;  
+        //Serial.println("Clockwise");
+        //Serial.flush();
+      } else{
+        encoderPos[pinOffset]--;
+        //Serial.println("Anticlockwise");
+        //Serial.flush();
+      }
     }
-  }
-  
+  }  
   lastRotaryBounce = millis();
+  //sei(); //restart interrupts
 }
 
 
