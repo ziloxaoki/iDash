@@ -724,32 +724,6 @@ namespace iDash
             }            
         }
 
-        private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (isWaitingForKey)
-            {
-                isWaitingForKey = false;
-                label4.Visible = false;
-                string buttonId = buttonsActive.SelectedItem.ToString();
-
-                if (isButtonBinded(buttonId))
-                {
-                    MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
-                                "Important Note",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error,
-                                MessageBoxDefaultButton.Button1);
-                    return;
-                }
-
-                string value = buttonId + Utils.SIGN_EQUALS + e.KeyChar;
-                if (!views2.Items.Contains(value))
-                    views2.Items.Add(value);
-
-                syncViews();
-            }
-        }
-
         private void resetConnectionUI()
         {
             irc = null;
@@ -900,6 +874,33 @@ namespace iDash
             stopAssettoThreads = true;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             statusBar.AppendText("Simulator disconnected.");
+        }
+
+
+        private void MainForm_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (isWaitingForKey)
+            {
+                isWaitingForKey = false;
+                label4.Visible = false;
+                string buttonId = buttonsActive.SelectedItem.ToString();
+
+                if (isButtonBinded(buttonId))
+                {
+                    MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
+                                "Important Note",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error,
+                                MessageBoxDefaultButton.Button1);
+                    return;
+                }
+
+                string value = buttonId + Utils.SIGN_EQUALS + e.KeyCode;
+                if (!views2.Items.Contains(value))
+                    views2.Items.Add(value);
+
+                syncViews();
+            }
         }
     }
 }

@@ -370,7 +370,7 @@ namespace iDash
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(1111, 213);
+            this.label4.Location = new System.Drawing.Point(1172, 661);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(176, 33);
             this.label4.TabIndex = 33;
@@ -379,11 +379,11 @@ namespace iDash
             // 
             // button9
             // 
-            this.button9.Location = new System.Drawing.Point(913, 204);
+            this.button9.Location = new System.Drawing.Point(974, 652);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(170, 48);
             this.button9.TabIndex = 32;
-            this.button9.Text = "Map to Key";
+            this.button9.Text = "Map to Keyboard";
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
@@ -410,7 +410,7 @@ namespace iDash
             // button13
             // 
             this.button13.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.button13.Location = new System.Drawing.Point(1487, 456);
+            this.button13.Location = new System.Drawing.Point(1487, 424);
             this.button13.Name = "button13";
             this.button13.Size = new System.Drawing.Size(33, 48);
             this.button13.TabIndex = 27;
@@ -420,7 +420,7 @@ namespace iDash
             // button14
             // 
             this.button14.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.button14.Location = new System.Drawing.Point(1487, 388);
+            this.button14.Location = new System.Drawing.Point(1487, 356);
             this.button14.Name = "button14";
             this.button14.Size = new System.Drawing.Size(33, 48);
             this.button14.TabIndex = 26;
@@ -430,7 +430,7 @@ namespace iDash
             // button15
             // 
             this.button15.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.button15.Location = new System.Drawing.Point(1487, 71);
+            this.button15.Location = new System.Drawing.Point(1487, 95);
             this.button15.Name = "button15";
             this.button15.Size = new System.Drawing.Size(33, 48);
             this.button15.TabIndex = 25;
@@ -440,7 +440,7 @@ namespace iDash
             // button16
             // 
             this.button16.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.button16.Location = new System.Drawing.Point(1487, 3);
+            this.button16.Location = new System.Drawing.Point(1487, 27);
             this.button16.Name = "button16";
             this.button16.Size = new System.Drawing.Size(33, 48);
             this.button16.TabIndex = 24;
@@ -450,7 +450,7 @@ namespace iDash
             // button18
             // 
             this.button18.Image = global::iDash.Properties.Resources._112_RightArrowShort_Grey_32x32_72;
-            this.button18.Location = new System.Drawing.Point(746, 417);
+            this.button18.Location = new System.Drawing.Point(744, 388);
             this.button18.Name = "button18";
             this.button18.Size = new System.Drawing.Size(48, 34);
             this.button18.TabIndex = 22;
@@ -460,7 +460,7 @@ namespace iDash
             // views2
             // 
             this.views2.FormattingEnabled = true;
-            this.views2.Location = new System.Drawing.Point(838, 277);
+            this.views2.Location = new System.Drawing.Point(838, 196);
             this.views2.Name = "views2";
             this.views2.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.views2.Size = new System.Drawing.Size(643, 433);
@@ -575,28 +575,28 @@ namespace iDash
             // iRacingToolStripMenuItem
             // 
             this.iRacingToolStripMenuItem.Name = "iRacingToolStripMenuItem";
-            this.iRacingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.iRacingToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.iRacingToolStripMenuItem.Text = "IRacing";
             this.iRacingToolStripMenuItem.Click += new System.EventHandler(this.iRacingToolStripMenuItem_Click);
             // 
             // raceroomToolStripMenuItem
             // 
             this.raceroomToolStripMenuItem.Name = "raceroomToolStripMenuItem";
-            this.raceroomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.raceroomToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.raceroomToolStripMenuItem.Text = "Raceroom";
             this.raceroomToolStripMenuItem.Click += new System.EventHandler(this.raceroomToolStripMenuItem_Click);
             // 
             // assettoToolStripMenuItem
             // 
             this.assettoToolStripMenuItem.Name = "assettoToolStripMenuItem";
-            this.assettoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.assettoToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.assettoToolStripMenuItem.Text = "Assetto Corsa";
             this.assettoToolStripMenuItem.Click += new System.EventHandler(this.assettoToolStripMenuItem_Click);
             // 
             // noneToolStripMenuItem
             // 
             this.noneToolStripMenuItem.Name = "noneToolStripMenuItem";
-            this.noneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.noneToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.noneToolStripMenuItem.Text = "None";
             this.noneToolStripMenuItem.Click += new System.EventHandler(this.noneToolStripMenuItem_Click);
             // 
@@ -613,21 +613,21 @@ namespace iDash
             // iRacingToolStripMenuItem1
             // 
             this.iRacingToolStripMenuItem1.Name = "iRacingToolStripMenuItem1";
-            this.iRacingToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.iRacingToolStripMenuItem1.Size = new System.Drawing.Size(146, 22);
             this.iRacingToolStripMenuItem1.Text = "iRacing";
             this.iRacingToolStripMenuItem1.Click += new System.EventHandler(this.iRacingToolStripMenuItem1_Click);
             // 
             // raceRoomToolStripMenuItem1
             // 
             this.raceRoomToolStripMenuItem1.Name = "raceRoomToolStripMenuItem1";
-            this.raceRoomToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.raceRoomToolStripMenuItem1.Size = new System.Drawing.Size(146, 22);
             this.raceRoomToolStripMenuItem1.Text = "RaceRoom";
             this.raceRoomToolStripMenuItem1.Click += new System.EventHandler(this.raceRoomToolStripMenuItem1_Click);
             // 
             // assettoToolStripMenuItem1
             // 
             this.assettoToolStripMenuItem1.Name = "assettoToolStripMenuItem1";
-            this.assettoToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.assettoToolStripMenuItem1.Size = new System.Drawing.Size(146, 22);
             this.assettoToolStripMenuItem1.Text = "Assetto Corsa";
             this.assettoToolStripMenuItem1.Click += new System.EventHandler(this.assettoToolStripMenuItem1_Click);
             // 
@@ -645,7 +645,7 @@ namespace iDash
             this.Name = "MainForm";
             this.Text = "iDash";
             this.Load += new System.EventHandler(this.MainForm_Load);
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             this.mainTab.ResumeLayout(false);
             this.settingsTab.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
