@@ -36,6 +36,7 @@ namespace iDash
         private static List<string> _7Segment = new List<string>();
         private static string strFormat = "";
         private static readonly Object listLock = new Object();
+        private int selectedSimulator = Constants.IRacing;
 
         public delegate void AppendToStatusBarDelegate(String s);
         public AppendToStatusBarDelegate appendToStatusBar;
@@ -78,7 +79,7 @@ namespace iDash
         }
 
 
-        private int getSelectedSimulator()
+        /*private int getSelectedSimulator()
         {
             for (int x = 0; x < simulatorToolStripMenuItem.DropDownItems.Count - 1; x++)
             {
@@ -100,7 +101,7 @@ namespace iDash
             }
 
             return -1;
-        }
+        }*/
 
         //parse the view dialog so 7 segment display nows which properties to show
         private void parseViews()
@@ -131,7 +132,7 @@ namespace iDash
         //update the temporary array where the settings changes are stored. i.e when a new view is added
         private void syncViews()
         {
-            int selectedSimulator = getSelectedConfiguration();
+            //int selectedSimulator = getSelectedConfiguration();
             if (selectedSimulator < settingsToolStripMenuItem.DropDownItems.Count)
             {
                 ArrayList objCollection = new ArrayList();
@@ -151,7 +152,7 @@ namespace iDash
             this.selected.Items.Clear();
             this.textFormat.Clear();
 
-            int selectedSimulator = getSelectedConfiguration();
+            //int selectedSimulator = getSelectedConfiguration();
 
             if (selectedSimulator < TM1637ListBoxItems.Count)
             {
@@ -402,7 +403,7 @@ namespace iDash
             }
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void deleteTemplate_Click(object sender, EventArgs e)
         {
             if (views.SelectedIndex != -1)
             {
@@ -416,7 +417,7 @@ namespace iDash
             syncViews();
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private void addTemplate_Click(object sender, EventArgs e)
         {
             string viewValue = null;
 
@@ -472,6 +473,7 @@ namespace iDash
             if (views2.SelectedIndex > 0)
             {
                 this.MoveItem(views2, -1);
+                syncViews();
             }
         }
 
@@ -481,6 +483,7 @@ namespace iDash
             if (views2.SelectedIndex < views2.Items.Count - 1)
             {
                 this.MoveItem(views2, 1);
+                syncViews();
             }
         }
 
@@ -544,10 +547,10 @@ namespace iDash
             return strFormat;
         }
 
-        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        private void leftTab_SelectedIndexChanged(object sender, EventArgs e)
         {
-            isSearchingButton = tabControl1.SelectedIndex == 1;
-            loadViewProperties();
+            isSearchingButton = leftTab.SelectedIndex == 1;
+            //loadViewProperties();
         }
 
         private void addButtonToList(int index)
@@ -635,7 +638,7 @@ namespace iDash
             return false;
         }
 
-        private void button18_Click(object sender, EventArgs e)
+        private void addButtonBind_Click(object sender, EventArgs e)
         {
             if(buttonsActive.SelectedIndex > -1 && buttonActions.SelectedIndex > -1)
             {
@@ -667,7 +670,7 @@ namespace iDash
             syncViews();
         }
 
-        private void button12_Click(object sender, EventArgs e)
+        private void deleteButtonBind_Click(object sender, EventArgs e)
         {
             if (views2.SelectedIndex != -1)
             {
@@ -721,7 +724,9 @@ namespace iDash
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error,
                                 MessageBoxDefaultButton.Button1);
-            }            
+            }
+
+            syncViews();          
         }
 
         private void resetConnectionUI()
@@ -751,7 +756,7 @@ namespace iDash
 
         private void setButtonHandler()
         {
-            int selectedSimulator = getSelectedSimulator();
+            //int selectedSimulator = getSelectedSimulator();
 
             if (selectedSimulator < ButtonsListBoxItems.Count)
             {
@@ -781,6 +786,7 @@ namespace iDash
             this.iRacingToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
+            selectedSimulator = Constants.IRacing;
 
             setButtonHandler();
         }
@@ -806,6 +812,7 @@ namespace iDash
             this.raceRoomToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
+            selectedSimulator = Constants.Raceroom;
 
             setButtonHandler();
         }
@@ -831,6 +838,7 @@ namespace iDash
             this.assettoToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
+            selectedSimulator = Constants.Assetto;
 
             setButtonHandler();
         }
@@ -840,6 +848,7 @@ namespace iDash
             resetAllSettings();
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             this.props.Items.AddRange(Constants.IRacingTelemetryData);
+            this.selectedSimulator = Constants.IRacing;
 
             loadViewProperties();
         }
@@ -849,6 +858,7 @@ namespace iDash
             resetAllSettings();
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             this.props.Items.AddRange(Constants.RaceRoomTelemetryData);
+            this.selectedSimulator = Constants.Raceroom;
 
             loadViewProperties();
         }
@@ -858,6 +868,7 @@ namespace iDash
             resetAllSettings();
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             this.props.Items.AddRange(Constants.AssettoTelemetryData);
+            this.selectedSimulator = Constants.Assetto;
 
             loadViewProperties();
         }
@@ -874,6 +885,7 @@ namespace iDash
             stopAssettoThreads = true;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             statusBar.AppendText("Simulator disconnected.");
+            selectedSimulator = Constants.None;
         }
 
 

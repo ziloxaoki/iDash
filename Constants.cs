@@ -8,6 +8,10 @@ namespace iDash
 {
     class Constants
     {
+        public static int IRacing = 0;
+        public static int Raceroom = 1;
+        public static int Assetto = 2;
+        public static int None = 3;
         public static object[] RaceRoomTelemetryData = new object[] {
             "EngineRps.Single",
             "MaxEngineRps.Single",

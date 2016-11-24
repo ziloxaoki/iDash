@@ -93,10 +93,21 @@ namespace iDash
                             }
                             break;
                         case "kmh":
-                            string t = field.FieldType.Name;
                             if (field.FieldType.Name.Equals("Single"))
                             {
                                 result = ((int)Math.Floor((Single)field.GetValue(clazz))).ToString();
+                            }
+                            break;
+                        case "Single[]":
+                            if (field.FieldType.Name.Equals("Single[]"))
+                            {
+                                Single[] values = (Single[])field.GetValue(clazz);
+                                foreach (Single value in values)
+                                {
+                                    result += value.ToString() + ".";
+                                }
+
+                                result = result.Remove(result.Length - 1);
                             }
                             break;
                         default:
@@ -150,8 +161,19 @@ namespace iDash
         }
 
         protected void StaticInfoUpdated(object sender, StaticInfoEventArgs e)
-        {
-            lastRpm = e.StaticInfo.MaxRpm;
+        {            
+            if (e.StaticInfo.MaxRpm == 0)
+            {
+                //auto calibrate the max rpm. Sometimes the card doesn't return this info.
+                if (lastRpm < currentRpm && currentRpm > 5000)
+                {
+                    lastRpm = currentRpm;
+                }
+            }
+            else
+            {                
+                lastRpm = e.StaticInfo.MaxRpm;
+            }
             firstRpm = FIRST_RPM * lastRpm;
             si = e.StaticInfo;                     
         }
@@ -163,7 +185,7 @@ namespace iDash
 
         protected void PhysicsUpdated(object sender, PhysicsEventArgs e)
         {
-            currentRpm = e.Physics.Rpms;
+            currentRpm = e.Physics.Rpms;            
             ph = e.Physics;
         }
 

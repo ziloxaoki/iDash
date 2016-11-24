@@ -36,13 +36,13 @@ namespace iDash
             this.label1 = new System.Windows.Forms.Label();
             this.mainTab = new System.Windows.Forms.TabControl();
             this.settingsTab = new System.Windows.Forms.TabPage();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.leftTab = new System.Windows.Forms.TabControl();
             this.tm1637 = new System.Windows.Forms.TabPage();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.button11 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
-            this.button8 = new System.Windows.Forms.Button();
+            this.addTemplate = new System.Windows.Forms.Button();
+            this.deleteTemplate = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
@@ -59,12 +59,12 @@ namespace iDash
             this.label4 = new System.Windows.Forms.Label();
             this.button9 = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.button12 = new System.Windows.Forms.Button();
+            this.deleteButtonBind = new System.Windows.Forms.Button();
             this.button13 = new System.Windows.Forms.Button();
             this.button14 = new System.Windows.Forms.Button();
             this.button15 = new System.Windows.Forms.Button();
             this.button16 = new System.Windows.Forms.Button();
-            this.button18 = new System.Windows.Forms.Button();
+            this.addButtonBind = new System.Windows.Forms.Button();
             this.views2 = new System.Windows.Forms.ListBox();
             this.buttonActions = new System.Windows.Forms.ListBox();
             this.buttonsActive = new System.Windows.Forms.ListBox();
@@ -86,7 +86,7 @@ namespace iDash
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
-            this.tabControl1.SuspendLayout();
+            this.leftTab.SuspendLayout();
             this.tm1637.SuspendLayout();
             this.buttons.SuspendLayout();
             this.debugTab.SuspendLayout();
@@ -132,7 +132,7 @@ namespace iDash
             // 
             // settingsTab
             // 
-            this.settingsTab.Controls.Add(this.tabControl1);
+            this.settingsTab.Controls.Add(this.leftTab);
             this.settingsTab.Location = new System.Drawing.Point(4, 22);
             this.settingsTab.Name = "settingsTab";
             this.settingsTab.Padding = new System.Windows.Forms.Padding(3);
@@ -141,27 +141,27 @@ namespace iDash
             this.settingsTab.Text = "Dashboard";
             this.settingsTab.UseVisualStyleBackColor = true;
             // 
-            // tabControl1
+            // leftTab
             // 
-            this.tabControl1.Alignment = System.Windows.Forms.TabAlignment.Left;
-            this.tabControl1.Controls.Add(this.tm1637);
-            this.tabControl1.Controls.Add(this.buttons);
-            this.tabControl1.Location = new System.Drawing.Point(-4, 0);
-            this.tabControl1.Multiline = true;
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1568, 733);
-            this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-            this.tabControl1.TabIndex = 0;
-            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            this.leftTab.Alignment = System.Windows.Forms.TabAlignment.Left;
+            this.leftTab.Controls.Add(this.tm1637);
+            this.leftTab.Controls.Add(this.buttons);
+            this.leftTab.Location = new System.Drawing.Point(-4, 0);
+            this.leftTab.Multiline = true;
+            this.leftTab.Name = "leftTab";
+            this.leftTab.SelectedIndex = 0;
+            this.leftTab.Size = new System.Drawing.Size(1568, 733);
+            this.leftTab.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+            this.leftTab.TabIndex = 0;
+            this.leftTab.SelectedIndexChanged += new System.EventHandler(this.leftTab_SelectedIndexChanged);
             // 
             // tm1637
             // 
             this.tm1637.Controls.Add(this.label7);
             this.tm1637.Controls.Add(this.label6);
             this.tm1637.Controls.Add(this.button11);
-            this.tm1637.Controls.Add(this.button7);
-            this.tm1637.Controls.Add(this.button8);
+            this.tm1637.Controls.Add(this.addTemplate);
+            this.tm1637.Controls.Add(this.deleteTemplate);
             this.tm1637.Controls.Add(this.button5);
             this.tm1637.Controls.Add(this.button6);
             this.tm1637.Controls.Add(this.button4);
@@ -211,25 +211,25 @@ namespace iDash
             this.button11.UseVisualStyleBackColor = true;
             this.button11.Click += new System.EventHandler(this.button11_Click);
             // 
-            // button7
+            // addTemplate
             // 
-            this.button7.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.button7.Location = new System.Drawing.Point(1328, 144);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(33, 48);
-            this.button7.TabIndex = 13;
-            this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.button7_Click);
+            this.addTemplate.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
+            this.addTemplate.Location = new System.Drawing.Point(1328, 144);
+            this.addTemplate.Name = "addTemplate";
+            this.addTemplate.Size = new System.Drawing.Size(33, 48);
+            this.addTemplate.TabIndex = 13;
+            this.addTemplate.UseVisualStyleBackColor = true;
+            this.addTemplate.Click += new System.EventHandler(this.addTemplate_Click);
             // 
-            // button8
+            // deleteTemplate
             // 
-            this.button8.Image = global::iDash.Properties.Resources.bin;
-            this.button8.Location = new System.Drawing.Point(1489, 664);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(46, 48);
-            this.button8.TabIndex = 12;
-            this.button8.UseVisualStyleBackColor = true;
-            this.button8.Click += new System.EventHandler(this.button8_Click);
+            this.deleteTemplate.Image = global::iDash.Properties.Resources.bin;
+            this.deleteTemplate.Location = new System.Drawing.Point(1489, 664);
+            this.deleteTemplate.Name = "deleteTemplate";
+            this.deleteTemplate.Size = new System.Drawing.Size(46, 48);
+            this.deleteTemplate.TabIndex = 12;
+            this.deleteTemplate.UseVisualStyleBackColor = true;
+            this.deleteTemplate.Click += new System.EventHandler(this.deleteTemplate_Click);
             // 
             // button5
             // 
@@ -349,12 +349,12 @@ namespace iDash
             this.buttons.Controls.Add(this.label4);
             this.buttons.Controls.Add(this.button9);
             this.buttons.Controls.Add(this.label5);
-            this.buttons.Controls.Add(this.button12);
+            this.buttons.Controls.Add(this.deleteButtonBind);
             this.buttons.Controls.Add(this.button13);
             this.buttons.Controls.Add(this.button14);
             this.buttons.Controls.Add(this.button15);
             this.buttons.Controls.Add(this.button16);
-            this.buttons.Controls.Add(this.button18);
+            this.buttons.Controls.Add(this.addButtonBind);
             this.buttons.Controls.Add(this.views2);
             this.buttons.Controls.Add(this.buttonActions);
             this.buttons.Controls.Add(this.buttonsActive);
@@ -397,15 +397,15 @@ namespace iDash
             this.label5.TabIndex = 31;
             this.label5.Text = "Buttons";
             // 
-            // button12
+            // deleteButtonBind
             // 
-            this.button12.Image = global::iDash.Properties.Resources.bin;
-            this.button12.Location = new System.Drawing.Point(1487, 661);
-            this.button12.Name = "button12";
-            this.button12.Size = new System.Drawing.Size(48, 48);
-            this.button12.TabIndex = 28;
-            this.button12.UseVisualStyleBackColor = true;
-            this.button12.Click += new System.EventHandler(this.button12_Click);
+            this.deleteButtonBind.Image = global::iDash.Properties.Resources.bin;
+            this.deleteButtonBind.Location = new System.Drawing.Point(1487, 661);
+            this.deleteButtonBind.Name = "deleteButtonBind";
+            this.deleteButtonBind.Size = new System.Drawing.Size(48, 48);
+            this.deleteButtonBind.TabIndex = 28;
+            this.deleteButtonBind.UseVisualStyleBackColor = true;
+            this.deleteButtonBind.Click += new System.EventHandler(this.deleteButtonBind_Click);
             // 
             // button13
             // 
@@ -447,15 +447,15 @@ namespace iDash
             this.button16.UseVisualStyleBackColor = true;
             this.button16.Click += new System.EventHandler(this.button16_Click);
             // 
-            // button18
+            // addButtonBind
             // 
-            this.button18.Image = global::iDash.Properties.Resources._112_RightArrowShort_Grey_32x32_72;
-            this.button18.Location = new System.Drawing.Point(744, 388);
-            this.button18.Name = "button18";
-            this.button18.Size = new System.Drawing.Size(48, 34);
-            this.button18.TabIndex = 22;
-            this.button18.UseVisualStyleBackColor = true;
-            this.button18.Click += new System.EventHandler(this.button18_Click);
+            this.addButtonBind.Image = global::iDash.Properties.Resources._112_RightArrowShort_Grey_32x32_72;
+            this.addButtonBind.Location = new System.Drawing.Point(744, 388);
+            this.addButtonBind.Name = "addButtonBind";
+            this.addButtonBind.Size = new System.Drawing.Size(48, 34);
+            this.addButtonBind.TabIndex = 22;
+            this.addButtonBind.UseVisualStyleBackColor = true;
+            this.addButtonBind.Click += new System.EventHandler(this.addButtonBind_Click);
             // 
             // views2
             // 
@@ -648,7 +648,7 @@ namespace iDash
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             this.mainTab.ResumeLayout(false);
             this.settingsTab.ResumeLayout(false);
-            this.tabControl1.ResumeLayout(false);
+            this.leftTab.ResumeLayout(false);
             this.tm1637.ResumeLayout(false);
             this.tm1637.PerformLayout();
             this.buttons.ResumeLayout(false);
@@ -676,7 +676,7 @@ namespace iDash
         private System.Windows.Forms.RichTextBox debugData;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox debugModes;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl leftTab;
         private System.Windows.Forms.TabPage tm1637;
         private System.Windows.Forms.TabPage buttons;
         private System.Windows.Forms.Button button1;
@@ -685,8 +685,8 @@ namespace iDash
         private System.Windows.Forms.ListBox views;
         private System.Windows.Forms.ListBox selected;
         private System.Windows.Forms.ListBox props;
-        private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button addTemplate;
+        private System.Windows.Forms.Button deleteTemplate;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button4;
@@ -705,8 +705,8 @@ namespace iDash
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox isSimConnected;
         private System.Windows.Forms.Button button9;
-        private System.Windows.Forms.Button button12;
-        private System.Windows.Forms.Button button18;
+        private System.Windows.Forms.Button deleteButtonBind;
+        private System.Windows.Forms.Button addButtonBind;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.MenuStrip mainmenu;
         private System.Windows.Forms.ToolStripMenuItem simulatorToolStripMenuItem;
