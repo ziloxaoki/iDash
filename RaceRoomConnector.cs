@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using iDash.Data;
+using R3E.Data;
 using System.IO;
 using System.Threading;
 using System.Reflection;
@@ -102,7 +102,7 @@ namespace iDash
         {
             try
             {
-                _file = MemoryMappedFile.OpenExisting(Constant.SharedMemoryName);
+                _file = MemoryMappedFile.OpenExisting(R3E.Constant.SharedMemoryName);
                 _view = _file.CreateViewAccessor(0, Marshal.SizeOf(typeof(Shared)));
                 NotifyStatusMessage("Memory mapped successfully");
                 return true;
