@@ -56,6 +56,7 @@ namespace iDash
             Logger.LogMessageToFile("Init app.");
             this.appendToStatusBar = new AppendToStatusBarDelegate(UpdateStatusBar);
             this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
+            //Action Handlers have a pointer to Form, so they can only be initialized after the form.
             InitializeComponent();
 
             handleButtonActions = new HandleButtonActions(handleButtons);            

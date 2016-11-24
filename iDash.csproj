@@ -100,7 +100,6 @@
     <Compile Include="CommandHandler.cs" />
     <Compile Include="ICommandHandler.cs" />
     <Compile Include="IRacingConnector.cs" />
-    <Compile Include="KeySim.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

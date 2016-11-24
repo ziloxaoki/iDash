@@ -82,11 +82,28 @@ namespace iDash
 
         public override void process(string action, State state)
         {
-            if (state == State.KeyDown)
+            INPUT[] inputs = null;
+            ushort keycode = (ushort)Utils.ConvertCharToVirtualKey(action);
+            switch (state)
             {
-                ushort Keycode = (ushort)Utils.ConvertCharToVirtualKey(action[0]);
+                case State.KeyDown:
+                    inputs = getKeyAction(keycode, false);
+                    break;
 
-                INPUT[] inputs = new INPUT[]
+                case State.KeyUp:
+                    inputs = getKeyAction(keycode, true);                    
+                    break;
+            } 
+            
+            if(inputs != null)
+            {
+                SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+            }           
+        }
+
+        private INPUT[] getKeyAction(ushort keycode, bool isKeyUp)
+        {
+            INPUT[] inputs = new INPUT[]
                 {
                     new INPUT
                     {
@@ -95,17 +112,16 @@ namespace iDash
                         {
                             ki = new KEYBDINPUT
                             {
-                                wVk = Keycode,
+                                wVk = keycode,
                                 wScan = 0,
-                                dwFlags = 0,
+                                dwFlags = isKeyUp ? KEYEVENTF_KEYUP : 0x00,
                                 dwExtraInfo = GetMessageExtraInfo(),
                             }
                         }
                     }
                 };
 
-                SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
-            }
+            return inputs;
         }
     }
 
