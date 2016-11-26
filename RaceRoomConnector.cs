@@ -9,6 +9,7 @@ using R3E.Data;
 using System.IO;
 using System.Threading;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace iDash
 {
@@ -37,7 +38,12 @@ namespace iDash
             this.sm = sm;
 
             new Thread(new ThreadStart(start)).Start();
-        }        
+        }
+
+        private bool isRrreRunning()
+        {
+            return Process.GetProcessesByName("RRRE").Length > 0;
+        }
 
         public async void start()
         {
@@ -50,7 +56,7 @@ namespace iDash
             {
                 msg.Clear();
 
-                if (Utils.isRrreRunning())
+                if (isRrreRunning())
                 {
                     if (!Mapped)
                     {

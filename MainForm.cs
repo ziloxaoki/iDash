@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -48,7 +49,10 @@ namespace iDash
         private bool isWaitingForKey = false;
 
         public delegate void HandleButtonActions(List<State> states);
-        public HandleButtonActions handleButtonActions;                
+        public HandleButtonActions handleButtonActions;
+
+        private Thread SendDateTimeArduino;
+        private bool isSimulatorDisconnected = true;
 
 
         public MainForm()
@@ -75,8 +79,12 @@ namespace iDash
 
             this.iRacingToolStripMenuItem1.PerformClick();
 
+            sm.sendCommand(Utils.getDisconnectedMsgCmd());
+
             sm.Init();
-            vf.InitializeJoystick();                                    
+            vf.InitializeJoystick();
+
+            new Thread(new ThreadStart(sendDatetimeToArduino)).Start();
         }
 
 
@@ -103,6 +111,15 @@ namespace iDash
 
             return -1;
         }*/
+
+        private async void sendDatetimeToArduino()
+        {
+            while (isSimulatorDisconnected)
+            {
+                sm.sendCommand(Utils.getDisconnectedMsgCmd());
+                await Task.Delay(10);
+            }
+        }
 
         //parse the view dialog so 7 segment display nows which properties to show
         private void parseViews()
@@ -146,7 +163,7 @@ namespace iDash
             }
         }
 
-        private void loadViewProperties()
+        private void loadViewProperties(int simulatorIndex)
         {
             this.views.Items.Clear();
             this.views2.Items.Clear();
@@ -155,13 +172,13 @@ namespace iDash
 
             //int selectedSimulator = getSelectedConfiguration();
 
-            if (selectedSimulator < TM1637ListBoxItems.Count)
+            if (simulatorIndex < TM1637ListBoxItems.Count)
             {
-                this.views.Items.AddRange(TM1637ListBoxItems[selectedSimulator].ToArray());
+                this.views.Items.AddRange(TM1637ListBoxItems[simulatorIndex].ToArray());
             }
-            if (selectedSimulator < ButtonsListBoxItems.Count)
+            if (simulatorIndex < ButtonsListBoxItems.Count)
             {
-                this.views2.Items.AddRange(ButtonsListBoxItems[selectedSimulator].ToArray());
+                this.views2.Items.AddRange(ButtonsListBoxItems[simulatorIndex].ToArray());
             }
 
             if (views.Items.Count > 0)
@@ -171,7 +188,7 @@ namespace iDash
                 views2.SelectedIndex = 0;
         }
 
-        private void restoreViewProperties()
+        private void restoreAppConfiguration()
         {           
             using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(Properties.Settings.Default.TM1637)))
             {
@@ -191,7 +208,8 @@ namespace iDash
                 }
             }
 
-            loadViewProperties();
+            //Default to first simulator
+            loadViewProperties(0);
         }
 
 
@@ -410,12 +428,12 @@ namespace iDash
             {
                 for (int i = views.SelectedItems.Count - 1; i >= 0; i--)
                     views.Items.Remove(views.SelectedItems[i]);
+
+                syncViews();
             }
 
             if (views.Items.Count > 0)
-                views.SelectedIndex = 0;
-
-            syncViews();
+                views.SelectedIndex = 0;            
         }
 
         private void addTemplate_Click(object sender, EventArgs e)
@@ -425,31 +443,33 @@ namespace iDash
             for (int i = 0; i < selected.SelectedItems.Count; i++) {             
                 viewValue += (string)selected.SelectedItems[i] + Utils.LIST_SEPARATOR;
             }
+
             if (viewValue != null && viewValue.Length > 0)
             {
                 viewValue += textFormat.Text + Utils.LIST_SEPARATOR + isSimConnected.Checked;
                 if (!views.Items.Contains(viewValue))
                 {
                     views.Items.Add(viewValue);
+                    syncViews();
                 }
-            }
-
-            syncViews();
+            }            
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void viewUp_Click(object sender, EventArgs e)
         {
             if (views.SelectedIndex > 0)
             {
                 this.MoveItem(views, -1);
-            }
+                syncViews();
+            }            
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void viewDown_Click(object sender, EventArgs e)
         {
             if (views.SelectedIndex < views.Items.Count - 1)
             {
                 this.MoveItem(views, 1);
+                syncViews();
             }
         }
 
@@ -469,7 +489,7 @@ namespace iDash
             }
         }
 
-        private void button14_Click(object sender, EventArgs e)
+        private void view2Up_Click(object sender, EventArgs e)
         {
             if (views2.SelectedIndex > 0)
             {
@@ -479,7 +499,7 @@ namespace iDash
         }
 
 
-        private void button13_Click(object sender, EventArgs e)
+        private void view2Down_Click(object sender, EventArgs e)
         {
             if (views2.SelectedIndex < views2.Items.Count - 1)
             {
@@ -633,7 +653,14 @@ namespace iDash
             foreach(string s in views2.Items) {
                 string id = s.Split(Utils.SIGN_EQUALS)[0];
                 if (buttonId.Equals(id))
+                {
+                    MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
+                                "Important Note",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error,
+                                MessageBoxDefaultButton.Button1);
                     return true;
+                }
             }
 
             return false;
@@ -646,18 +673,16 @@ namespace iDash
                 string buttonId = buttonsActive.SelectedItem.ToString();
                 
                 if(isButtonBinded(buttonId))
-                {
-                    MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
-                                "Important Note",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error,
-                                MessageBoxDefaultButton.Button1);
+                {                    
                     return;
                 }
 
                 string value = buttonId + Utils.SIGN_EQUALS + buttonActions.SelectedItem.ToString();
                 if (!views2.Items.Contains(value))
+                {
                     views2.Items.Add(value);
+                    syncViews();
+                }
             }
             else
             {
@@ -666,9 +691,7 @@ namespace iDash
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error,
                                 MessageBoxDefaultButton.Button1);
-            }
-
-            syncViews();
+            }            
         }
 
         private void deleteButtonBind_Click(object sender, EventArgs e)
@@ -677,12 +700,12 @@ namespace iDash
             {
                 for (int i = views2.SelectedItems.Count - 1; i >= 0; i--)
                     views2.Items.Remove(views2.SelectedItems[i]);
+
+                syncViews();
             }
 
             if (views2.Items.Count > 0)
-                views2.SelectedIndex = 0;
-
-            syncViews();
+                views2.SelectedIndex = 0;            
         }        
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -690,7 +713,7 @@ namespace iDash
             this.iRacingToolStripMenuItem1.CheckState = CheckState.Checked;
 
             //restore TM1637 and Buttons settings
-            restoreViewProperties();
+            restoreAppConfiguration();
 
             if (this.views.Items.Count > 0)
             {
@@ -703,7 +726,7 @@ namespace iDash
             }
         }
 
-        private async void button9_Click(object sender, EventArgs e)
+        private async void keystroke_Click(object sender, EventArgs e)
         {
             if (buttonsActive.SelectedIndex > -1)
             {                
@@ -725,9 +748,7 @@ namespace iDash
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error,
                                 MessageBoxDefaultButton.Button1);
-            }
-
-            syncViews();          
+            }      
         }
 
         private void resetConnectionUI()
@@ -755,19 +776,20 @@ namespace iDash
             }
         }
 
-        private void setButtonHandler()
+        private void setButtonHandler(int simulatorIndex)
         {
             //int selectedSimulator = getSelectedSimulator();
 
-            if (selectedSimulator < ButtonsListBoxItems.Count)
+            if (simulatorIndex < ButtonsListBoxItems.Count)
             {
-                bActions = ButtonsListBoxItems[selectedSimulator];
+                bActions = ButtonsListBoxItems[simulatorIndex];
             }
               
         }
 
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            isSimulatorDisconnected = false;
             //update connection menu state
             resetConnectionUI();
             //keep iRacing threads alive
@@ -789,11 +811,12 @@ namespace iDash
             this.settingsToolStripMenuItem.Enabled = false;
             selectedSimulator = Constants.IRacing;
 
-            setButtonHandler();
+            setButtonHandler(selectedSimulator);
         }
 
         private void raceroomToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            isSimulatorDisconnected = false;
             //update connection menu state
             resetConnectionUI();
             //stop iRacing threads
@@ -815,11 +838,12 @@ namespace iDash
             this.settingsToolStripMenuItem.Enabled = false;
             selectedSimulator = Constants.Raceroom;
 
-            setButtonHandler();
+            setButtonHandler(selectedSimulator);
         }
 
         private void assettoToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            isSimulatorDisconnected = false;
             //update connection menu state
             resetConnectionUI();
             //stop iRacing threads
@@ -830,7 +854,7 @@ namespace iDash
             stopAssettoThreads = false;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
 
-            if (rrc == null)
+            if (acc == null)
             {
                 acc = new AssettoCorsaConnector(sm);
                 acc.StatusMessageSubscribers += UpdateStatusBar;
@@ -841,7 +865,7 @@ namespace iDash
             this.settingsToolStripMenuItem.Enabled = false;
             selectedSimulator = Constants.Assetto;
 
-            setButtonHandler();
+            setButtonHandler(selectedSimulator);
         }
 
         private void iRacingToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -851,7 +875,7 @@ namespace iDash
             this.props.Items.AddRange(Constants.IRacingTelemetryData);
             this.selectedSimulator = Constants.IRacing;
 
-            loadViewProperties();
+            loadViewProperties(selectedSimulator);
         }
 
         private void raceRoomToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -861,7 +885,7 @@ namespace iDash
             this.props.Items.AddRange(Constants.RaceRoomTelemetryData);
             this.selectedSimulator = Constants.Raceroom;
 
-            loadViewProperties();
+            loadViewProperties(selectedSimulator);
         }
 
         private void assettoToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -871,7 +895,7 @@ namespace iDash
             this.props.Items.AddRange(Constants.AssettoTelemetryData);
             this.selectedSimulator = Constants.Assetto;
 
-            loadViewProperties();
+            loadViewProperties(selectedSimulator);
         }
 
         private void noneToolStripMenuItem_Click(object sender, EventArgs e)
@@ -887,6 +911,11 @@ namespace iDash
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             statusBar.AppendText("Simulator disconnected.");
             selectedSimulator = Constants.None;
+            if (!isSimulatorDisconnected)
+            {
+                isSimulatorDisconnected = true;
+                new Thread(new ThreadStart(sendDatetimeToArduino)).Start();
+            }
         }
 
 
@@ -900,11 +929,6 @@ namespace iDash
 
                 if (isButtonBinded(buttonId))
                 {
-                    MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
-                                "Important Note",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error,
-                                MessageBoxDefaultButton.Button1);
                     return;
                 }
 

@@ -173,11 +173,11 @@ long lastRotaryStateChange = 0;
 volatile long lastRotaryBounce = 0;
 long lastSynAck = 0;
 
-bool isConnected = false;
+//bool isConnected = false;
 boolean isDebugMode = false;
 long lastMessageSent = 0;
 
-
+bool noDataReceived = true;
 
 int asize(byte* b) {
   return sizeof(b) / sizeof(byte);
@@ -486,20 +486,23 @@ void processCommand(byte *buffer, int commandLength) {
     
     //syn ack
     case 'a' : 
-      isConnected = true;
-      lastSynAck = millis();
+      //isConnected = true;
       sendHandshacking();  
       break;
 
     case 'B' :    
-      sendToTM1637_MAX7221(buffer);         
+      sendToTM1637_MAX7221(buffer);      
+      noDataReceived = false;   
       break;
 
     case 'C' :
       sendToWS2812B(buffer);
+      noDataReceived = false;
       //sendDataToSerial(commandLength,buffer);
       break;
   }  
+
+  lastSynAck = millis();
   buffer[0] = 0;
 }
 
@@ -608,13 +611,16 @@ void loop() {
 //    Serial.print("freeMemory()=");
 //    Serial.println(freeMemory());
   //haven't received Syn Ack from IDash for too long
-  if(millis() - lastSynAck > 5000 || !isConnected) {
-    resetTM1637_MAX7221();
-    resetWS2812B();
+  if(millis() - lastSynAck > 5000 /*|| !isConnected*/) {
+    if(noDataReceived) {
+      resetTM1637_MAX7221();
+      resetWS2812B();
+    }    
     //testWS2812B();
-    isConnected = false;  
+    //isConnected = false;  
     isDebugMode = false;  
-    sendHandshacking();    
+    sendHandshacking();   
+    noDataReceived = true; 
     delay(50);
   }
   

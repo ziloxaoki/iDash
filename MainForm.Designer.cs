@@ -43,8 +43,8 @@ namespace iDash
             this.button11 = new System.Windows.Forms.Button();
             this.addTemplate = new System.Windows.Forms.Button();
             this.deleteTemplate = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
+            this.buttonViewDown = new System.Windows.Forms.Button();
+            this.buttonViewUp = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
@@ -57,11 +57,11 @@ namespace iDash
             this.props = new System.Windows.Forms.ListBox();
             this.buttons = new System.Windows.Forms.TabPage();
             this.label4 = new System.Windows.Forms.Label();
-            this.button9 = new System.Windows.Forms.Button();
+            this.keystrokeButton = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.deleteButtonBind = new System.Windows.Forms.Button();
-            this.button13 = new System.Windows.Forms.Button();
-            this.button14 = new System.Windows.Forms.Button();
+            this.buttonView2Down = new System.Windows.Forms.Button();
+            this.buttonView2Up = new System.Windows.Forms.Button();
             this.button15 = new System.Windows.Forms.Button();
             this.button16 = new System.Windows.Forms.Button();
             this.addButtonBind = new System.Windows.Forms.Button();
@@ -162,8 +162,8 @@ namespace iDash
             this.tm1637.Controls.Add(this.button11);
             this.tm1637.Controls.Add(this.addTemplate);
             this.tm1637.Controls.Add(this.deleteTemplate);
-            this.tm1637.Controls.Add(this.button5);
-            this.tm1637.Controls.Add(this.button6);
+            this.tm1637.Controls.Add(this.buttonViewDown);
+            this.tm1637.Controls.Add(this.buttonViewUp);
             this.tm1637.Controls.Add(this.button4);
             this.tm1637.Controls.Add(this.button3);
             this.tm1637.Controls.Add(this.button2);
@@ -231,25 +231,25 @@ namespace iDash
             this.deleteTemplate.UseVisualStyleBackColor = true;
             this.deleteTemplate.Click += new System.EventHandler(this.deleteTemplate_Click);
             // 
-            // button5
+            // buttonViewDown
             // 
-            this.button5.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.button5.Location = new System.Drawing.Point(1489, 459);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(33, 48);
-            this.button5.TabIndex = 11;
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
+            this.buttonViewDown.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
+            this.buttonViewDown.Location = new System.Drawing.Point(1489, 459);
+            this.buttonViewDown.Name = "buttonViewDown";
+            this.buttonViewDown.Size = new System.Drawing.Size(33, 48);
+            this.buttonViewDown.TabIndex = 11;
+            this.buttonViewDown.UseVisualStyleBackColor = true;
+            this.buttonViewDown.Click += new System.EventHandler(this.viewDown_Click);
             // 
-            // button6
+            // buttonViewUp
             // 
-            this.button6.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.button6.Location = new System.Drawing.Point(1489, 391);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(33, 48);
-            this.button6.TabIndex = 10;
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
+            this.buttonViewUp.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
+            this.buttonViewUp.Location = new System.Drawing.Point(1489, 391);
+            this.buttonViewUp.Name = "buttonViewUp";
+            this.buttonViewUp.Size = new System.Drawing.Size(33, 48);
+            this.buttonViewUp.TabIndex = 10;
+            this.buttonViewUp.UseVisualStyleBackColor = true;
+            this.buttonViewUp.Click += new System.EventHandler(this.viewUp_Click);
             // 
             // button4
             // 
@@ -347,11 +347,11 @@ namespace iDash
             // buttons
             // 
             this.buttons.Controls.Add(this.label4);
-            this.buttons.Controls.Add(this.button9);
+            this.buttons.Controls.Add(this.keystrokeButton);
             this.buttons.Controls.Add(this.label5);
             this.buttons.Controls.Add(this.deleteButtonBind);
-            this.buttons.Controls.Add(this.button13);
-            this.buttons.Controls.Add(this.button14);
+            this.buttons.Controls.Add(this.buttonView2Down);
+            this.buttons.Controls.Add(this.buttonView2Up);
             this.buttons.Controls.Add(this.button15);
             this.buttons.Controls.Add(this.button16);
             this.buttons.Controls.Add(this.addButtonBind);
@@ -377,15 +377,15 @@ namespace iDash
             this.label4.Text = "Press a key.";
             this.label4.Visible = false;
             // 
-            // button9
+            // keystrokeButton
             // 
-            this.button9.Location = new System.Drawing.Point(974, 652);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(170, 48);
-            this.button9.TabIndex = 32;
-            this.button9.Text = "Map to Keyboard";
-            this.button9.UseVisualStyleBackColor = true;
-            this.button9.Click += new System.EventHandler(this.button9_Click);
+            this.keystrokeButton.Location = new System.Drawing.Point(974, 652);
+            this.keystrokeButton.Name = "keystrokeButton";
+            this.keystrokeButton.Size = new System.Drawing.Size(170, 48);
+            this.keystrokeButton.TabIndex = 32;
+            this.keystrokeButton.Text = "Map to Keyboard";
+            this.keystrokeButton.UseVisualStyleBackColor = true;
+            this.keystrokeButton.Click += new System.EventHandler(this.keystroke_Click);
             // 
             // label5
             // 
@@ -407,25 +407,25 @@ namespace iDash
             this.deleteButtonBind.UseVisualStyleBackColor = true;
             this.deleteButtonBind.Click += new System.EventHandler(this.deleteButtonBind_Click);
             // 
-            // button13
+            // buttonView2Down
             // 
-            this.button13.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.button13.Location = new System.Drawing.Point(1487, 424);
-            this.button13.Name = "button13";
-            this.button13.Size = new System.Drawing.Size(33, 48);
-            this.button13.TabIndex = 27;
-            this.button13.UseVisualStyleBackColor = true;
-            this.button13.Click += new System.EventHandler(this.button13_Click);
+            this.buttonView2Down.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
+            this.buttonView2Down.Location = new System.Drawing.Point(1487, 424);
+            this.buttonView2Down.Name = "buttonView2Down";
+            this.buttonView2Down.Size = new System.Drawing.Size(33, 48);
+            this.buttonView2Down.TabIndex = 27;
+            this.buttonView2Down.UseVisualStyleBackColor = true;
+            this.buttonView2Down.Click += new System.EventHandler(this.view2Down_Click);
             // 
-            // button14
+            // buttonView2Up
             // 
-            this.button14.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.button14.Location = new System.Drawing.Point(1487, 356);
-            this.button14.Name = "button14";
-            this.button14.Size = new System.Drawing.Size(33, 48);
-            this.button14.TabIndex = 26;
-            this.button14.UseVisualStyleBackColor = true;
-            this.button14.Click += new System.EventHandler(this.button14_Click);
+            this.buttonView2Up.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
+            this.buttonView2Up.Location = new System.Drawing.Point(1487, 356);
+            this.buttonView2Up.Name = "buttonView2Up";
+            this.buttonView2Up.Size = new System.Drawing.Size(33, 48);
+            this.buttonView2Up.TabIndex = 26;
+            this.buttonView2Up.UseVisualStyleBackColor = true;
+            this.buttonView2Up.Click += new System.EventHandler(this.view2Up_Click);
             // 
             // button15
             // 
@@ -687,14 +687,14 @@ namespace iDash
         private System.Windows.Forms.ListBox props;
         private System.Windows.Forms.Button addTemplate;
         private System.Windows.Forms.Button deleteTemplate;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button buttonViewDown;
+        private System.Windows.Forms.Button buttonViewUp;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button11;
-        private System.Windows.Forms.Button button13;
-        private System.Windows.Forms.Button button14;
+        private System.Windows.Forms.Button buttonView2Down;
+        private System.Windows.Forms.Button buttonView2Up;
         private System.Windows.Forms.Button button15;
         private System.Windows.Forms.Button button16;
         private System.Windows.Forms.ListBox views2;
@@ -704,7 +704,7 @@ namespace iDash
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox isSimConnected;
-        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button keystrokeButton;
         private System.Windows.Forms.Button deleteButtonBind;
         private System.Windows.Forms.Button addButtonBind;
         private System.Windows.Forms.Label label4;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -449,12 +448,7 @@ namespace iDash
             }
 
             return String.Format(pattern, text);
-        }
-
-        public static bool isRrreRunning()
-        {
-            return Process.GetProcessesByName("RRRE").Length > 0;
-        }
+        }        
 
         public static string[] convertObjectCollectionToStringArray(ListBox.ObjectCollection origin)
         {
