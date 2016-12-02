@@ -15,7 +15,7 @@ namespace iDash
         private const int WAIT_SERIAL_CONNECT = 3000;
         //arduino will wait 5 secs for a SYN ACK
         private const int WAIT_TO_SEND_SYN_ACK = 500;
-        private const int ARDUINO_TIMED_OUT = 5000;
+        private const int ARDUINO_TIMED_OUT = 1000;
 
         private int commandLength;        
         private byte[] serialCommand = new byte[BUFFER_SIZE];
@@ -68,7 +68,7 @@ namespace iDash
                 if (isArduinoAlive())
                 {
                     //if arduino does not receive a SynAck in 5s it will disconnect and start sending ACK commands
-                    this.sendSynAck();
+                    //this.sendSynAck();
                     await Task.Delay(WAIT_TO_SEND_SYN_ACK);
                 }
                 else
@@ -108,7 +108,7 @@ namespace iDash
         }
 
 
-        private async void start()
+        /*private async void start()
         {            
             while (!MainForm.stopThreads) {
                 if (isArduinoAlive())
@@ -126,7 +126,7 @@ namespace iDash
             }
 
             Dispose();
-        }
+        }*/
 
         private void sendSynAck()
         {
@@ -144,17 +144,16 @@ namespace iDash
                     switch (c)
                     {
                         //ACK message sent by Arduino
-                        case Command.CMD_SYN:
-                            lastArduinoResponse = Utils.getCurrentTimeMillis();
-                            type = "CMD_SYN";
-                            break;
+                        //case Command.CMD_SYN:
+                        //    type = "CMD_SYN";
+                        //    break;
                         //Arduino response to a set debug mode message
                         case Command.CMD_SET_DEBUG_MODE:
                             isArduinoInDebugMode = command.getData()[1] == 1;
                             type = "CMD_SET_DEBUG_MODE";
                             break;
                         //Arduino buttons state message
-                        case Command.CMD_BUTTON_STATUS:
+                        case Command.CMD_BUTTON_STATUS:                            
                             NotifyCommandReceived(command);
                             type = "CMD_BUTTON_STATUS";
                             break;
@@ -168,6 +167,8 @@ namespace iDash
                 {
                     Logger.LogMessageToFile(e.Source + ": " + e.Message);
                 }
+
+                lastArduinoResponse = Utils.getCurrentTimeMillis();
             }
         }      
 

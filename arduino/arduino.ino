@@ -485,10 +485,10 @@ void processCommand(byte *buffer, int commandLength) {
       break;*/
     
     //syn ack
-    case 'a' : 
+    //case 'a' : 
       //isConnected = true;
-      sendHandshacking();  
-      break;
+    //  sendHandshacking();  
+    //  break;
 
     case 'B' :    
       sendToTM1637_MAX7221(buffer);      
@@ -578,7 +578,7 @@ void sendDebugModeState(byte state) {
   sendDataToSerial(offset, response);
 }
 
-void sendHandshacking() {
+/*void sendHandshacking() {
   byte response[5];
   int offset = 0;
   
@@ -589,7 +589,7 @@ void sendHandshacking() {
   response[offset++] = COMMAND_END;
   
   sendDataToSerial(offset, response);
-}
+}*/
 
 void sendButtonStatus() {
   byte response[100];
@@ -619,7 +619,7 @@ void loop() {
     //testWS2812B();
     //isConnected = false;  
     isDebugMode = false;  
-    sendHandshacking();   
+//    sendHandshacking();   
     noDataReceived = true; 
     delay(50);
   }

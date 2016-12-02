@@ -79,8 +79,6 @@ namespace iDash
 
             this.iRacingToolStripMenuItem1.PerformClick();
 
-            sm.sendCommand(Utils.getDisconnectedMsgCmd());
-
             sm.Init();
             vf.InitializeJoystick();
 
