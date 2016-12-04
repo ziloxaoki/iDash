@@ -262,7 +262,7 @@ namespace iDash
 
         private void buttonSend_Click(object sender, EventArgs e) // send button  event
         {
-            byte[] aux = Utils.getHex(richTextBoxSend.Text);
+            byte[] aux = Utils.convertStringToInt(richTextBoxSend.Text);
             Command command = new Command(aux);
             sm.sendCommand(command, true);     //transmit data
         }

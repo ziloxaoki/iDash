@@ -110,7 +110,7 @@ namespace iDash
             this.richTextBoxSend.Name = "richTextBoxSend";
             this.richTextBoxSend.Size = new System.Drawing.Size(615, 21);
             this.richTextBoxSend.TabIndex = 6;
-            this.richTextBoxSend.Text = "C9 0B 01 D5 7E";
+            this.richTextBoxSend.Text = "201-11-2-214-126";
             // 
             // label1
             // 

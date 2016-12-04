@@ -367,16 +367,16 @@ namespace iDash
             return Encoding.ASCII.GetBytes(str);
         }
 
-        public static byte[] getHex(string str)
+        public static byte[] convertStringToInt(string str)
         {
-            string[] hexValuesSplit = str.Split(' ');
+            string[] hexValuesSplit = str.Split('-');
             byte[] result = new byte[hexValuesSplit.Length];
             int offset = 0;
 
             foreach (String hex in hexValuesSplit)
             {
                 // Convert the number expressed in base-16 to an integer.
-                byte value = (byte)Convert.ToInt32(hex, 16);
+                byte value = (byte)Convert.ToInt16(hex);
                 result[offset++] = value;
             }
             return result;
