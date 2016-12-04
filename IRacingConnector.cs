@@ -65,7 +65,7 @@ namespace iDash
                 else
                 {
                     isConnected = false;
-                    sm.sendCommand(Utils.getDisconnectedMsgCmd());
+                    sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                 }
 
                 //c = new Command(Command.CMD_RGB_SHIFT, colourPattern);
@@ -119,7 +119,7 @@ namespace iDash
             }
             catch(Exception e)
             {
-                Logger.LogMessageToFile(e.Source + ": " + e.Message);
+                Logger.LogExceptionToFile(e);
             }
 
             return result;

@@ -8,14 +8,17 @@ namespace iDash
         private byte[] data;
         private byte crc;
         //BC e BF
-        public const byte CMD_INIT = (byte)'^'; //94d 5Eh
-        public const byte CMD_END = (byte)'\n'; //10d Ah
-        public const byte CMD_SET_DEBUG_MODE = 0x01;
+        public const byte CMD_INIT = 200; //94d 5Eh
+        public const byte CMD_INIT_DEBUG = 201; //95d 5Fh
+        public const byte CMD_END = (byte)'~'; //126d 7Eh
+        public const byte CMD_SET_DEBUG_MODE = 11;
+        public const byte CMD_RESPONSE_SET_DEBUG_MODE = 12;
         public const byte CMD_SYN = (byte)'A'; //65d 41h
         public const byte CMD_7_SEGS = (byte)'B'; //66d 42h
         public const byte CMD_SYN_ACK = (byte)'a'; //97d 61h
         public const byte CMD_RGB_SHIFT = (byte)'C'; //67d 43h
         public const byte CMD_BUTTON_STATUS = (byte)'D'; //68d 44h
+        public const byte CMD_INVALID = (byte)0xef; //239d EFh
 
         public Command(byte[] buffer)
         {
@@ -34,14 +37,16 @@ namespace iDash
         public Command(byte command, byte[] cData)
         {
             int commandLength = getLength(cData) + 4;
-
+            //rawdata
             this.rawData = new byte[commandLength];
             this.rawData[0] = CMD_INIT;
             this.rawData[1] = command;
             Array.Copy(cData, 0, rawData, 2, cData.Length);
+            //data
             this.data = new byte[commandLength - 2];
             this.data[0] = CMD_INIT;
             this.data[1] = command;
+            //set crc
             Array.Copy(cData, 0, data, 2, cData.Length);
             this.crc = calculateCRC(this.data);
             this.rawData[commandLength - 2] = this.crc;
@@ -98,7 +103,7 @@ namespace iDash
         public bool isValidCommand(byte[] command)
         {
             int commandLength = getLength(command);
-            if (command != null && commandLength > 3 && command[0] == CMD_INIT && command[commandLength - 1] == CMD_END)
+            if (command != null && commandLength > 3 && (command[0] == CMD_INIT || command[0] == CMD_INIT_DEBUG) && command[commandLength - 1] == CMD_END)
             {
                 byte[] temp = new byte[commandLength - 2];
                 Array.Copy(command, 0, temp, 0, temp.Length);

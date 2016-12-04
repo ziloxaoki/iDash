@@ -365,7 +365,22 @@ namespace iDash
         public static byte[] getBytes(string str)
         {
             return Encoding.ASCII.GetBytes(str);
-        }        
+        }
+
+        public static byte[] getHex(string str)
+        {
+            string[] hexValuesSplit = str.Split(' ');
+            byte[] result = new byte[hexValuesSplit.Length];
+            int offset = 0;
+
+            foreach (String hex in hexValuesSplit)
+            {
+                // Convert the number expressed in base-16 to an integer.
+                byte value = (byte)Convert.ToInt32(hex, 16);
+                result[offset++] = value;
+            }
+            return result;
+        }
 
         public static int Count(byte[] array, byte val)
         {
@@ -481,8 +496,8 @@ namespace iDash
 
     public enum DebugMode
     {
-        None,
-        Default,
-        Verbose
+        None, //0
+        Default, //1
+        Verbose //2
     }
 }

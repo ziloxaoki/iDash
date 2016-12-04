@@ -60,7 +60,7 @@ namespace iDash
                     rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
                 }
 
-                sm.sendCommand(rgbShift);
+                sm.sendCommand(rgbShift, false);
             }
         }
         
@@ -123,7 +123,7 @@ namespace iDash
                 {
                     byte[] b = Utils.getBytes(msg.ToString());
                     Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
-                    sm.sendCommand(c);
+                    sm.sendCommand(c, false);
                 }
             }
         }

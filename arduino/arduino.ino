@@ -27,9 +27,6 @@
 #define isLow(P)((*(pinOfPin(P))& pinMask(P))==0)
 #define digitalState(P)((uint8_t)isHigh(P))
 
-const char COMMAND_INIT = '^';
-const char COMMAND_END = '\n';
-
 // -------------------------------------------------------------------------------------------------------
 // TM1637 7 Segment modules -----------------------------------------------------------------------------
 //
@@ -102,6 +99,20 @@ ScreenItem MAX7221_screen6;
 ScreenItem * MAX7221_screens[] = { &MAX7221_screen1, &MAX7221_screen2, &MAX7221_screen3, &MAX7221_screen4, &MAX7221_screen5, &MAX7221_screen6 };
 */
 
+//------------------ Protocol constants
+
+const byte CMD_INIT = 200; //94d 5Eh
+const byte CMD_INIT_DEBUG = 201; //95d 5Fh
+const byte CMD_END = (byte)'~'; //126d 7Eh
+const byte CMD_SET_DEBUG_MODE = 11;
+const byte CMD_RESPONSE_SET_DEBUG_MODE = 12;
+const byte CMD_SYN = (byte)'A'; //65d 41h
+const byte CMD_7_SEGS = (byte)'B'; //66d 42h
+const byte CMD_SYN_ACK = (byte)'a'; //97d 61h
+const byte CMD_RGB_SHIFT = (byte)'C'; //67d 43h
+const byte CMD_BUTTON_STATUS = (byte)'D'; //68d 44h
+const byte CMD_INVALID = (byte)0xef; //239d EFh
+
 // WS2812b chained RGBLEDS count
 // 0 disabled, > 0 enabled
 int WS2812B_RGBLEDCOUNT = 16; 
@@ -171,13 +182,12 @@ byte lastState[] = {0, 0};
 long lastRotaryStateChange = 0;
 
 volatile long lastRotaryBounce = 0;
-long lastSynAck = 0;
+long lastTimeReceivedByte = 0;
 
 //bool isConnected = false;
-boolean isDebugMode = false;
-long lastMessageSent = 0;
-
-bool noDataReceived = true;
+int debugMode = 0;
+const byte INVALID_COMMAND_HEADER = 0xEF;
+//long lastMessageSent = 0;
 
 int asize(byte* b) {
   return sizeof(b) / sizeof(byte);
@@ -209,8 +219,20 @@ void resetWS2812B() {
 }
 
 void testWS2812B() {
-  byte v[] = {'^','C', 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
+  byte v[] = {CMD_INIT,CMD_RGB_SHIFT, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
   sendToWS2812B(v);
+}
+
+void convertHexToString(int offset, byte *buffer) {
+  int i = 0;
+  Serial.println();
+  Serial.print('*');
+  while (i < offset) {
+     Serial.print(String(buffer[i++], DEC));        
+     Serial.print('-');   
+  }   
+ 
+  Serial.println('*'); 
 }
 
 void sendToTM1637_MAX7221(byte *buffer) {
@@ -464,73 +486,67 @@ int calculateCrc(int dataLength, byte *response) {
 }
 
 void sendDataToSerial(int commandLength, byte *response) {
-  if(!isDebugMode || millis() - lastMessageSent > 1000 || response[1] == 0x01 || response[1] == 'C') {
-    Serial.write(response, commandLength);
-    lastMessageSent = millis();
-  }
-
+  Serial.write(response, commandLength);
   Serial.flush();
 }
 
 void processCommand(byte *buffer, int commandLength) {  
   //debug
   switch(buffer[1]) {
-    case 0x01 :
-      isDebugMode = (buffer[2] == 1);
-      sendDebugModeState(buffer[2]);       
+    case CMD_SET_DEBUG_MODE :
+      debugMode = buffer[2];      
+      sendDebugModeState(buffer[0], debugMode);       
       break;
-
-    /*case 'D' :
-      sendButtonStatus();   
-      break;*/
     
     //syn ack
-    //case 'a' : 
+    case CMD_SYN_ACK : 
       //isConnected = true;
-    //  sendHandshacking();  
-    //  break;
-
-    case 'B' :    
-      sendToTM1637_MAX7221(buffer);      
-      noDataReceived = false;   
+      sendHandshacking();  
       break;
 
-    case 'C' :
-      sendToWS2812B(buffer);
-      noDataReceived = false;
-      //sendDataToSerial(commandLength,buffer);
+    case CMD_7_SEGS :    
+      sendToTM1637_MAX7221(buffer);      
+      break;
+
+    case CMD_RGB_SHIFT :
+      sendToWS2812B(buffer);      
       break;
   }  
 
-  lastSynAck = millis();
+  //if(debugMode > 0) {
+    sendDataToSerial(commandLength, buffer);  
+  //}
+  
   buffer[0] = 0;
 }
-
 
 int readline(int readch, byte *buffer, int len)
 {  
   static int pos = 0;
   int rpos;
 
-  if (readch > 0) {
-    switch (readch) {
-      case '^': // command init found
-        pos = 0;
+  switch (readch) {
+    case CMD_INIT_DEBUG:
+    case CMD_INIT: // command init found
+      pos = 0;
+      buffer[pos++] = readch;
+      buffer[pos] = 0;
+      break;        
+    case CMD_END: // End command
+      rpos = pos;
+      pos = 0;  // Reset position index ready for next time
+      return rpos - 1; //last char is the crc
+    default:
+      if (pos < len-1) {
         buffer[pos++] = readch;
         buffer[pos] = 0;
-        break;        
-      case '\n': // End command
-        rpos = pos;
-        pos = 0;  // Reset position index ready for next time
-        return rpos - 1; //last char is the crc
-      default:
-        if (pos < len-1) {
-          buffer[pos++] = readch;
-          buffer[pos] = 0;
-        }
-    }
+      }
   }
-  // No end of line has been found, so return -1.
+
+  //flag to show that arduino is receiving data from App.    
+  lastTimeReceivedByte = millis();
+  
+  // No end of command has been found, so return -1.
   return -1;
 }
 
@@ -542,67 +558,68 @@ void processData() {
   long startReading = millis();
   while (Serial.available()) {
     commandLength = readline(Serial.read(), buffer, 100);       
- 
     if (commandLength > 0) {  
       int crc = calculateCrc(commandLength, buffer); 
 
       if(crc == buffer[commandLength]) {    
         processCommand(buffer, commandLength);     
       } else {
-        if(isDebugMode) {
-          Serial.write(0xEF);
+        if(debugMode > 0) {          
+          Serial.write(INVALID_COMMAND_HEADER);
           sendDataToSerial(commandLength, buffer);
+          Serial.write(CMD_END);
         }
       }
-    }
+    }    
     if(millis() - startReading > 10) {
       break;
     }
   }
-  //byte t[] = {'^','B',91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91};
-  //byte s[] = {'^','C',255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,129,10};
+  //byte t[] = {'^',CMD_7_SEGS,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91};
+  //byte s[] = {'^',CMD_RGB_SHIFT,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,129,10};
   //processCommand(s);
 }
 
-void sendDebugModeState(byte state) {
-  byte response[6];
-  int offset = 0;
-  
-  //handshaking
-  response[offset++] = COMMAND_INIT;
-  response[offset++] = 1;
-  response[offset++] = state;
-  response[offset++] = calculateCrc(offset - 1, response);
-  response[offset++] = COMMAND_END;
-  
-  sendDataToSerial(offset, response);
-}
-
-/*void sendHandshacking() {
+void sendDebugModeState(byte header, byte state) {
   byte response[5];
   int offset = 0;
   
   //handshaking
-  response[offset++] = COMMAND_INIT;
-  response[offset++] = 'A';
+  response[offset++] = header;
+  //set debug mode response
+  response[offset++] = CMD_RESPONSE_SET_DEBUG_MODE;
+  response[offset++] = state;
   response[offset++] = calculateCrc(offset - 1, response);
-  response[offset++] = COMMAND_END;
+  response[offset++] = CMD_END;
   
   sendDataToSerial(offset, response);
-}*/
+}
 
-void sendButtonStatus() {
+void sendHandshacking() {
+  byte response[4];
+  int offset = 0;
+  
+  //handshaking
+  response[offset++] = CMD_INIT;
+  response[offset++] = CMD_SYN;
+  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = CMD_END;
+  
+  sendDataToSerial(offset, response);
+}
+
+void sendButtonStatus(byte header) {
   byte response[100];
   int offset = 0;
   
   //return buttons state      
-  response[offset++] = COMMAND_INIT;
-  response[offset++] = 'D';
+  response[offset++] = header;
+  response[offset++] = CMD_BUTTON_STATUS;
   offset = sendButtonState(offset, response);
   offset = sendAnalogState(offset, response);
   offset = sendRotaryState(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
-  response[offset++] = COMMAND_END;   
+  response[offset++] = CMD_END;   
   
   sendDataToSerial(offset, response);
 }
@@ -611,23 +628,21 @@ void loop() {
 //    Serial.print("freeMemory()=");
 //    Serial.println(freeMemory());
   //haven't received Syn Ack from IDash for too long
-  if(millis() - lastSynAck > 5000 /*|| !isConnected*/) {
-    if(noDataReceived) {
-      resetTM1637_MAX7221();
-      resetWS2812B();
-    }    
+  if(millis() - lastTimeReceivedByte > 1000 /*|| !isConnected*/) {
+    resetTM1637_MAX7221();
+    resetWS2812B();  
     //testWS2812B();
     //isConnected = false;  
-    isDebugMode = false;  
-//    sendHandshacking();   
-    noDataReceived = true; 
+    //isDebugMode = false;  
+    debugMode = 0;  
+    //sendHandshacking();   
     delay(50);
   }
   
   processData();
-
+  
   //if(isConnected) {
-    sendButtonStatus(); 
+    sendButtonStatus(CMD_INIT); 
   //}  
 
 }

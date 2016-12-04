@@ -51,38 +51,47 @@ namespace iDash
         public delegate void HandleButtonActions(List<State> states);
         public HandleButtonActions handleButtonActions;
 
-        private Thread SendDateTimeArduino;
         private bool isSimulatorDisconnected = true;
 
 
         public MainForm()
         {
-            Logger.LogMessageToFile("Init app.");
-            this.appendToStatusBar = new AppendToStatusBarDelegate(UpdateStatusBar);
-            this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
-            //Action Handlers have a pointer to Form, so they can only be initialized after the form.
-            InitializeComponent();
+            Logger.LogMessageToFile("Initializing IDash.", true);
+            try {
+                this.appendToStatusBar = new AppendToStatusBarDelegate(UpdateStatusBar);
+                this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
+                //Action Handlers have a pointer to Form, so they can only be initialized after the form.
+                InitializeComponent();
 
-            handleButtonActions = new HandleButtonActions(handleButtons);            
+                handleButtonActions = new HandleButtonActions(handleButtons);
 
-            sm = new SerialManager();
-            sm.StatusMessageSubscribers += UpdateStatusBar;
-            sm.DebugMessageSubscribers += UpdateDebugData;
+                Logger.LogMessageToFile("Initializing serial manager.", true);
+                sm = new SerialManager();
+                sm.StatusMessageSubscribers += UpdateStatusBar;
+                sm.DebugMessageSubscribers += UpdateDebugData;
 
-            bh = new ButtonHandler(sm);
-            bh.buttonStateHandler += ButtonStateReceived;
-            //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
-            System.Threading.Thread.Sleep(1000);
+                Logger.LogMessageToFile("Initializing button handler.", true);
+                bh = new ButtonHandler(sm);
+                bh.buttonStateHandler += ButtonStateReceived;
+                //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
+                System.Threading.Thread.Sleep(1000);
 
-            vf = new VJoyFeeder(bh);            
-            vf.StatusMessageSubscribers += UpdateStatusBar;                       
+                Logger.LogMessageToFile("Initializing Vjoy.", true);
+                vf = new VJoyFeeder(bh);
+                vf.StatusMessageSubscribers += UpdateStatusBar;
 
-            this.iRacingToolStripMenuItem1.PerformClick();
+                this.iRacingToolStripMenuItem1.PerformClick();
 
-            sm.Init();
-            vf.InitializeJoystick();
+                sm.Init();
+                vf.InitializeJoystick();
 
-            new Thread(new ThreadStart(sendDatetimeToArduino)).Start();
+                new Thread(new ThreadStart(sendDatetimeToArduino)).Start();
+                AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory + "\n");
+            }
+            catch (Exception e)
+            {
+                Logger.LogExceptionToFile(e);
+            }
         }
 
 
@@ -114,7 +123,7 @@ namespace iDash
         {
             while (isSimulatorDisconnected)
             {
-                sm.sendCommand(Utils.getDisconnectedMsgCmd());
+                sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                 await Task.Delay(10);
             }
         }
@@ -253,9 +262,9 @@ namespace iDash
 
         private void buttonSend_Click(object sender, EventArgs e) // send button  event
         {
-            byte[] aux = System.Text.Encoding.ASCII.GetBytes(richTextBoxSend.Text);
-            Command command = new Command(aux[0], Utils.getSubArray<byte>(aux, 1, aux.Length - 1));
-            sm.sendCommand(command);     //transmit data
+            byte[] aux = Utils.getHex(richTextBoxSend.Text);
+            Command command = new Command(aux);
+            sm.sendCommand(command, true);     //transmit data
         }
 
         protected async override void OnFormClosing(FormClosingEventArgs e)
@@ -314,20 +323,20 @@ namespace iDash
 
         private async void debugModes_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //dbug mode off
+            AppendToDebugDialog("Verbose data saved to: " + AppDomain.CurrentDomain.BaseDirectory + "log.log\n");
+
+            //debug mode off
             byte[] state = { 0x00 };
-            if (debugModes.SelectedIndex != 0)
-            {
-                //debug mode on
-                state[0] = 0x01;
-            }
+            //0 = none, 1 = default, 2 = verbose
+            state[0] = (byte)debugModes.SelectedIndex;
             Command command = new Command(Command.CMD_SET_DEBUG_MODE, state);
             SerialManager.debugMode = (DebugMode)debugModes.SelectedItem;
-            //make sure Arduino has received/updated the debug mode state
-            while (SerialManager.isArduinoInDebugMode != (state[0] == 1))
-            {
-                sm.sendCommand(command);     //transmit data
+            //make sure Arduino and IDash debug state are in sync
+            while (SerialManager.arduinoInDebugMode != state[0])
+            {                
+                sm.sendCommand(command, false);     //transmit data
                 await Task.Delay(WAIT_ARDUINO_SET_DEBUG_MODE);
+                state[0] = (byte)debugModes.SelectedIndex;
             }
         }
 
@@ -936,6 +945,11 @@ namespace iDash
 
                 syncViews();
             }
+        }
+
+        private void IsDisabledSerial_CheckedChanged(object sender, EventArgs e)
+        {
+            sm.isDisabledSerial = IsDisabledSerial.Checked;
         }
     }
 }

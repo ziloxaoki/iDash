@@ -66,7 +66,7 @@ namespace iDash
                 else
                 {
                     isConnected = false;
-                    sm.sendCommand(Utils.getDisconnectedMsgCmd());                    
+                    sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);                    
                 }
 
                 await Task.Delay(5);
@@ -130,7 +130,7 @@ namespace iDash
                 }
                 catch (Exception e)
                 {
-                    Logger.LogMessageToFile(e.Source + ": " + e.Message);
+                    Logger.LogExceptionToFile(e);
                 }
             }
 

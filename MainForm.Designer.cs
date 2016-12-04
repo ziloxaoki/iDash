@@ -69,6 +69,7 @@ namespace iDash
             this.buttonActions = new System.Windows.Forms.ListBox();
             this.buttonsActive = new System.Windows.Forms.ListBox();
             this.debugTab = new System.Windows.Forms.TabPage();
+            this.IsDisabledSerial = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.debugModes = new System.Windows.Forms.ComboBox();
             this.clearData = new System.Windows.Forms.Button();
@@ -109,7 +110,7 @@ namespace iDash
             this.richTextBoxSend.Name = "richTextBoxSend";
             this.richTextBoxSend.Size = new System.Drawing.Size(615, 21);
             this.richTextBoxSend.TabIndex = 6;
-            this.richTextBoxSend.Text = "";
+            this.richTextBoxSend.Text = "C9 0B 01 D5 7E";
             // 
             // label1
             // 
@@ -484,6 +485,7 @@ namespace iDash
             // 
             // debugTab
             // 
+            this.debugTab.Controls.Add(this.IsDisabledSerial);
             this.debugTab.Controls.Add(this.label2);
             this.debugTab.Controls.Add(this.debugModes);
             this.debugTab.Controls.Add(this.clearData);
@@ -498,6 +500,17 @@ namespace iDash
             this.debugTab.TabIndex = 1;
             this.debugTab.Text = "Debug";
             this.debugTab.UseVisualStyleBackColor = true;
+            // 
+            // IsDisabledSerial
+            // 
+            this.IsDisabledSerial.AutoSize = true;
+            this.IsDisabledSerial.Location = new System.Drawing.Point(802, 18);
+            this.IsDisabledSerial.Name = "IsDisabledSerial";
+            this.IsDisabledSerial.Size = new System.Drawing.Size(125, 17);
+            this.IsDisabledSerial.TabIndex = 15;
+            this.IsDisabledSerial.Text = "Ignore incoming data";
+            this.IsDisabledSerial.UseVisualStyleBackColor = true;
+            this.IsDisabledSerial.CheckedChanged += new System.EventHandler(this.IsDisabledSerial_CheckedChanged);
             // 
             // label2
             // 
@@ -718,6 +731,7 @@ namespace iDash
         private System.Windows.Forms.ToolStripMenuItem noneToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem assettoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem assettoToolStripMenuItem1;
+        private System.Windows.Forms.CheckBox IsDisabledSerial;
     }
 }
 
