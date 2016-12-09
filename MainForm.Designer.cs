@@ -69,7 +69,8 @@ namespace iDash
             this.buttonActions = new System.Windows.Forms.ListBox();
             this.buttonsActive = new System.Windows.Forms.ListBox();
             this.debugTab = new System.Windows.Forms.TabPage();
-            this.IsDisabledSerial = new System.Windows.Forms.CheckBox();
+            this.asHex = new System.Windows.Forms.CheckBox();
+            this.isDisabledSerial = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.debugModes = new System.Windows.Forms.ComboBox();
             this.clearData = new System.Windows.Forms.Button();
@@ -485,7 +486,8 @@ namespace iDash
             // 
             // debugTab
             // 
-            this.debugTab.Controls.Add(this.IsDisabledSerial);
+            this.debugTab.Controls.Add(this.asHex);
+            this.debugTab.Controls.Add(this.isDisabledSerial);
             this.debugTab.Controls.Add(this.label2);
             this.debugTab.Controls.Add(this.debugModes);
             this.debugTab.Controls.Add(this.clearData);
@@ -501,16 +503,27 @@ namespace iDash
             this.debugTab.Text = "Debug";
             this.debugTab.UseVisualStyleBackColor = true;
             // 
-            // IsDisabledSerial
+            // asHex
             // 
-            this.IsDisabledSerial.AutoSize = true;
-            this.IsDisabledSerial.Location = new System.Drawing.Point(802, 18);
-            this.IsDisabledSerial.Name = "IsDisabledSerial";
-            this.IsDisabledSerial.Size = new System.Drawing.Size(125, 17);
-            this.IsDisabledSerial.TabIndex = 15;
-            this.IsDisabledSerial.Text = "Ignore incoming data";
-            this.IsDisabledSerial.UseVisualStyleBackColor = true;
-            this.IsDisabledSerial.CheckedChanged += new System.EventHandler(this.IsDisabledSerial_CheckedChanged);
+            this.asHex.AutoSize = true;
+            this.asHex.Location = new System.Drawing.Point(802, 41);
+            this.asHex.Name = "asHex";
+            this.asHex.Size = new System.Drawing.Size(129, 17);
+            this.asHex.TabIndex = 16;
+            this.asHex.Text = "Show as hexadecimal";
+            this.asHex.UseVisualStyleBackColor = true;
+            this.asHex.CheckedChanged += new System.EventHandler(this.AsHex_CheckedChanged);
+            // 
+            // isDisabledSerial
+            // 
+            this.isDisabledSerial.AutoSize = true;
+            this.isDisabledSerial.Location = new System.Drawing.Point(802, 18);
+            this.isDisabledSerial.Name = "isDisabledSerial";
+            this.isDisabledSerial.Size = new System.Drawing.Size(125, 17);
+            this.isDisabledSerial.TabIndex = 15;
+            this.isDisabledSerial.Text = "Ignore incoming data";
+            this.isDisabledSerial.UseVisualStyleBackColor = true;
+            this.isDisabledSerial.CheckedChanged += new System.EventHandler(this.IsDisabledSerial_CheckedChanged);
             // 
             // label2
             // 
@@ -731,7 +744,8 @@ namespace iDash
         private System.Windows.Forms.ToolStripMenuItem noneToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem assettoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem assettoToolStripMenuItem1;
-        private System.Windows.Forms.CheckBox IsDisabledSerial;
+        private System.Windows.Forms.CheckBox isDisabledSerial;
+        private System.Windows.Forms.CheckBox asHex;
     }
 }
 

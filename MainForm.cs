@@ -322,20 +322,24 @@ namespace iDash
         }
 
         private async void debugModes_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        {            
             AppendToDebugDialog("Verbose data saved to: " + AppDomain.CurrentDomain.BaseDirectory + "log.log\n");
 
             //0 = none, 1 = default, 2 = verbose
             byte[] state = { (byte)debugModes.SelectedIndex };
-            
+            //update formd debug mode reference
+            sm.formDebugMode = (DebugMode)debugModes.SelectedIndex;
+
             Command command = new Command(Command.CMD_SET_DEBUG_MODE, state);
 
             //make sure Arduino and IDash debug state are in sync
-            while (state[0] != (int)SerialManager.debugMode)
+            while (state[0] != (int)sm.arduinoDebugMode)
             {                
                 sm.sendCommand(command, false);     //transmit data
                 await Task.Delay(WAIT_ARDUINO_SET_DEBUG_MODE);
+                //update state if value in combobox changed
                 state[0] = (byte)debugModes.SelectedIndex;
+                sm.formDebugMode = (DebugMode)debugModes.SelectedIndex;
             }
         }
 
@@ -948,7 +952,12 @@ namespace iDash
 
         private void IsDisabledSerial_CheckedChanged(object sender, EventArgs e)
         {
-            sm.isDisabledSerial = IsDisabledSerial.Checked;
+            sm.isDisabledSerial = isDisabledSerial.Checked;
+        }
+
+        private void AsHex_CheckedChanged(object sender, EventArgs e)
+        {
+            sm.asHex = asHex.Checked;
         }
     }
 }

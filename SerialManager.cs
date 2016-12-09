@@ -25,9 +25,11 @@ namespace iDash
         private object dataLock = new object();
         private object sendLock = new object();
 
-        public static DebugMode debugMode = DebugMode.None;         
+        public DebugMode formDebugMode = DebugMode.None;   
+        public DebugMode arduinoDebugMode = DebugMode.None;
         public bool isDisabledSerial = false;
         private long lastMessageLogged = 0;
+        public bool asHex = false;
 
         //events
         public delegate void CommandReceivedHandler(Command command);
@@ -156,7 +158,7 @@ namespace iDash
                         break;
                     //Arduino response to a set debug mode message
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:
-                        debugMode = (DebugMode)command.getData()[1];
+                        arduinoDebugMode = (DebugMode)command.getData()[1];
                         type = "CMD_RESPONSE_SET_DEBUG_MODE";                        
                         break;
                     //Arduino buttons state message
@@ -169,10 +171,10 @@ namespace iDash
                         type = "CMD_INVALID";
                         break;
                 }
-                if (debugMode == DebugMode.Default) {
+                if (formDebugMode == DebugMode.Default) {
                     if (isDisabledSerial) {
                         if (command.getRawData()[0] == Command.CMD_INIT_DEBUG) {
-                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), false), type));
+                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
                         }
                     }
@@ -180,7 +182,7 @@ namespace iDash
                     {
                         if ((c != Command.CMD_BUTTON_STATUS && c != Command.CMD_SYN) || Utils.hasTimedOut(lastMessageLogged, 1000))
                         {
-                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), false), type));
+                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
                         }
                     }
@@ -284,7 +286,7 @@ namespace iDash
                     }
                 }
             }
-            if (debugMode == DebugMode.Verbose)
+            if (formDebugMode == DebugMode.Verbose)
             {
                 Logger.LogDataToFile(logData.ToString());
             }
