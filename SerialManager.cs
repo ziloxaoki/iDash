@@ -25,8 +25,7 @@ namespace iDash
         private object dataLock = new object();
         private object sendLock = new object();
 
-        public static DebugMode debugMode = DebugMode.None;
-        public static int arduinoInDebugMode = 0;        
+        public static DebugMode debugMode = DebugMode.None;         
         public bool isDisabledSerial = false;
         private long lastMessageLogged = 0;
 
@@ -157,7 +156,7 @@ namespace iDash
                         break;
                     //Arduino response to a set debug mode message
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:
-                        arduinoInDebugMode = command.getData()[1];
+                        debugMode = (DebugMode)command.getData()[1];
                         type = "CMD_RESPONSE_SET_DEBUG_MODE";                        
                         break;
                     //Arduino buttons state message
@@ -173,7 +172,7 @@ namespace iDash
                 if (debugMode == DebugMode.Default) {
                     if (isDisabledSerial) {
                         if (command.getRawData()[0] == Command.CMD_INIT_DEBUG) {
-                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData()), type));
+                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), false), type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
                         }
                     }
@@ -181,7 +180,7 @@ namespace iDash
                     {
                         if ((c != Command.CMD_BUTTON_STATUS && c != Command.CMD_SYN) || Utils.hasTimedOut(lastMessageLogged, 1000))
                         {
-                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData()), type));
+                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), false), type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
                         }
                     }

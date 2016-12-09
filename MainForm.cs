@@ -325,14 +325,13 @@ namespace iDash
         {
             AppendToDebugDialog("Verbose data saved to: " + AppDomain.CurrentDomain.BaseDirectory + "log.log\n");
 
-            //debug mode off
-            byte[] state = { 0x00 };
             //0 = none, 1 = default, 2 = verbose
-            state[0] = (byte)debugModes.SelectedIndex;
+            byte[] state = { (byte)debugModes.SelectedIndex };
+            
             Command command = new Command(Command.CMD_SET_DEBUG_MODE, state);
-            SerialManager.debugMode = (DebugMode)debugModes.SelectedItem;
+
             //make sure Arduino and IDash debug state are in sync
-            while (SerialManager.arduinoInDebugMode != state[0])
+            while (state[0] != (int)SerialManager.debugMode)
             {                
                 sm.sendCommand(command, false);     //transmit data
                 await Task.Delay(WAIT_ARDUINO_SET_DEBUG_MODE);

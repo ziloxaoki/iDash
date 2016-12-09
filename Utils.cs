@@ -320,12 +320,27 @@ namespace iDash
         }
 
 
-        public static string byteArrayToString(byte[] ba)
+        public static string byteArrayToString(byte[] ba, bool asHex)
         {
+            StringBuilder result = new StringBuilder();
+
             if (ba != null && ba.Length > 0)
             {
-                string hex = BitConverter.ToString(ba);
-                return hex.Replace("-", "");
+                foreach (byte b in ba)
+                {
+                    if (asHex)
+                    {
+                        result.AppendFormat("{0:X2}", b);                        
+                    }
+                    else
+                    {
+                        result.Append(Convert.ToString(b));
+                    }
+
+                    result.Append("-");
+                }
+
+                return result.ToString().TrimEnd('-');
             }
 
             return "empty";
