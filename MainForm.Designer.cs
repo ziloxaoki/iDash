@@ -88,6 +88,7 @@ namespace iDash
             this.iRacingToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.raceRoomToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.label9 = new System.Windows.Forms.Label();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -99,7 +100,7 @@ namespace iDash
             // 
             // buttonSend
             // 
-            this.buttonSend.Location = new System.Drawing.Point(1109, 11);
+            this.buttonSend.Location = new System.Drawing.Point(945, 9);
             this.buttonSend.Name = "buttonSend";
             this.buttonSend.Size = new System.Drawing.Size(97, 34);
             this.buttonSend.TabIndex = 0;
@@ -111,7 +112,7 @@ namespace iDash
             // 
             this.cmdData.Location = new System.Drawing.Point(246, 14);
             this.cmdData.Name = "cmdData";
-            this.cmdData.Size = new System.Drawing.Size(857, 21);
+            this.cmdData.Size = new System.Drawing.Size(693, 21);
             this.cmdData.TabIndex = 6;
             this.cmdData.Text = "1-255-1-1-255-1-1-255-1-1-255-1-1-255-1-1-255-1-255-1-1-255-1-1-255-1-1-255-1-1-2" +
     "55-1-1-255-1-1-255-1-1-1-1-255-1-1-255-1-1-255";
@@ -489,6 +490,7 @@ namespace iDash
             // 
             // debugTab
             // 
+            this.debugTab.Controls.Add(this.label9);
             this.debugTab.Controls.Add(this.label8);
             this.debugTab.Controls.Add(this.cmdHeader);
             this.debugTab.Controls.Add(this.asHex);
@@ -528,7 +530,7 @@ namespace iDash
             // asHex
             // 
             this.asHex.AutoSize = true;
-            this.asHex.Location = new System.Drawing.Point(1212, 34);
+            this.asHex.Location = new System.Drawing.Point(945, 71);
             this.asHex.Name = "asHex";
             this.asHex.Size = new System.Drawing.Size(129, 17);
             this.asHex.TabIndex = 16;
@@ -539,7 +541,7 @@ namespace iDash
             // isDisabledSerial
             // 
             this.isDisabledSerial.AutoSize = true;
-            this.isDisabledSerial.Location = new System.Drawing.Point(1212, 11);
+            this.isDisabledSerial.Location = new System.Drawing.Point(945, 48);
             this.isDisabledSerial.Name = "isDisabledSerial";
             this.isDisabledSerial.Size = new System.Drawing.Size(125, 17);
             this.isDisabledSerial.TabIndex = 15;
@@ -679,6 +681,16 @@ namespace iDash
             this.assettoToolStripMenuItem1.Text = "Assetto Corsa";
             this.assettoToolStripMenuItem1.Click += new System.EventHandler(this.assettoToolStripMenuItem1_Click);
             // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Consolas", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(1090, 9);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(373, 78);
+            this.label9.TabIndex = 19;
+            this.label9.Text = resources.GetString("label9.Text");
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -770,6 +782,7 @@ namespace iDash
         private System.Windows.Forms.CheckBox asHex;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.RichTextBox cmdHeader;
+        private System.Windows.Forms.Label label9;
     }
 }
 
