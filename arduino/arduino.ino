@@ -513,9 +513,9 @@ void processCommand(byte *buffer, int commandLength) {
       break;
   }  
 
-  //if(debugMode > 0) {
+  if(debugMode > 0) {
     sendDataToSerial(commandLength, buffer);  
-  //}
+  }
   
   buffer[0] = 0;
 }
