@@ -8,6 +8,8 @@ namespace iDash
 {
     public class Logger
     {
+        private static readonly object _sync = new object();
+
         public static string GetAppPath()
         {
             string path = AppDomain.CurrentDomain.BaseDirectory;
@@ -21,30 +23,32 @@ namespace iDash
         }
 
         public static void LogMessageToFile(string msg, bool isNewLine)
-        {
+        {            
             string logLine = System.String.Format(
-                    "[{0:G}]: {1}", System.DateTime.Now, msg);
+                "[{0:G}]: {1}", System.DateTime.Now, msg);
 
             LogDataToFile(logLine);
 
-            if(isNewLine)
+            if (isNewLine)
             {
                 LogDataToFile("\n");
-            }
-
+            }            
         }
 
         public static void LogDataToFile(string msg)
         {
-            System.IO.StreamWriter sw = System.IO.File.AppendText(
-                GetAppPath() + "log.log");
-            try
-            {                
-                sw.Write(msg);
-            }
-            finally
+            lock (_sync)
             {
-                sw.Close();
+                System.IO.StreamWriter sw = System.IO.File.AppendText(
+                GetAppPath() + "log.log");
+                try
+                {
+                    sw.Write(msg);
+                }
+                finally
+                {
+                    sw.Close();
+                }
             }
         }
 

@@ -262,8 +262,13 @@ namespace iDash
 
         private void buttonSend_Click(object sender, EventArgs e) // send button  event
         {
-            byte[] aux = Utils.convertStringToInt(richTextBoxSend.Text);
-            Command command = new Command(aux);
+            byte[] data = null;
+            byte header = 0;
+            if (cmdData.Text.Length > 0)
+                data = Utils.convertStringToInt(cmdData.Text);
+            if (cmdHeader.Text.Length > 0)
+                header = (byte)Convert.ToInt16(cmdHeader.Text);
+            Command command = new Command(header, data, true);
             sm.sendCommand(command, true);     //transmit data
         }
 

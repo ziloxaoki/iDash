@@ -22,7 +22,7 @@ namespace iDash
         private byte[] serialCommand = new byte[BUFFER_SIZE];
         private SerialPort serialPort = new SerialPort(); //create of serial port
         private static long lastArduinoResponse = 0;        
-        private object dataLock = new object();
+        private object readLock = new object();
         private object sendLock = new object();
 
         public DebugMode formDebugMode = DebugMode.None;   
@@ -146,35 +146,35 @@ namespace iDash
 
         private string processCommand(Command command)
         {
+            string type = "invalid";
             //called by processData that is already sync
-            String type = "undefined";
             try {                
                 byte c = command.getData()[0];
                 switch (c)
                 {
                     //ACK message sent by Arduino
                     case Command.CMD_SYN:
-                        type = "CMD_SYN";
                         break;
                     //Arduino response to a set debug mode message
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:
-                        arduinoDebugMode = (DebugMode)command.getData()[1];
-                        type = "CMD_RESPONSE_SET_DEBUG_MODE";                        
+                        arduinoDebugMode = (DebugMode)command.getData()[1];                     
                         break;
                     //Arduino buttons state message
                     case Command.CMD_BUTTON_STATUS:                            
                         NotifyCommandReceived(command);
-                        type = "CMD_BUTTON_STATUS";
                         break;
                     //Arduino response when crc command failed
                     case Command.CMD_INVALID:
-                        type = "CMD_INVALID";
                         break;
                 }
+                type = command.getCommandType();
+
                 if (formDebugMode == DebugMode.Default) {
                     if (isDisabledSerial) {
                         if (command.getRawData()[0] == Command.CMD_INIT_DEBUG) {
-                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
+                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", 
+                                Utils.byteArrayToString(command.getRawData(), asHex), 
+                                type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
                         }
                     }
@@ -214,6 +214,12 @@ namespace iDash
                         bs += command.getLength();
                         serialPort.Write(command.getRawData(), 0, command.getLength());
 
+                        /*if (formDebugMode == DebugMode.Verbose)
+                        {
+                            Logger.LogDataToFile(String.Format("Data sent:{0} - ({1})\n", 
+                                Utils.byteArrayToString(command.getRawData(), asHex),
+                                command.getCommandType()));
+                        }*/
                     }
                 }
                 catch (Exception e)
@@ -234,7 +240,7 @@ namespace iDash
         {
             StringBuilder logData = new StringBuilder("");
 
-            lock (dataLock)
+            lock (readLock)
             {
                 if (serialData != null) { 
                     foreach (byte b in serialData)

@@ -32,7 +32,7 @@ namespace iDash
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.buttonSend = new System.Windows.Forms.Button();
-            this.richTextBoxSend = new System.Windows.Forms.RichTextBox();
+            this.cmdData = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.mainTab = new System.Windows.Forms.TabControl();
             this.settingsTab = new System.Windows.Forms.TabPage();
@@ -69,6 +69,8 @@ namespace iDash
             this.buttonActions = new System.Windows.Forms.ListBox();
             this.buttonsActive = new System.Windows.Forms.ListBox();
             this.debugTab = new System.Windows.Forms.TabPage();
+            this.label8 = new System.Windows.Forms.Label();
+            this.cmdHeader = new System.Windows.Forms.RichTextBox();
             this.asHex = new System.Windows.Forms.CheckBox();
             this.isDisabledSerial = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -97,7 +99,7 @@ namespace iDash
             // 
             // buttonSend
             // 
-            this.buttonSend.Location = new System.Drawing.Point(689, 11);
+            this.buttonSend.Location = new System.Drawing.Point(1109, 11);
             this.buttonSend.Name = "buttonSend";
             this.buttonSend.Size = new System.Drawing.Size(97, 34);
             this.buttonSend.TabIndex = 0;
@@ -105,22 +107,23 @@ namespace iDash
             this.buttonSend.UseVisualStyleBackColor = true;
             this.buttonSend.Click += new System.EventHandler(this.buttonSend_Click);
             // 
-            // richTextBoxSend
+            // cmdData
             // 
-            this.richTextBoxSend.Location = new System.Drawing.Point(68, 19);
-            this.richTextBoxSend.Name = "richTextBoxSend";
-            this.richTextBoxSend.Size = new System.Drawing.Size(615, 21);
-            this.richTextBoxSend.TabIndex = 6;
-            this.richTextBoxSend.Text = "201-11-2-214-126";
+            this.cmdData.Location = new System.Drawing.Point(246, 14);
+            this.cmdData.Name = "cmdData";
+            this.cmdData.Size = new System.Drawing.Size(857, 21);
+            this.cmdData.TabIndex = 6;
+            this.cmdData.Text = "1-255-1-1-255-1-1-255-1-1-255-1-1-255-1-1-255-1-255-1-1-255-1-1-255-1-1-255-1-1-2" +
+    "55-1-1-255-1-1-255-1-1-1-1-255-1-1-255-1-1-255";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 22);
+            this.label1.Location = new System.Drawing.Point(171, 17);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 13);
+            this.label1.Size = new System.Drawing.Size(69, 13);
             this.label1.TabIndex = 9;
-            this.label1.Text = "Send data";
+            this.label1.Text = "CMD_DATA:";
             // 
             // mainTab
             // 
@@ -486,6 +489,8 @@ namespace iDash
             // 
             // debugTab
             // 
+            this.debugTab.Controls.Add(this.label8);
+            this.debugTab.Controls.Add(this.cmdHeader);
             this.debugTab.Controls.Add(this.asHex);
             this.debugTab.Controls.Add(this.isDisabledSerial);
             this.debugTab.Controls.Add(this.label2);
@@ -494,7 +499,7 @@ namespace iDash
             this.debugTab.Controls.Add(this.debugData);
             this.debugTab.Controls.Add(this.label1);
             this.debugTab.Controls.Add(this.buttonSend);
-            this.debugTab.Controls.Add(this.richTextBoxSend);
+            this.debugTab.Controls.Add(this.cmdData);
             this.debugTab.Location = new System.Drawing.Point(4, 22);
             this.debugTab.Name = "debugTab";
             this.debugTab.Padding = new System.Windows.Forms.Padding(3);
@@ -503,10 +508,27 @@ namespace iDash
             this.debugTab.Text = "Debug";
             this.debugTab.UseVisualStyleBackColor = true;
             // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(9, 17);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(85, 13);
+            this.label8.TabIndex = 18;
+            this.label8.Text = "CMD_HEADER:";
+            // 
+            // cmdHeader
+            // 
+            this.cmdHeader.Location = new System.Drawing.Point(100, 14);
+            this.cmdHeader.Name = "cmdHeader";
+            this.cmdHeader.Size = new System.Drawing.Size(42, 21);
+            this.cmdHeader.TabIndex = 17;
+            this.cmdHeader.Text = "67";
+            // 
             // asHex
             // 
             this.asHex.AutoSize = true;
-            this.asHex.Location = new System.Drawing.Point(802, 41);
+            this.asHex.Location = new System.Drawing.Point(1212, 34);
             this.asHex.Name = "asHex";
             this.asHex.Size = new System.Drawing.Size(129, 17);
             this.asHex.TabIndex = 16;
@@ -517,7 +539,7 @@ namespace iDash
             // isDisabledSerial
             // 
             this.isDisabledSerial.AutoSize = true;
-            this.isDisabledSerial.Location = new System.Drawing.Point(802, 18);
+            this.isDisabledSerial.Location = new System.Drawing.Point(1212, 11);
             this.isDisabledSerial.Name = "isDisabledSerial";
             this.isDisabledSerial.Size = new System.Drawing.Size(125, 17);
             this.isDisabledSerial.TabIndex = 15;
@@ -689,7 +711,7 @@ namespace iDash
         }
 
         private System.Windows.Forms.Button buttonSend;
-        private System.Windows.Forms.RichTextBox richTextBoxSend;
+        private System.Windows.Forms.RichTextBox cmdData;
         private System.Windows.Forms.Label label1;
 
         #endregion
@@ -746,6 +768,8 @@ namespace iDash
         private System.Windows.Forms.ToolStripMenuItem assettoToolStripMenuItem1;
         private System.Windows.Forms.CheckBox isDisabledSerial;
         private System.Windows.Forms.CheckBox asHex;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.RichTextBox cmdHeader;
     }
 }
 

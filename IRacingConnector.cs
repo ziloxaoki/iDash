@@ -86,10 +86,16 @@ namespace iDash
                     switch (type)
                     {
                         case "int":
-                            result = wrapper.GetTelemetryValue<int>(name).Value.ToString();
+                            int value = wrapper.GetTelemetryValue<int>(name).Value;
+                            if (name.Equals("Gear", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                //return reverse symbol
+                                if (value < 0) return "R";
+                            }
+                            result = value.ToString();
                             break;
                         case "float":
-                            result = (wrapper.GetTelemetryValue<float>(name).Value).ToString();
+                            result = wrapper.GetTelemetryValue<float>(name).Value.ToString();
                             break;
                         case "bool":
                             result = wrapper.GetTelemetryValue<bool>(name).Value.ToString();

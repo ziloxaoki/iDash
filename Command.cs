@@ -34,25 +34,84 @@ namespace iDash
             }
         }
 
-        public Command(byte command, byte[] cData)
+        public Command(byte command, byte[] cData) : this(command, cData, false) { }
+
+        public Command(byte command, byte[] cData, bool isDebug)
         {
-            int commandLength = getLength(cData) + 4;
+            //header, code, crc, end
+            int commandLength = 4;
+            if (cData != null)
+            {
+                commandLength += cData.Length;
+            } 
+            //int commandLength = getLength(cData) + 4;
             //rawdata
             this.rawData = new byte[commandLength];
             this.rawData[0] = CMD_INIT;
             this.rawData[1] = command;
-            Array.Copy(cData, 0, rawData, 2, cData.Length);
-            //data
+
+            if(commandLength > 4)
+                Array.Copy(cData, 0, rawData, 2, cData.Length);
+
+            //data - exclude crc and end
             this.data = new byte[commandLength - 2];
             this.data[0] = CMD_INIT;
             this.data[1] = command;
-            //set crc
-            Array.Copy(cData, 0, data, 2, cData.Length);
+
+            if(isDebug)
+            {
+                this.rawData[0] = CMD_INIT_DEBUG;
+                this.data[0] = CMD_INIT_DEBUG;
+            }
+
+            if (commandLength > 4)
+                Array.Copy(cData, 0, data, 2, cData.Length);
+
+            //set crc            
             this.crc = calculateCRC(this.data);
             this.rawData[commandLength - 2] = this.crc;
-            this.rawData[commandLength - 1] = Command.CMD_END;
+            this.rawData[commandLength - 1] = Command.CMD_END;                
         }
 
+        public string getCommandType()
+        {
+            string result = "invalid";
+            switch (rawData[1])
+            {
+                case CMD_SET_DEBUG_MODE:
+                    result = "CMD_SET_DEBUG_MODE";
+                    break;
+
+                case CMD_RESPONSE_SET_DEBUG_MODE:
+                    result = "CMD_RESPONSE_SET_DEBUG_MODE";
+                    break;
+
+                case CMD_SYN:
+                    result = "CMD_SYN";
+                    break; //65d 41h
+
+                case CMD_7_SEGS:
+                    result = "CMD_7_SEGS";
+                    break; //66d 42h
+
+                case CMD_SYN_ACK:
+                    result = "CMD_SYN_ACK";
+                    break; //97d 61h
+
+                case CMD_RGB_SHIFT:
+                    result = "CMD_RGB_SHIFT";
+                    break; //67d 43h
+
+                case CMD_BUTTON_STATUS:
+                    result = "CMD_BUTTON_STATUS";
+                    break; //68d 44h
+
+                case CMD_INVALID:
+                    result = "CMD_INVALID";
+                    break; //239d EFh 
+            }
+            return result;
+        }
 
         public static byte calculateCRC(byte[] data)
         {
