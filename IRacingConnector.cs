@@ -45,7 +45,7 @@ namespace iDash
             StringBuilder msg = new StringBuilder();
             bool isConnected = false;
 
-            NotifyStatusMessage("Looking for IRacing...");
+            NotifyStatusMessage("Waiting for IRacing...");
 
             while (!MainForm.stopThreads && !MainForm.stopIRacingThreads)
             {

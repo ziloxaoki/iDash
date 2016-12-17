@@ -11,7 +11,26 @@ namespace iDash
         public static int IRacing = 0;
         public static int Raceroom = 1;
         public static int Assetto = 2;
-        public static int None = 3;
+        public static int RFactor = 3;
+        public static int None = 4;
+
+        public static object[] RFactorTelemetryData = new object[]
+        {
+            "speed.float",
+            "gear.int",
+            "engineRPM.float",
+            "engineWaterTemp.float",
+            "engineOilTemp.float",
+            "clutchRPM.float",
+            "unfilteredThrottle.float",
+            "unfilteredBrake.float",
+            "unfilteredSteering.float",
+            "unfilteredClutch.float",
+            "steeringArmForce.float",
+            "fuel.float",
+            "engineMaxRPM.float"
+        };
+
         public static object[] RaceRoomTelemetryData = new object[] {
             "EngineRps.Single",
             "MaxEngineRps.Single",

@@ -44,7 +44,7 @@ namespace iDash
         public async void start()
         {
 
-            NotifyStatusMessage("Looking for Assetto Corsa...");
+            NotifyStatusMessage("Waiting for Assetto Corsa...");
 
             bool isConnected = false;            
 

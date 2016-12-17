@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -506,6 +507,11 @@ namespace iDash
 
             byte[] b = Utils.getBytes(msg);
             return new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
+        }
+
+        public static bool IsGameRunning(String processName)
+        {
+            return Process.GetProcessesByName(processName).Length > 0;
         }
     }    
 

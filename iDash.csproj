@@ -95,6 +95,9 @@
     <Compile Include="AssettoCorsaConnector.cs" />
     <Compile Include="ButtonHandler.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="GameDefinition.cs" />
+    <Compile Include="RFactorConnector.cs" />
+    <Compile Include="RFactorDataReader.cs" />
     <Compile Include="ISimConnector.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CommandHandler.cs" />
@@ -111,6 +114,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="R3E.cs" />
     <Compile Include="RaceRoomConnector.cs" />
+    <Compile Include="RF1Data.cs" />
+    <Compile Include="RF1SharedMemoryReader.cs" />
     <Compile Include="SerialManager.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="VJoyFeeder.cs" />

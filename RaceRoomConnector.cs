@@ -50,7 +50,7 @@ namespace iDash
             StringBuilder msg = new StringBuilder();
             bool isConnected = false;
 
-            NotifyStatusMessage("Looking for RRRE.exe...");
+            NotifyStatusMessage("Waiting for RRRE.exe...");
 
             while (!MainForm.stopThreads && !MainForm.stopRaceRoomThreads)
             {
