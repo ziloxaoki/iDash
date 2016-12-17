@@ -58,8 +58,7 @@ namespace iDash
                 {
                     if (!InitialiseInternal())
                     {
-                        //throw new GameDataReadException("Failed to initialise shared memory");
-                        return null;
+                        throw new Exception("Failed to initialise shared memory");
                     }
                 }
                 try
@@ -80,8 +79,7 @@ namespace iDash
                 }
                 catch (Exception ex)
                 {
-                    //throw new GameDataReadException(ex.Message, ex);
-                    return null;
+                    throw new Exception(ex.Message, ex);
                 }
             }
         }

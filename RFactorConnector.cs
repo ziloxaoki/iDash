@@ -14,14 +14,14 @@ namespace iDash
         public StatusMessageHandler StatusMessageSubscribers;
 
         public Boolean running = false;
-        private Object memoryMappedFileStruct;
         private float firstRpm = 0;
         private float lastRpm = 0;
         private float currentRpm = 0;
-        public static GameDefinition gameDefinition;
         private Boolean mapped = false;
         private RFactorDataReader gameDataReader;
         private RF1SharedMemoryReader.RF1StructWrapper wrapper;
+        private bool isConnected = false;
+        private bool isGameRunning = false;
 
         private bool disposed = false;
 
@@ -39,40 +39,57 @@ namespace iDash
             Object rawGameData;
             NotifyStatusMessage("Waiting for RFactor...");
 
+            isGameRunning = Utils.IsGameRunning(GameDefinition.automobilista.processName);
+
             while (!MainForm.stopThreads && !MainForm.stopRFactorThreads)
-            {
-                if (Utils.IsGameRunning(GameDefinition.automobilista.processName))
-                {
+            {                
+                if (isGameRunning)
+                {                    
                     if (!mapped)
                     {
                         mapped = gameDataReader.Initialise();
                     }
                     else
                     {
-                        rawGameData = gameDataReader.ReadGameData();
-                        wrapper = (RF1SharedMemoryReader.RF1StructWrapper)rawGameData;
-                        if (wrapper.data.numVehicles > 0)
-                        {
-                            lastRpm = wrapper.data.engineMaxRPM;
-                            firstRpm = FIRST_RPM * lastRpm;
-                            currentRpm = wrapper.data.engineRPM;
+                        try {
+                            rawGameData = gameDataReader.ReadGameData();
+                            wrapper = (RF1SharedMemoryReader.RF1StructWrapper)rawGameData;
+                            if (wrapper.data.numVehicles > 0)
+                            {
+                                lastRpm = wrapper.data.engineMaxRPM;
+                                firstRpm = FIRST_RPM * lastRpm;
+                                currentRpm = wrapper.data.engineRPM;
 
-                            sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
-                            //send7SegmentMsg();
-                            
-                        }
-                        else
-                        {
-                            sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
-                        }
-                    }
+                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
+                                //send7SegmentMsg();
 
-                    await Task.Delay(5);
+                                if (!isConnected)
+                                {
+                                    string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to Automobilista.";
+                                    NotifyStatusMessage(s);
+                                    isConnected = true;
+                                }
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Logger.LogExceptionToFile(e);
+                            isGameRunning = false;
+                            isConnected = false;
+                        }
+                    }                    
                 }
                 else
                 {
-                    await Task.Delay(2000);
+                    isGameRunning = Utils.IsGameRunning(GameDefinition.automobilista.processName);
+                } 
+
+                if(!isConnected)
+                {
+                    sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                 }
+
+                await Task.Delay(5);
             }            
             
             Dispose();
