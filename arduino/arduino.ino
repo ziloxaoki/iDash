@@ -356,12 +356,12 @@ void rotEncoder1(){
     if (isValidSignal(pinB, pinOffset)) {  
       if(pinB == HIGH) {    
         encoderPos[pinOffset]++;  
-        Serial.println("Anticlockwise");
-        Serial.flush();
+//        Serial.println("Anticlockwise");
+//        Serial.flush();
       } else{
         encoderPos[pinOffset]--;
-        Serial.println("Clockwise");
-        Serial.flush();
+//        Serial.println("Clockwise");
+//        Serial.flush();
       }
     }
   }  

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using iDash.rFactor1Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -58,10 +59,9 @@ namespace iDash
                             {
                                 lastRpm = wrapper.data.engineMaxRPM;
                                 firstRpm = FIRST_RPM * lastRpm;
-                                currentRpm = wrapper.data.engineRPM;
-
+                                currentRpm = wrapper.data.engineRPM;                                
                                 sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
-                                //send7SegmentMsg();
+                                send7SegmentMsg();
 
                                 if (!isConnected)
                                 {
@@ -95,65 +95,92 @@ namespace iDash
             Dispose();
         }
 
-        protected override string getTelemetryValue(string name, string type, string clazz)
+        private string getValue(string name, string type, object clazz)
         {
-            String result = "";
+            string result = "";
 
-            if (wrapper != null)
+            Type pType = clazz.GetType();
+
+            System.Reflection.FieldInfo field = pType.GetField(name);
+
+            if (field != null)
             {
-                //retrieve field by name
-                FieldInfo prop = wrapper.GetType().GetField(name);
-
-                if (prop != null && !String.IsNullOrEmpty(type))
+                try
                 {
-                    //pType = real field type
-                    string pType = prop.FieldType.Name;
-                    //type = expected field type, has to match to pType otherwise abort
-                    try
+                    switch (type)
                     {
-                        switch (type)
-                        {
-                            case "int":
-                                if (type.Equals(pType))
+                        case "time":
+                            float seconds = 0;
+                                                        
+                            if (field.FieldType.Name.Equals("Single"))
+                            {
+                                seconds = (float)field.GetValue(clazz);
+                            }
+
+                            TimeSpan interval = TimeSpan.FromSeconds(seconds);
+                            result = interval.ToString(@"mm\.ss\.fff");
+                            break;
+                        case "kmh":
+                            if (field.FieldType.Name.Equals("Single"))
+                            {
+                                result = ((int)Math.Floor((Single)field.GetValue(clazz) * 3.6)).ToString();
+                            }
+                            break;                        
+                        default:
+                            if (name.Equals("gear"))
+                            {
+                                int gear = (int)field.GetValue(clazz) - 1;
+                                if (gear < 0)
                                 {
-                                    int val = ((int)prop.GetValue(wrapper));
-                                    if (name.Equals("gear", StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        //return reverse symbol
-                                        if (val < 0) return "R";
-                                    }
-                                    result = val.ToString();
+                                    return "R";
                                 }
-                                break;
-                            case "float":
-                                if (type.Equals(pType))
-                                {
-                                    result = ((Single)prop.GetValue(wrapper)).ToString();
-                                }
-                                break;
-                            case "kmh":
-                                if (pType.Equals("Single"))
-                                {
-                                    result = ((int)Math.Floor((Single)prop.GetValue(wrapper) * 3.6)).ToString();
-                                }
-                                break;
-                            case "time":
-                                if (pType.Equals("Single"))
-                                {
-                                    float seconds = (Single)prop.GetValue(wrapper);
-                                    TimeSpan interval = TimeSpan.FromSeconds(seconds);
-                                    result = interval.ToString(@"mm\.ss\.fff");
-                                }
-                                break;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogExceptionToFile(e);
+
+                                result = (gear + 1).ToString();
+                            }
+                            else
+                            {
+                                result = field.GetValue(clazz).ToString();
+                            }
+                            break;
                     }
                 }
+                catch (Exception e)
+                {
+                    Logger.LogExceptionToFile(e);
+                }
             }
+
             return result;
+        }
+
+        protected override string getTelemetryValue(string name, string type, string clazz)
+        {
+            string result = "";
+
+            if (!String.IsNullOrEmpty(name) && !String.IsNullOrEmpty(clazz))
+            {
+                switch (clazz)
+                {
+                    case "shared":
+                        result = getValue(name, type, wrapper.data);
+                        break;
+                    case "vehicle":
+                        result = getValue(name, type, getCurrentPlayer(wrapper.data.vehicle));
+                        break;
+                }
+            }
+
+            return result;
+        }
+
+        private rfVehicleInfo getCurrentPlayer(rfVehicleInfo[] vehicle)
+        {
+            foreach (rfVehicleInfo player in vehicle) {
+                if (player.isPlayer == 1)
+                    return player;
+            }
+
+            return vehicle[0];
         }
 
         //notify subscribers (statusbar) that a message has to be logged

@@ -64,6 +64,7 @@ namespace iDash
             }
         }
         
+        //implemented by child classes
         protected abstract string getTelemetryValue(string name, string type, string clazz);
 
         protected string getTelemetryData(string name, string strPattern)

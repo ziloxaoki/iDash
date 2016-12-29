@@ -815,7 +815,7 @@ namespace iDash
             stopRaceRoomThreads = true;
             //stop Assetto threads
             stopAssettoThreads = true;
-            //stop Assetto threads
+            //stop rFactor threads
             stopRFactorThreads = true;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked; 
                        
@@ -844,7 +844,7 @@ namespace iDash
             stopRaceRoomThreads = false;
             //stop Assetto threads
             stopAssettoThreads = true;
-            //stop Assetto threads
+            //stop rFactor threads
             stopRFactorThreads = true;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
 
@@ -873,7 +873,7 @@ namespace iDash
             stopRaceRoomThreads = true;
             //keep Assetto threads alive
             stopAssettoThreads = false;
-            //stop Assetto threads
+            //stop rFactor threads
             stopRFactorThreads = true;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
 
@@ -902,7 +902,7 @@ namespace iDash
             stopRaceRoomThreads = true;
             //stop Assetto threads
             stopAssettoThreads = true;
-            //stop Assetto threads
+            //stop rFactor threads
             stopRFactorThreads = false;
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
 
@@ -918,6 +918,28 @@ namespace iDash
             selectedSimulator = Constants.Raceroom;
 
             setButtonHandler(selectedSimulator);
+        }
+
+        private void noneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //update connection menu state
+            resetConnectionUI();
+            //stop iRacing threads
+            stopIRacingThreads = true;
+            //stop RaceRoom threads
+            stopRaceRoomThreads = true;
+            //stop Assetto threads
+            stopAssettoThreads = true;
+            //stop rFactor threads
+            stopRFactorThreads = true;
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+            statusBar.AppendText("Simulator disconnected.");
+            selectedSimulator = Constants.None;
+            if (!isSimulatorDisconnected)
+            {
+                isSimulatorDisconnected = true;
+                new Thread(new ThreadStart(sendDatetimeToArduino)).Start();
+            }
         }
 
         private void iRacingToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -958,29 +980,7 @@ namespace iDash
             this.selectedSimulator = Constants.RFactor;
 
             loadViewProperties(selectedSimulator);
-        }
-
-        private void noneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            //update connection menu state
-            resetConnectionUI();
-            //stop iRacing threads
-            stopIRacingThreads = true;
-            //stop RaceRoom threads
-            stopRaceRoomThreads = true;
-            //stop Assetto threads
-            stopAssettoThreads = true;
-            //stop Assetto threads
-            stopRFactorThreads = true;
-            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
-            statusBar.AppendText("Simulator disconnected.");
-            selectedSimulator = Constants.None;
-            if (!isSimulatorDisconnected)
-            {
-                isSimulatorDisconnected = true;
-                new Thread(new ThreadStart(sendDatetimeToArduino)).Start();
-            }
-        }
+        }        
 
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)

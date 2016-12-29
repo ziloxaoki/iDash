@@ -16,8 +16,10 @@ namespace iDash
         //arduino will wait 5 secs for a SYN ACK        
         private const int ARDUINO_TIMED_OUT = 1000;
         private const int WAIT_SERIAL_CONNECT = 1000;
+        //lets try to send a SYN to arduino, 5 times, before it times out
         private const int WAIT_TO_SEND_SYN_ACK = ARDUINO_TIMED_OUT / 5;
 
+        //arduino command length
         private int commandLength;        
         private byte[] serialCommand = new byte[BUFFER_SIZE];
         private SerialPort serialPort = new SerialPort(); //create of serial port
@@ -25,10 +27,15 @@ namespace iDash
         private object readLock = new object();
         private object sendLock = new object();
 
+        //debug mode set on form
         public DebugMode formDebugMode = DebugMode.None;   
+        //debug mode currently set in arduino
         public DebugMode arduinoDebugMode = DebugMode.None;
+        //disable messages when in Default debugging mode. This is set by the mainform. (ignore incoming data)
         public bool isDisabledSerial = false;
-        private long lastMessageLogged = 0;
+        //indicates how often a debug message need to be logged in the debug dialog
+        private long lastMessageLogged = 0; 
+        //show debug commands in hex or int (show as hexadecimal)
         public bool asHex = false;
 
         //events
@@ -50,13 +57,6 @@ namespace iDash
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                         
             
             this.tryToConnect();
-
-            //timer1 = new System.Timers.Timer(1000);
-            //timer1.Elapsed += timer1_Tick;
-            // Set it to go off every five seconds
-            // And start it        
-            //timer1.Enabled = true;
-
         }
 
         private bool isArduinoAlive()
@@ -117,27 +117,6 @@ namespace iDash
 
         }
 
-
-        /*private async void start()
-        {            
-            while (!MainForm.stopThreads) {
-                if (isArduinoAlive())
-                {
-                    //if arduino does not receive a SynAck in 5s it will disconnect and start sending ACK commands
-                    this.sendSynAck();
-                    await Task.Delay(WAIT_TO_SEND_SYN_ACK, false);
-                }
-                else
-                {
-                    tryToConnect();
-                    //wait for arduino ACK message
-                    await Task.Delay(WAIT_SERIAL_CONNECT);
-                }                     
-            }
-
-            Dispose();
-        }*/
-
         private void sendSynAck()
         {
             Command synack = new Command(Command.CMD_SYN_ACK, new byte[0]);
@@ -155,7 +134,7 @@ namespace iDash
                     //ACK message sent by Arduino
                     case Command.CMD_SYN:
                         break;
-                    //Arduino response to a set debug mode message
+                    //Arduino response to the set debug mode command
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:
                         arduinoDebugMode = (DebugMode)command.getData()[1];                     
                         break;
@@ -247,7 +226,7 @@ namespace iDash
                     {
                         switch (b)
                         {
-                            //command init char found
+                            //init command char found
                             case Command.CMD_INIT_DEBUG:
                             case Command.CMD_INIT:
                                 serialCommand[0] = b;
@@ -257,7 +236,7 @@ namespace iDash
                                 logData.Append(b + "-");
                                 break;
 
-                            //command end char found, send it to be processed
+                            //end of command char found, send command to be processed
                             case Command.CMD_END:
                                 serialCommand[commandLength] = b;
 
