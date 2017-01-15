@@ -30,8 +30,10 @@ namespace iDash
                 {
                     int numActiveLeds = (int)(Math.Ceiling((currentRpm - firstRpm) / rpmPerLed));
 
-                    if (numActiveLeds < LED_NUM_TOTAL)
+                    if (numActiveLeds <= LED_NUM_TOTAL + 1)
                     {
+                        if (numActiveLeds > LED_NUM_TOTAL)
+                            numActiveLeds = LED_NUM_TOTAL;
                         Array.Copy(Utils.colourPattern, 0, rpmLed, 0, numActiveLeds * 3); //each led colour has 3 bytes
 
                         rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
