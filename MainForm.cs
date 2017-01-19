@@ -29,6 +29,7 @@ namespace iDash
 
         private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>(4);
         private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>(4);
+        private Dictionary<String, int> buttonStateMap = new Dictionary<String, int>();
         private ArrayList bActions = new ArrayList();
 
         public static bool stopThreads = false;
@@ -621,26 +622,69 @@ namespace iDash
                 actionHandler.process(actionId, state);
         }
 
+        //send key action to game
         private void handleButtons(List<State> states)
         {
             if (states != null)
             {                                
                 for (int x = 0; x < states.Count; x++)
-                {
+                {                    
                     if (states[x] != State.None)
                     {
+                        //it is configuring button
                         if (isSearchingButton)
                         {
                             this.addButtonToList(x);
                         }
-
-                        for (int y = 0; y < bActions.Count; y++)
+                        else
                         {
-                            string[] split = bActions[y].ToString().Split(Utils.SIGN_EQUALS);
-                            if (split[0] == BUTTON_PREFIX + x)
+                            //send the key action to the game
+                            for (int y = 0; y < bActions.Count; y++)
                             {
-                                this.processButton(split[1], states[x]);
-                                break;
+                                string[] split = bActions[y].ToString().Split(Utils.SIGN_EQUALS);
+                                bool isAntiClockwise = split[0].Contains("-");
+                                string buttonId = split[0].Replace("+", "").Replace("-", "");
+                                if (buttonId.Equals(BUTTON_PREFIX + x))
+                                {                                    
+                                    string[] commandSplit = split[1].Split(Utils.LIST_SEPARATOR);
+                                    int nextAction = 0;
+
+                                    if (!buttonStateMap.ContainsKey(split[1]))
+                                    {
+                                        buttonStateMap.Add(split[1], 0);
+                                    }
+                                    else
+                                    {
+                                        if (isAntiClockwise)
+                                        {
+                                            nextAction = buttonStateMap[split[1]] - 1;
+                                        }
+                                        else
+                                        {
+                                            nextAction = buttonStateMap[split[1]] + 1;
+                                        }
+                                        if (nextAction == commandSplit.Length)
+                                        {
+                                            nextAction = 0;
+                                        }
+                                        if (nextAction < 0)
+                                        {
+                                            nextAction = commandSplit.Length - 1;
+                                        }
+                                    }
+
+                                    buttonStateMap[split[1]] = nextAction;
+
+                                    this.processButton(commandSplit[nextAction], states[x]);
+
+                                    /*MessageBox.Show(string.Format("{0}", commandSplit[nextAction]),
+                                        "Important Note",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error,
+                                        MessageBoxDefaultButton.Button1);*/
+
+                                    break;
+                                }
                             }
                         }
                     }
@@ -665,22 +709,26 @@ namespace iDash
             }
         }
 
-        private bool isButtonBinded(string buttonId)
+        private int isButtonBinded(string buttonId)
         {
+            int offset = 0;
+            buttonId = buttonId;
             foreach(string s in views2.Items) {
                 string id = s.Split(Utils.SIGN_EQUALS)[0];
-                if (buttonId.Equals(id))
+                if (buttonId.Equals(id.Replace("+", "").Replace("-", "")))
                 {
-                    MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
+                    /*MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
                                 "Important Note",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error,
-                                MessageBoxDefaultButton.Button1);
-                    return true;
+                                MessageBoxDefaultButton.Button1);*/
+                    return offset;
                 }
+
+                offset++;
             }
 
-            return false;
+            return -1;
         }
 
         private void addButtonBind_Click(object sender, EventArgs e)
@@ -688,13 +736,16 @@ namespace iDash
             if(buttonsActive.SelectedIndex > -1 && buttonActions.SelectedIndex > -1)
             {
                 string buttonId = buttonsActive.SelectedItem.ToString();
-                
-                if(isButtonBinded(buttonId))
-                {                    
+
+                int buttonBinded = isButtonBinded(buttonId);
+                //button not binded yet
+                if (buttonBinded >= 0)
+                {
                     return;
                 }
 
                 string value = buttonId + Utils.SIGN_EQUALS + buttonActions.SelectedItem.ToString();
+
                 if (!views2.Items.Contains(value))
                 {
                     views2.Items.Add(value);
@@ -990,15 +1041,20 @@ namespace iDash
                 isWaitingForKey = false;
                 label4.Visible = false;
                 string buttonId = buttonsActive.SelectedItem.ToString();
-
-                if (isButtonBinded(buttonId))
+                string buttonAction = "";
+                int buttonBinded = isButtonBinded(buttonId);
+                //button not binded yet
+                if (buttonBinded < 0)
                 {
-                    return;
+                    buttonAction = buttonId + (isClockWise.Checked ? "+" : "-") + Utils.SIGN_EQUALS + e.KeyCode;
+                    views2.Items.Add(buttonAction);
                 }
-
-                string value = buttonId + Utils.SIGN_EQUALS + e.KeyCode;
-                if (!views2.Items.Contains(value))
-                    views2.Items.Add(value);
+                else
+                {
+                    string actionsBinded = views2.Items[buttonBinded].ToString().Split('=')[1];
+                    buttonAction = actionsBinded + "," + e.KeyCode;
+                    views2.Items[buttonBinded] = buttonId + (isClockWise.Checked ? "+" : "-") + Utils.SIGN_EQUALS + buttonAction;
+                }                    
 
                 syncViews();
             }

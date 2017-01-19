@@ -16,6 +16,7 @@ namespace iDash
 
         public static object[] RFactorTelemetryData = new object[]
         {
+            "hour.time",
             "speed.kmh.shared",
             "gear.int.shared",
             "engineRPM.float.shared",
@@ -60,6 +61,7 @@ namespace iDash
         };
 
         public static object[] RaceRoomTelemetryData = new object[] {
+            "hour.time",
             "EngineRps.Single",
             "MaxEngineRps.Single",
             "FuelPressure.Single",
@@ -149,6 +151,7 @@ namespace iDash
         };
 
         public static object[] IRacingTelemetryData = new object[] {
+            "hour.time",
             "AirDensity.float",
             "AirPressure.float",
             "AirTemp.float",
@@ -401,6 +404,7 @@ namespace iDash
         };
 
         public static object[] AssettoTelemetryData = new object[] {
+            "hour.time",
             "PacketId.Int32.physics",
             "Gas.Single.physics",
             "Brake.Single.physics",

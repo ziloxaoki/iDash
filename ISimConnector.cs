@@ -71,6 +71,8 @@ namespace iDash
 
         protected string getTelemetryData(string name, string strPattern)
         {
+            if (name.Equals("hour.time"))
+                return DateTime.Now.ToString("hh.mm.ss.ff");
 
             string result = "";
 

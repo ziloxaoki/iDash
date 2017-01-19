@@ -9,6 +9,8 @@
 #include <MemoryFree.h>
 
 
+#define RIGHT 1
+#define LEFT -1
 #define portOfPin(P)\
   (((P)>=0&&(P)<8)?&PORTD:(((P)>7&&(P)<14)?&PORTB:&PORTC))
 #define ddrOfPin(P)\
@@ -330,17 +332,17 @@ void setup()
 
 }
 
-bool isValidSignal(bool isHigh, int offset) {
+bool isValidSignal(bool isHigh, int pinOffset) {
   if(isHigh) {    
-    if(orientation[offset] > 0) {      
+    if(orientation[pinOffset] == RIGHT) {      
       return true;
     }
-    orientation[offset]+=1;
+    orientation[pinOffset]=RIGHT;
   } else {
-    if(orientation[offset] < 0) {      
+    if(orientation[pinOffset] == LEFT) {      
       return true;
     }
-    orientation[offset]-=1;
+    orientation[pinOffset]=LEFT;
   }
 
   return false;
@@ -399,18 +401,19 @@ int sendRotaryState(int offset, byte *response) {
     if(millis() - lastRotaryStateChange > 100) {  
       if(encoderPos[i] != lastPos[i]) {      
         if(lastPos[i] < encoderPos[i]) {  
+          //turn left
           lastState[i] = 1;    
-        } else {      
+        } else {     
+          //turn right          
           lastState[i] = 2;       
         }
         lastPos[i] = encoderPos[i];        
-        
+
+        lastRotaryStateChange = millis();
       } else {
+        //not pressed
         lastState[i] = 0;     
       }  
-      if(i == TOTAL_ROTARY - 1) {
-        lastRotaryStateChange = millis();              
-      }
     }
 
     switch(lastState[i]) {
