@@ -165,11 +165,11 @@ namespace iDash
             {
                 ArrayList objCollection = new ArrayList();
                 objCollection.AddRange(Utils.convertObjectCollectionToStringArray(views.Items));
-                TM1637ListBoxItems.Insert(selectedSimulator, objCollection);
+                TM1637ListBoxItems[selectedSimulator] = objCollection;
 
                 ArrayList objCollection2 = new ArrayList();
                 objCollection2.AddRange(Utils.convertObjectCollectionToStringArray(views2.Items));
-                ButtonsListBoxItems.Insert(selectedSimulator, objCollection2);
+                ButtonsListBoxItems[selectedSimulator] = objCollection2;
             }
         }
 
