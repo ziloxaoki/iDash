@@ -355,7 +355,7 @@ void rotEncoder1(){
     int pinB = digitalState(encoderPinB[pinOffset]);
 
     //anti bounce incorrect reading. First reading is lost but prevent incorrect reading.
-    if (isValidSignal(pinB, pinOffset)) {  
+    //if (isValidSignal(pinB, pinOffset)) {  
       if(pinB == HIGH) {    
         encoderPos[pinOffset]++;  
 //        Serial.println("Anticlockwise");
@@ -365,7 +365,7 @@ void rotEncoder1(){
 //        Serial.println("Clockwise");
 //        Serial.flush();
       }
-    }
+    //}
   }  
   lastRotaryBounce = millis();
   //sei(); //restart interrupts
@@ -378,7 +378,7 @@ void rotEncoder2(){
     int pinB = digitalState(encoderPinB[pinOffset]);
 
     //anti bounce incorrect reading. First reading is lost but prevent incorrect reading.
-    if (isValidSignal(pinB, pinOffset)) {  
+    //if (isValidSignal(pinB, pinOffset)) {  
       if(pinB == HIGH) {    
         encoderPos[pinOffset]++;  
         //Serial.println("Clockwise");
@@ -388,7 +388,7 @@ void rotEncoder2(){
         //Serial.println("Anticlockwise");
         //Serial.flush();
       }
-    }
+    //}
   }  
   lastRotaryBounce = millis();
   //sei(); //restart interrupts
@@ -398,7 +398,7 @@ void rotEncoder2(){
 int sendRotaryState(int offset, byte *response) {  
   for(int i = 0; i < TOTAL_ROTARY; i++) {                  
 
-    if(millis() - lastRotaryStateChange > 100) {  
+    if(millis() - lastRotaryStateChange > 50) {  
       if(encoderPos[i] != lastPos[i]) {      
         if(lastPos[i] < encoderPos[i]) {  
           //turn left
