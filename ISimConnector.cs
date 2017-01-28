@@ -26,11 +26,11 @@ namespace iDash
             Command rgbShift = null;
             if (rpmPerLed > 0 && currentRpm > firstRpm - 2000)
             {
-                if (currentRpm > firstRpm)
+                if (currentRpm >= firstRpm)
                 {
-                    int numActiveLeds = (int)(Math.Ceiling((currentRpm - firstRpm) / rpmPerLed));
+                    int numActiveLeds = (int)(Math.Ceiling((currentRpm - firstRpm) / rpmPerLed)) + 1;
 
-                    if (numActiveLeds <= LED_NUM_TOTAL + 1)
+                    if (currentRpm < lastRpm)
                     {
                         if (numActiveLeds > LED_NUM_TOTAL)
                             numActiveLeds = LED_NUM_TOTAL;

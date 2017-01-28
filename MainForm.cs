@@ -712,7 +712,7 @@ namespace iDash
         private int isButtonBinded(string buttonId)
         {
             int offset = 0;
-            buttonId = buttonId;
+
             foreach(string s in views2.Items) {
                 string id = s.Split(Utils.SIGN_EQUALS)[0];
                 if (buttonId.Equals(id.Replace("+", "").Replace("-", "")))

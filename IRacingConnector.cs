@@ -141,13 +141,23 @@ namespace iDash
                 firstRpm = float.Parse(yq.Value, CultureInfo.InvariantCulture.NumberFormat);
                 //Logger.LogMessageToFile("Shift:" + maxRpm + "\n");
             }*/
-            YamlQuery yq = e.SessionInfo["DriverInfo"]["DriverCarSLLastRPM"];
-            if (yq != null)
+            YamlQuery yLastRPM = e.SessionInfo["DriverInfo"]["DriverCarSLLastRPM"];
+            YamlQuery yShiftRPM = e.SessionInfo["DriverInfo"]["DriverCarSLShiftRPM"];
+            if (yShiftRPM != null)
             {
-                lastRpm = float.Parse(yq.Value, CultureInfo.InvariantCulture.NumberFormat);
-                firstRpm = FIRST_RPM * lastRpm;
+                lastRpm = float.Parse(yShiftRPM.Value, CultureInfo.InvariantCulture.NumberFormat);                
                 //Logger.LogMessageToFile("Shift:" + maxRpm + "\n");
             }
+            else
+            {
+                if (yLastRPM != null)
+                {
+                    lastRpm = float.Parse(yLastRPM.Value, CultureInfo.InvariantCulture.NumberFormat);
+                    //Logger.LogMessageToFile("Shift:" + maxRpm + "\n");
+                }
+            }
+
+            firstRpm = FIRST_RPM * lastRpm;
         }
 
         private void OnTelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
