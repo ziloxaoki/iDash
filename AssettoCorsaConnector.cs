@@ -164,7 +164,7 @@ namespace iDash
         {            
             if (e.StaticInfo.MaxRpm == 0)
             {
-                //auto calibrate the max rpm. Sometimes the card doesn't return this info.
+                //auto calibrate the max rpm. Sometimes the car doesn't return this info.
                 if (lastRpm < currentRpm && currentRpm > 5000)
                 {
                     lastRpm = currentRpm;
@@ -175,6 +175,8 @@ namespace iDash
                 lastRpm = e.StaticInfo.MaxRpm;
             }
             firstRpm = FIRST_RPM * lastRpm;
+            //calibrate shift gear light rpm
+            lastRpm *= 0.93f;
             si = e.StaticInfo;                     
         }
 

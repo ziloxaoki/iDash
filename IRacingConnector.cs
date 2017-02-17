@@ -152,7 +152,8 @@ namespace iDash
             {
                 if (yLastRPM != null)
                 {
-                    lastRpm = float.Parse(yLastRPM.Value, CultureInfo.InvariantCulture.NumberFormat);
+                    //calibrate shift gear light rpm
+                    lastRpm = float.Parse(yLastRPM.Value, CultureInfo.InvariantCulture.NumberFormat) * 0.93f;
                     //Logger.LogMessageToFile("Shift:" + maxRpm + "\n");
                 }
             }
