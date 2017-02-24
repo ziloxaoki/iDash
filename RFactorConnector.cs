@@ -60,7 +60,7 @@ namespace iDash
                                 lastRpm = wrapper.data.engineMaxRPM;
                                 firstRpm = FIRST_RPM * lastRpm;
                                 //calibrate shift gear light rpm
-                                lastRpm *= 0.93f;
+                                lastRpm *= 0.97f;
                                 currentRpm = wrapper.data.engineRPM;                                
                                 sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
                                 send7SegmentMsg();

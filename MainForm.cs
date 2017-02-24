@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -53,6 +54,7 @@ namespace iDash
 
         public delegate void HandleButtonActions(List<State> states);
         public HandleButtonActions handleButtonActions;
+        public static bool formFinishedLoading;
 
         private bool isSimulatorDisconnected = true;
 
@@ -65,6 +67,8 @@ namespace iDash
                 this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
                 //Action Handlers have a pointer to Form, so they can only be initialized after the form.
                 InitializeComponent();
+
+                this.Shown += new System.EventHandler(FormLoadComplete);
 
                 handleButtonActions = new HandleButtonActions(handleButtons);
 
@@ -293,7 +297,7 @@ namespace iDash
         }
 
         public void AppendToStatusBar(String s)
-        {
+        {            
             statusBar.AppendText(s);
         }
 
@@ -1069,5 +1073,10 @@ namespace iDash
         {
             sm.asHex = asHex.Checked;
         }
-    }
+
+        private void FormLoadComplete(object sender, EventArgs e)
+        {
+            formFinishedLoading = true;
+        }
+    }    
 }

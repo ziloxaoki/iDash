@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace iDash
 {
@@ -65,7 +67,8 @@ namespace iDash
         }
 
         private async void tryToConnect()
-        {            
+        {
+            HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             while (!MainForm.stopThreads)
             {
@@ -88,7 +91,10 @@ namespace iDash
                         }
 
                         serialPort.PortName = port;    //selected name of port
-                        NotifyStatusMessage("Searching for Arduino at " + port + "...");
+                        if (!notificationSent.Contains(port))
+                        {
+                            NotifyStatusMessage("Searching for Arduino at " + port + "...");                            
+                        }                        
 
                         try
                         {
@@ -96,8 +102,19 @@ namespace iDash
                         }
                         catch
                         {
-                            Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...
-                            serialPort.Open();        //try again
+                            if (!notificationSent.Contains(port))
+                            {
+                                MessageBox.Show(String.Format("Port {0} already in use", port),
+                                    "Warning",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Warning);
+                            }
+                            Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...                            
+                        }
+
+                        if (MainForm.formFinishedLoading)
+                        {
+                            notificationSent.Add(port);
                         }
 
                         //check if connected

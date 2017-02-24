@@ -7,8 +7,11 @@ namespace iDash
     public class VJoyFeeder
     {
         // Declaring one joystick (Device id 1) and a position structure. 
+        private static uint CENTER = 16384;
+        private static uint AXIS_OFFSET = 4;
         public vJoy joystick;
         public uint jID = 1;
+        private uint axisX = 0, axisY = 0;
 
         //events
         public delegate void StatusMessageHandler(string m);
@@ -108,11 +111,67 @@ namespace iDash
             }
         }
 
+        //direction: 0=not pressed, +1=up or right pressed, -1=down or left pressed
+        private uint calculateAxisPosition(uint previous, int direction)
+        {
+            if (direction == 0) return CENTER;
+            if (previous > 0 && direction < 0)
+            {
+                return CENTER - 1000;
+            }
+
+            if (previous < 0 && direction > 0)
+            {
+                return 1000 + CENTER;
+            }
+
+            if (direction > 0 && previous < 31767)
+            {
+                return previous += 1000;
+            }
+            if (direction < 0 && previous > 1000)
+            {
+                return previous -= 1000;
+            }
+
+            return previous;
+        }
+
+        private void setAxis(List<State> states)
+        {
+            int directionX = 0, directionY = 0;
+            //0=up, 1=down, 2=right, 3=left
+            if (states[0] == State.KeyDown || states[0] == State.KeyHold)
+            {
+                directionX = 1;
+            } else if(states[1] == State.KeyDown || states[1] == State.KeyHold)
+            {
+                directionX = -1;
+            }
+            if (states[2] == State.KeyDown || states[2] == State.KeyHold)
+            {
+                directionX = 1;
+            }
+            else if (states[3] == State.KeyDown || states[3] == State.KeyHold)
+            {
+                directionX = -1;
+            }
+
+            axisX = calculateAxisPosition(axisX, directionX);
+            axisY = calculateAxisPosition(axisY, directionY);
+
+            joystick.SetAxis((int)axisX, jID, HID_USAGES.HID_USAGE_X);
+            joystick.SetAxis((int)axisY, jID, HID_USAGES.HID_USAGE_Y);
+        }
+
         public void ButtonStateReceived(List<State> states)
         {
-            for (uint i = 0; i < states.Count; i++)
+            
+            setAxis(states);
+
+            for (uint i = AXIS_OFFSET; i < states.Count; i++)
             {
-                joystick.SetBtn(states[(int)i] == State.KeyDown || states[(int)i] == State.KeyHold, jID, i + 1);
+                joystick.SetBtn(states[(int)i] == State.KeyDown || states[(int)i] == State.KeyHold, jID, i + 1 - AXIS_OFFSET);                
             }
         }
 

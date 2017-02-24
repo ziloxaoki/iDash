@@ -467,8 +467,16 @@ int sendAnalogState(int offset, byte *response) {
   return offset;  
 }
 
+int sendAxisState(int offset, byte *response) {
+  //axis
+  for (int i = 0; i < 4; i++) {
+     response[offset++] = 0;
+  }
+  
+  return offset;
+}
 
-int sendButtonState(int offset, byte *response) {
+int sendButtonState(int offset, byte *response) {  
   for (int i = 0; i < ENABLED_BUTTONS_COUNT; i++) {      
     response[offset++] = digitalState(BUTTON_PINS[i]) == HIGH ? 0 : 1;
   }   
@@ -618,9 +626,11 @@ void sendButtonStatus(byte header) {
   //return buttons state      
   response[offset++] = header;
   response[offset++] = CMD_BUTTON_STATUS;
+  //axis has to be the last bytes in the array
+  offset = sendAxisState(offset, response);
   offset = sendButtonState(offset, response);
   offset = sendAnalogState(offset, response);
-  offset = sendRotaryState(offset, response);
+  offset = sendRotaryState(offset, response);  
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;   
   
