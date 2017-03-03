@@ -14,12 +14,12 @@ namespace iDash
         int bs = 0;
 
         private const int BUFFER_SIZE = 40;
-        private const int WAIT_TO_RECONNECT = 1000;        
+        private const int WAIT_TO_RECONNECT = 500;        
         //arduino will wait 5 secs for a SYN ACK        
-        private const int ARDUINO_TIMED_OUT = 1000;
-        private const int WAIT_SERIAL_CONNECT = 1000;
+        private const int ARDUINO_TIMED_OUT = 500;
+        private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
-        private const int WAIT_TO_SEND_SYN_ACK = ARDUINO_TIMED_OUT / 5;
+        private const int WAIT_FOR_ARDUINO_DATA = 100;
 
         //arduino command length
         private int commandLength;        
@@ -50,6 +50,8 @@ namespace iDash
 
         private bool disposed = false;
 
+        private string[] portNames;
+
         public void Init()
         {
             serialPort.Parity = Parity.None;     //selected parity 
@@ -69,21 +71,17 @@ namespace iDash
         private async void tryToConnect()
         {
             HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            portNames = SerialPort.GetPortNames();
 
             while (!MainForm.stopThreads)
             {
                 if (isArduinoAlive())
-                {
-                    //if arduino does not receive a SynAck in 5s it will disconnect and start sending ACK commands
-                    if (!Utils.hasTimedOut(lastArduinoResponse, WAIT_TO_SEND_SYN_ACK))
-                    {
-                        this.sendSynAck();
-                    }
-                    await Task.Delay(WAIT_TO_SEND_SYN_ACK);
+                {                    
+                    await Task.Delay(WAIT_FOR_ARDUINO_DATA);
                 }
                 else
                 {
-                    foreach (string port in this.getportnames())
+                    foreach (string port in portNames)
                     {
                         if (serialPort.IsOpen)  //if port is  open 
                         {
@@ -102,13 +100,13 @@ namespace iDash
                         }
                         catch
                         {
-                            if (!notificationSent.Contains(port))
+                            /*if (!notificationSent.Contains(port))
                             {
                                 MessageBox.Show(String.Format("Port {0} already in use", port),
                                     "Warning",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Warning);
-                            }
+                            }*/
                             Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...                            
                         }
 
@@ -126,6 +124,8 @@ namespace iDash
                         if (isArduinoAlive())
                         {
                             NotifyStatusMessage("Arduino found at port " + port + "...");
+                            //if arduino found always try to reconnect to this port
+                            portNames = new string[] {port};
                             break;
                         }
                     }
@@ -191,12 +191,6 @@ namespace iDash
 
             return type;                        
         }      
-
-        
-        public string[] getportnames()
-        {
-            return SerialPort.GetPortNames(); //load all names of  com ports to string 
-        }
 
         public void sendCommand(Command command, bool forcePost)
         {

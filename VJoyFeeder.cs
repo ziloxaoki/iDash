@@ -25,7 +25,8 @@ namespace iDash
 
         public void InitializeJoystick()
         {
-            joystick = new vJoy();           
+            if (joystick == null)
+                joystick = new vJoy();           
 
             // Get the driver attributes (Vendor ID, Product ID, Version Number)
             if (!joystick.vJoyEnabled())
@@ -87,7 +88,7 @@ namespace iDash
             else
                 NotifyStatusMessage(String.Format("Version of Driver ({0:X}) does NOT match DLL Version ({1:X})", DrvVer, DllVer));
 
-
+            NotifyStatusMessage(String.Format("Failed to acquire vJoy device number {0}.", joystick.GetVJDStatus(jID)));
             // Acquire the target
             if ((status == VjdStat.VJD_STAT_OWN) || ((status == VjdStat.VJD_STAT_FREE) && (!joystick.AcquireVJD(jID))))
             {
@@ -166,7 +167,13 @@ namespace iDash
 
         public void ButtonStateReceived(List<State> states)
         {
-            
+            //When usb was disconnected it was losing the VJD
+            VjdStat status = joystick.GetVJDStatus(jID);
+
+            if (status != VjdStat.VJD_STAT_OWN) {
+                joystick.AcquireVJD(jID);
+            }
+
             setAxis(states);
 
             for (uint i = AXIS_OFFSET; i < states.Count; i++)
