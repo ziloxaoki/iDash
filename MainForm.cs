@@ -81,7 +81,7 @@ namespace iDash
                 bh = new ButtonHandler(sm);
                 bh.buttonStateHandler += ButtonStateReceived;
                 //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
-                System.Threading.Thread.Sleep(1000);
+                Thread.Sleep(1000);
 
                 Logger.LogMessageToFile("Initializing Vjoy.", true);
                 vf = new VJoyFeeder(bh);
