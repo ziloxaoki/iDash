@@ -92,7 +92,12 @@ namespace iDash
                         if (!notificationSent.Contains(port))
                         {
                             NotifyStatusMessage("Searching for Arduino at " + port + "...");                            
-                        }                        
+                        }
+
+                        if (MainForm.formFinishedLoading)
+                        {
+                            notificationSent.Add(port);
+                        }
 
                         try
                         {
@@ -107,14 +112,11 @@ namespace iDash
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Warning);
                             }*/
-                            Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...                            
-                        }
+                            Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
 
-                        if (MainForm.formFinishedLoading)
-                        {
-                            notificationSent.Add(port);
+                            continue;                          
                         }
-
+                       
                         //check if connected
                         sendSynAck();
 
