@@ -142,16 +142,16 @@ int BUTTON_PINS[] = { BUTTON_PIN_1, BUTTON_PIN_2, BUTTON_PIN_3, BUTTON_PIN_4, BU
 
 // -------------------- ANALOG ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-const int EXTRA_BUTTONS_TOTAL = 4;  //Extra pins. Each pin can handle multiple buttons
+const int EXTRA_BUTTONS_TOTAL = 8;  //Extra pins. Each pin can handle multiple buttons
 
 int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT_PULLUP}, //A7 Left paddle - INPUT_PULLUP
                                 {20, INPUT_PULLUP}, //A6 Right Paddle - INPUT_PULLUP
                                 {19, INPUT},        //A5 Extra 1 - INPUT
                                 {18, INPUT},        //A4 Extra 2 - INPUT
-                                {17, INPUT},        //A3
-                                {16, INPUT},        //A2
-                                {15, INPUT},        //A1
-                                {14, INPUT}};       //A0
+                                {17, INPUT_PULLUP},        //A3 Toggle switch up
+                                {16, INPUT_PULLUP},        //A2 Toggle switch down
+                                {15, INPUT_PULLUP},        //A1 Toggle switch left
+                                {14, INPUT_PULLUP}};       //A0 Toggle switch right
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
@@ -159,15 +159,15 @@ int BUTTON_LIMITS[8][4][2] = {{{645, 900}, {-1, -1}, {-1, -1}, {-1, -1}},       
                               {{615, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
                               {{450, 520}, {550, 620}, {625, 685}, {690, 745}},   //A5 Extra 1 - INPUT
                               {{450, 520}, {550, 620}, {625, 685}, {690, 745}},   //A4 Extra 2 - INPUT                 
-                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
-                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
-                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
-                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
+                              {{-1, 100}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
+                              {{-1, 100}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
+                              {{-1, 100}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
+                              {{-1, 100}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
                               
 int GROUND_ANALOG_PIN = 15; //A1                                
 
-int extra_button_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int extra_button_last_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   // the previous reading from the input pin               
+int extra_button_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int extra_button_last_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   // the previous reading from the input pin               
 long lastButtonBounce = 0;             
 
 // -------------------- ROTARY ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -443,10 +443,12 @@ int sendAnalogState(int offset, byte *response) {
   for(int i = 0; i < EXTRA_BUTTONS_TOTAL; i++) {
     // read the state of the switch into a local variable:
     int reading = analogRead(EXTRA_BUTTONS_INIT[i][0]); 
-/*if(i == 2 || i == 3) {
-  Serial.println(reading);
-  delay(500);    
-}*/
+
+//Serial.print(i);
+//Serial.print("=");
+//Serial.println(reading);
+//delay(500);    
+
     for(int x = 0; x < MAXIMUM_BUTTONS_PER_ANALOG; x++) {
       int tmpButtonState = LOW;             // the current reading from the input pin
 
@@ -454,7 +456,7 @@ int sendAnalogState(int offset, byte *response) {
         //Read switch 1       
         tmpButtonState = 1; 
       }      
-      if((tmpButtonState != extra_button_last_states[btn]) && (millis() - lastButtonBounce > 50)) {
+      if((tmpButtonState != extra_button_last_states[btn]) && (millis() - lastButtonBounce > 100)) {
         extra_button_last_states[btn++] = tmpButtonState; 
         response[offset++] = tmpButtonState;
         lastButtonBounce = millis(); 
@@ -497,8 +499,11 @@ int calculateCrc(int dataLength, byte *response) {
 }
 
 void sendDataToSerial(int commandLength, byte *response) {
-  Serial.write(response, commandLength);
+  Serial.write(response, commandLength);  
   Serial.flush();
+//  for(int x=0; x<commandLength; x++)
+//  Serial.print(response[x]);
+//  Serial.println();
 }
 
 void processCommand(byte *buffer, int commandLength) {  
@@ -638,8 +643,8 @@ void sendButtonStatus(byte header) {
 }
 
 void loop() {  
-//    Serial.print("freeMemory()=");
-//    Serial.println(freeMemory());
+  //Serial.print("freeMemory()=");
+  //Serial.println(freeMemory());
   //haven't received Syn Ack from IDash for too long
   if(millis() - lastTimeReceivedByte > 1000 /*|| !isConnected*/) {
     resetTM1637_MAX7221();
@@ -656,6 +661,10 @@ void loop() {
   
   //if(isConnected) {
     sendButtonStatus(CMD_INIT); 
+  //delay(500);
   //}  
 
+//byte response[100];
+//  int offset = 0;
+//sendAnalogState(offset,response);
 }
