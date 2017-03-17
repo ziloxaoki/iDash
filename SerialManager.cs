@@ -13,7 +13,7 @@ namespace iDash
 
         int bs = 0;
 
-        private const int BUFFER_SIZE = 60;
+        private const int BUFFER_SIZE = 40;
         private const int WAIT_TO_RECONNECT = 500;        
         //arduino will wait 5 secs for a SYN ACK        
         private const int ARDUINO_TIMED_OUT = 500;

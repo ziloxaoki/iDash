@@ -4,6 +4,13 @@ using vJoyInterfaceWrap;
 
 namespace iDash
 {
+    public enum Position
+    {
+        NEGATIVE,
+        NULL,
+        POSITIVE
+    };
+
     public class VJoyFeeder
     {
         // Declaring one joystick (Device id 1) and a position structure. 
@@ -112,49 +119,42 @@ namespace iDash
         }
 
         //direction: 0=not pressed, +1=up or right pressed, -1=down or left pressed
-        private uint calculateAxisPosition(uint previous, int direction)
+        private uint calculateAxisPosition(uint previousPosition, Position direction)
         {
-            if (direction == 0) return CENTER;
-            if (previous > 0 && direction < 0)
+            if (direction == Position.NULL || (previousPosition > CENTER && direction == Position.NEGATIVE) || (previousPosition < CENTER && direction == Position.POSITIVE)) return CENTER;
+
+            if (direction == Position.POSITIVE && previousPosition < 31767)
             {
-                return CENTER - 1000;
+                return previousPosition += 1000;
             }
 
-            if (previous < 0 && direction > 0)
+            if (direction == Position.NEGATIVE && previousPosition > 1000)
             {
-                return 1000 + CENTER;
+                return previousPosition -= 1000;
             }
 
-            if (direction > 0 && previous < 31767)
-            {
-                return previous += 1000;
-            }
-            if (direction < 0 && previous > 1000)
-            {
-                return previous -= 1000;
-            }
-
-            return previous;
+            return previousPosition;
         }
 
         private void setAxis(List<State> states)
         {
-            int directionX = 0, directionY = 0;
+            Position directionX = Position.NULL, directionY = Position.NULL;
+
             //0=up, 1=down, 2=right, 3=left
             if (states[0] == State.KeyDown || states[0] == State.KeyHold)
             {
-                directionX = 1;
+                directionX = Position.POSITIVE;
             } else if(states[1] == State.KeyDown || states[1] == State.KeyHold)
             {
-                directionX = -1;
+                directionX = Position.NEGATIVE;
             }
             if (states[2] == State.KeyDown || states[2] == State.KeyHold)
             {
-                directionX = 1;
+                directionY = Position.POSITIVE;
             }
             else if (states[3] == State.KeyDown || states[3] == State.KeyHold)
             {
-                directionX = -1;
+                directionY = Position.NEGATIVE;
             }
 
             axisX = calculateAxisPosition(axisX, directionX);

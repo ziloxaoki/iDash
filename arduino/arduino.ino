@@ -142,7 +142,7 @@ int BUTTON_PINS[] = { BUTTON_PIN_1, BUTTON_PIN_2, BUTTON_PIN_3, BUTTON_PIN_4, BU
 
 // -------------------- ANALOG ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-const int EXTRA_BUTTONS_TOTAL = 8;  //Extra pins. Each pin can handle multiple buttons
+const int EXTRA_BUTTONS_TOTAL = 4;  //Extra pins. Each pin can handle multiple buttons
 
 int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT_PULLUP}, //A7 Left paddle - INPUT_PULLUP
                                 {20, INPUT_PULLUP}, //A6 Right Paddle - INPUT_PULLUP
@@ -159,16 +159,24 @@ int BUTTON_LIMITS[8][4][2] = {{{645, 900}, {-1, -1}, {-1, -1}, {-1, -1}},       
                               {{615, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
                               {{450, 520}, {550, 620}, {625, 685}, {690, 745}},   //A5 Extra 1 - INPUT
                               {{450, 520}, {550, 620}, {625, 685}, {690, 745}},   //A4 Extra 2 - INPUT                 
-                              {{-1, 100}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
-                              {{-1, 100}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
-                              {{-1, 100}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
-                              {{-1, 100}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
+                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
+                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
+                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
+                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
+
+
+int AXIS[4] = {17, 16, 15, 14};
+int AXIS_LIMITS[4][2] = {{-1, 100}, {-1, 100}, {-1, 100}, {-1, 100}};
                               
 int GROUND_ANALOG_PIN = 15; //A1                                
 
-int extra_button_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int extra_button_last_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   // the previous reading from the input pin               
-long lastButtonBounce = 0;             
+int extra_button_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int extra_button_last_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   // the previous reading from the input pin               
+long lastButtonBounce = 0;  
+
+int axis_states[] = {0, 0, 0, 0};
+int axis_last_states[] = {0, 0, 0, 0};   // the previous reading from the input pin               
+long lastAxisBounce = 0;
 
 // -------------------- ROTARY ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -327,6 +335,11 @@ void setup()
     pinAsInputPullUp(encoderPinA[i]);      
     pinAsInputPullUp(encoderPinB[i]);        
   } 
+
+  //Axis
+  for(int i = 0; i < 4; i++) {
+    pinAsInputPullUp(AXIS[i]);
+  }
   attachInterrupt(digitalPinToInterrupt(encoderPinA[0]), rotEncoder1, LOW); 
   attachInterrupt(digitalPinToInterrupt(encoderPinA[1]), rotEncoder2, LOW); 
 
@@ -470,9 +483,24 @@ int sendAnalogState(int offset, byte *response) {
 }
 
 int sendAxisState(int offset, byte *response) {
-  //axis
+
   for (int i = 0; i < 4; i++) {
-     response[offset++] = 0;
+    int reading = analogRead(AXIS[i]);
+
+    int tmpAxisState = LOW;             // the current reading from the input pin
+
+    if((reading > AXIS_LIMITS[i][0]) && (reading < AXIS_LIMITS[i][1])){           
+      //Read switch 1       
+      tmpAxisState = 1; 
+    }
+    if((tmpAxisState != axis_last_states[i]) && (millis() - lastAxisBounce > 100)) {
+      axis_last_states[i] = tmpAxisState; 
+      response[offset++] = tmpAxisState;
+      lastAxisBounce = millis(); 
+    } else {
+      response[offset++] = axis_last_states[i];
+    }        
+    
   }
   
   return offset;
