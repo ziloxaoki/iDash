@@ -165,7 +165,7 @@ int BUTTON_LIMITS[8][4][2] = {{{645, 900}, {-1, -1}, {-1, -1}, {-1, -1}},       
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
 
 
-int AXIS[4] = {17, 16, 15, 14};
+int AXIS[4] = {14, 15, 16, 17};
 int AXIS_LIMITS[4][2] = {{-1, 100}, {-1, 100}, {-1, 100}, {-1, 100}};
                               
 int GROUND_ANALOG_PIN = 15; //A1                                
@@ -483,6 +483,14 @@ int sendAnalogState(int offset, byte *response) {
 }
 
 int sendAxisState(int offset, byte *response) {
+  for(int x=0; x < 4; x++) {
+    response[offset++]=0;
+  }
+
+  return offset;
+}
+
+int sendAnalogState2(int offset, byte *response) {
 
   for (int i = 0; i < 4; i++) {
     int reading = analogRead(AXIS[i]);
@@ -664,6 +672,7 @@ void sendButtonStatus(byte header) {
   offset = sendButtonState(offset, response);
   offset = sendAnalogState(offset, response);
   offset = sendRotaryState(offset, response);  
+  offset = sendAnalogState2(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;   
   
