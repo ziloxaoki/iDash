@@ -7,7 +7,7 @@ namespace iDash
 {
     public enum GameEnum
     {
-        RACE_ROOM, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, ASSETTO_64BIT, ASSETTO_32BIT
+        RACE_ROOM, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, RF2, ASSETTO_64BIT, ASSETTO_32BIT
     }
     public class GameDefinition
     {
@@ -29,6 +29,8 @@ namespace iDash
             "marcas_launch_exe", "marcas_launch_params", "launch_marcas");
         public static GameDefinition ftruck = new GameDefinition(GameEnum.RF1, "Formula Truck", "FTRUCK",
             "ftruck_launch_exe", "ftruck_launch_params", "launch_ftruck");
+        public static GameDefinition rfactor2 = new GameDefinition(GameEnum.RF2, "RFactor 2", "RFACTOR2",
+            "rfactor2_exe", "rfactor2_params", "rfactor2");
         /*public static GameDefinition assetto64Bit = new GameDefinition(GameEnum.ASSETTO_64BIT, Configuration.getUIString("assetto_64_bit"), "acs", "CrewChiefV4.assetto.ACSSpotter",
             "acs_launch_exe", "acs_launch_params", "launch_acs");
         public static GameDefinition assetto32Bit = new GameDefinition(GameEnum.ASSETTO_32BIT, Configuration.getUIString("assetto_32_bit"), "acs_x86", "CrewChiefV4.assetto.ACSSpotter",

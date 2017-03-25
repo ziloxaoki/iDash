@@ -8,6 +8,9 @@ namespace iDash
 {
     public abstract class ISimConnector : IDisposable
     {
+        public delegate void StatusMessageHandler(string m);
+        public StatusMessageHandler StatusMessageSubscribers;
+
         protected SerialManager sm;
 
         private const int LED_NUM_TOTAL = 16;
@@ -130,6 +133,17 @@ namespace iDash
                     Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
                     sm.sendCommand(c, false);
                 }
+            }
+        }
+
+        //notify subscribers (statusbar) that a message has to be logged
+        public void NotifyStatusMessage(string args)
+        {
+            StatusMessageHandler handler = StatusMessageSubscribers;
+
+            if (handler != null)
+            {
+                handler(args + "\n");
             }
         }
 

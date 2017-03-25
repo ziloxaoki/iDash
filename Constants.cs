@@ -12,7 +12,8 @@ namespace iDash
         public static int Raceroom = 1;
         public static int Assetto = 2;
         public static int RFactor = 3;
-        public static int None = 4;
+        public static int RFactor2 = 4;
+        public static int None = 5;
 
         public static object[] RFactorTelemetryData = new object[]
         {
@@ -472,6 +473,215 @@ namespace iDash
             "MaxFuel.Single.static",
             "SuspensionMaxTravel.Single[].static",
             "TyreRadius.Single[].static",
+        };
+
+        public static object[] RFactor2TelemetryData = new object[] {
+            "hour.time",
+            "mDeltaTime.double.rF2State",                      // time since last update (seconds)
+            "mElapsedTime.double.rF2State",                    // game session time
+            "mLapNumber.int.rF2State",                         // current lap number
+            "mLapStartET.double.rF2State",                     // time this lap was started
+            "mVehicleName.byte[].rF2State",                    // current vehicle name
+            "mTrackName.byte[].rF2State",                      // current track name
+            // Position and derivatives
+            "mPos.rF2Vec3.rF2State",                           // world position in meters
+            "mLocalVel.rF2Vec3.rF2State",                      // velocity (meters/sec) in local vehicle coordinates
+            "mLocalAccel.rF2Vec3.rF2State",                    // acceleration (meters/sec^2) in local vehicle coordinates
+            "mSpeed.kmh.rF2State",                             // meters/sec
+            // Orientation and derivatives
+            "mOri.rF2Vec3[].rF2State",                         // rows of orientation matrix (use TelemQuat conversions if desired), also converts local
+                                                               // vehicle vectors into world X, Y, or Z using dot product of rows 0, 1, or 2 respectively
+            "mLocalRot.rF2Vec3.rF2State",                      // rotation (radians/sec) in local vehicle coordinates
+            "mLocalRotAccel.rF2Vec3.rF2State",                 // rotational acceleration (radians/sec^2) in local vehicle coordinates
+            // Vehicle status
+            "mGear.int.rF2State",                              // -1=reverse, 0=neutral, 1+=forward gears
+            "mEngineRPM.double.rF2State",                      // engine RPM
+            "mEngineWaterTemp.double.rF2State",                // Celsius
+            "mEngineOilTemp.double.rF2State",                  // Celsius
+            "mClutchRPM.double.rF2State",                      // clutch RPM
+            // Driver input
+            "mUnfilteredThrottle.double.rF2State",             // ranges  0.0-1.0
+            "mUnfilteredBrake.double.rF2State",                // ranges  0.0-1.0
+            "mUnfilteredSteering.double.rF2State",             // ranges -1.0-1.0 (left to right)
+            "mUnfilteredClutch.double.rF2State",               // ranges  0.0-1.0
+            // Filtered input (various adjustments for rev or speed limiting, TC, ABS?, speed sensitive steering, clutch work for semi-automatic shifting, etc.)
+            "mFilteredThrottle.double.rF2State",               // ranges  0.0-1.0
+            "mFilteredBrake.double.rF2State",                  // ranges  0.0-1.0
+            "mFilteredSteering.double.rF2State",               // ranges -1.0-1.0 (left to right)
+            "mFilteredClutch.double.rF2State",                 // ranges  0.0-1.0
+            // Misc
+            "mSteeringShaftTorque.double.rF2State",            // torque around steering shaft (used to be mSteeringArmForce, but that is not necessarily accurate for feedback purposes)
+            "mFront3rdDeflection.double.rF2State",             // deflection at front 3rd spring
+            "mRear3rdDeflection.double.rF2State",              // deflection at rear 3rd spring
+            // Aerodynamics
+            "mFrontWingHeight.double.rF2State",                // front wing height
+            "mFrontRideHeight.double.rF2State",                // front ride height
+            "mRearRideHeight.double.rF2State",                 // rear ride height
+            "mDrag.double.rF2State",                           // drag
+            "mFrontDownforce.double.rF2State",                 // front downforce
+            "mRearDownforce.double.rF2State",                  // rear downforce
+            // State/damage info
+            "mFuel.double.rF2State",                           // amount of fuel (liters)
+            "mEngineMaxRPM.double.rF2State",                   // rev limit
+            "mScheduledStops.byte.rF2State",                   // number of scheduled pitstops
+            "mOverheating.byte.rF2State",                     // whether overheating icon is shown
+            "mDetached.byte.rF2State",                        // whether any parts (besides wheels) have been detached
+            "mHeadlights.byte.rF2State",                      // whether headlights are on
+            "mDentSeverity.byte[].rF2State",                   // dent severity at 8 locations around the car (0=none, 1=some, 2=more)
+            "mLastImpactET.double.rF2State",                   // time of last impact
+            "mLastImpactMagnitude.double.rF2State",            // magnitude of last impact
+            "mLastImpactPos.rF2Vec3.rF2State",                 // location of last impact
+            "mMaxImpactMagnitude.double.rF2State",             // Max impact magnitude.  Tracked on every telemetry call, and reset on visit to pits or Session restart.
+            "mAccumulatedImpactMagnitude.double.rF2State",     // Accumulated impact magnitude.  Tracked on every telemetry call, and reset on visit to pits or Session restart.
+            // Expanded
+            "mEngineTorque.double.rF2State",                   // current engine torque (including additive torque) (used to be mEngineTq, but there's little reason to abbreviate it)
+            "mCurrentSector.int.rF2State",                     // the current sector (zero-based) with the pitlane stored in the sign bit (example: entering pits from third sector gives 0x80000002)
+            "mSpeedLimiter.byte.rF2State",                     // whether speed limiter is on
+            "mMaxGears.byte.rF2State",                         // maximum forward gears
+            "mFrontTireCompoundIndex.byte.rF2State",           // index within brand
+            "mRearTireCompoundIndex.byte.rF2State",            // index within brand
+            "mFuelCapacity.double.rF2State",                   // capacity in liters
+            "mFrontFlapActivated.byte.rF2State",               // whether front flap is activated
+            "mRearFlapActivated.byte.rF2State",                // whether rear flap is activated
+            "mRearFlapLegalStatus.byte.rF2State",              // 0=disallowed, 1=criteria detected but not allowed quite yet, 2=allowed
+            "mIgnitionStarter.byte.rF2State",                  // 0=off 1=ignition 2=ignition+starter
+            "mFrontTireCompoundName.byte[].rF2State",          // name of front tire compound
+            "mRearTireCompoundName.byte[].rF2State",           // name of rear tire compound
+            "mSpeedLimiterAvailable.byte.rF2State",            // whether speed limiter is available
+            "mAntiStallActivated.byte.rF2State",               // whether (hard) anti-stall is activated
+            "mVisualSteeringWheelRange.float.rF2State",        // the *visual* steering wheel range
+            "mRearBrakeBias.double.rF2State",                  // fraction of brakes on rear
+            "mTurboBoostPressure.double.rF2State",             // current turbo boost pressure if available
+            "mPhysicsToGraphicsOffset.float[].rF2State",       // offset from static CG to graphical center
+            "mPhysicalSteeringWheelRange.float.rF2State",      // the *physical* steering wheel range
+            "mExpansionTelem.byte[].rF2State",                 // for future use (note that the slot ID has been moved to mID above)
+            "mWheels.rF2Wheel[].rF2State",                     // wheel info (front left, front right, rear left, rear right)
+            "mSession.int.rF2State",                           // current session (0=testday 1-4=practice 5-8=qual 9=warmup 10-13=race)
+            "mCurrentET.double.rF2State",                      // current time (at last ScoringUpdate)
+            "mEndET.double.rF2State",                          // ending time
+            "mMaxLaps.int.rF2State",                           // maximum laps
+            "mLapDist.double.rF2State",                        // distance around track
+            "mNumVehicles.int.rF2State",                       // current number of vehicles
+                  // Game phases:
+                  // 0 Before session has begun
+                  // 1 Reconnaissance laps (race only)
+                  // 2 Grid walk-through (race only)
+                  // 3 Formation lap (race only)
+                  // 4 Starting-light countdown has begun (race only)
+                  // 5 Green flag
+                  // 6 Full course yellow / safety car
+                  // 7 Session stopped
+                  // 8 Session over
+            "mGamePhase.byte.rF2State",
+                  // Yellow flag states (applies to full-course only)
+                  // -1 Invalid
+                  //  0 None
+                  //  1 Pending
+                  //  2 Pits closed
+                  //  3 Pit lead lap
+                  //  4 Pits open
+                  //  5 Last lap
+                  //  6 Resume
+                  //  7 Race halt (not currently used)
+            "mYellowFlagState.sbyte.rF2State",
+            "mSectorFlag.sbyte[].rF2State",                    // whether there are any local yellows at the moment in each sector (not sure if sector 0 is first or last, so test)
+            "mStartLight.byte.rF2State",                       // start light frame (number depends on track)
+            "mNumRedLights.byte.rF2State",                     // number of red lights in start sequence
+            "mInRealtimeSU.byte.rF2State",                     // in realtime as opposed to at the monitor (reported via ScoringUpdate)
+            "mInRealtimeFC.byte.rF2State",                     // in realtime as opposed to at the monitor (reported via last EnterRealtime/ExitRealtime call)
+            "mPlayerName.byte[].rF2State",                     // player name (including possible multiplayer override)
+            "mPlrFileName.byte[].rF2State",                    // may be encoded to be a legal filename
+            "mDarkCloud.double.rF2State",                      // cloud darkness? 0.0-1.0
+            "mRaining.double.rF2State",                        // raining severity 0.0-1.0
+            "mAmbientTemp.double.rF2State",                    // temperature (Celsius)
+            "mTrackTemp.double.rF2State",                      // temperature (Celsius)
+            "mWind.rF2Vec3.rF2State",                          // wind speed
+            "mMinPathWetness.double.rF2State",                 // minimum wetness on main path 0.0-1.0
+            "mMaxPathWetness.double.rF2State",                 // maximum wetness on main path 0.0-1.0
+            "mInvulnerable.byte.rF2State",                     // Indicates invulnerability 0 (off), 1 (on)
+            "mExpansionScoring.byte[].rF2State",               // Future use.
+            "rF2VehScoringInfo[] mVehicles",                   // array of vehicle scoring info's
+                                                               // NOTE: everything beyound mNumVehicles is trash.
+
+
+            "mID.int.rF2VehScoringInfo",                       // slot ID (note that it can be re-used in multiplayer after someone leaves)
+            "mDriverName.byte[].rF2VehScoringInfo",            // driver name
+            "mVehicleName.byte[].rF2VehScoringInfo",           // vehicle name
+            "mTotalLaps.short.rF2VehScoringInfo",              // laps completed
+            "mSector.sbyte.rF2VehScoringInfo",                 // 0=sector3, 1=sector1, 2=sector2 (don't ask why)
+            "mFinishStatus.sbyte.rF2VehScoringInfo",           // 0=none, 1=finished, 2=dnf, 3=dq
+            "mLapDist.double.rF2VehScoringInfo",               // current distance around track
+            "mPathLateral.double.rF2VehScoringInfo",           // lateral position with respect to *very approximate* "center" path
+            "mTrackEdge.double.rF2VehScoringInfo",             // track edge (w.r.t. "center" path) on same side of track as vehicle
+            "mBestSector1.time.rF2VehScoringInfo",           // best sector 1
+            "mBestSector2.time.rF2VehScoringInfo",           // best sector 2 (plus sector 1)
+            "mBestLapTime.time.rF2VehScoringInfo",           // best lap time
+            "mLastSector1.time.rF2VehScoringInfo",           // last sector 1
+            "mLastSector2.time.rF2VehScoringInfo",           // last sector 2 (plus sector 1)
+            "mLastLapTime.time.rF2VehScoringInfo",           // last lap time
+            "mCurSector1.time.rF2VehScoringInfo",            // current sector 1 if valid
+            "mCurSector2.time.rF2VehScoringInfo",            // current sector 2 (plus sector 1) if valid
+            // no current laptime because it instantly becomes "last"
+            "mNumPitstops.short.rF2VehScoringInfo",            // number of pitstops made
+            "mNumPenalties.short.rF2VehScoringInfo",           // number of outstanding penalties
+            "mIsPlayer.byte.rF2VehScoringInfo",                // is this the player's vehicle
+            "mControl.sbyte.rF2VehScoringInfo",                // who's in control: -1=nobody (shouldn't get this), 0=local player, 1=local AI, 2=remote, 3=replay (shouldn't get this)
+            "mInPits.byte.rF2VehScoringInfo",                  // between pit entrance and pit exit (not always accurate for remote vehicles)
+            "mPlace.byte.rF2VehScoringInfo",                   // 1-based position
+            "mVehicleClass.byte[].rF2VehScoringInfo",          // vehicle class
+            // Dash Indicators
+            "mTimeBehindNext.time.rF2VehScoringInfo",        // time behind vehicle in next higher place
+            "mLapsBehindNext.int.rF2VehScoringInfo",           // laps behind vehicle in next higher place
+            "mTimeBehindLeader.time.rF2VehScoringInfo",      // time behind leader
+            "mLapsBehindLeader.int.rF2VehScoringInfo",         // laps behind leader
+            "mLapStartET.double.rF2VehScoringInfo",            // time this lap was started
+            // Position and derivatives
+            "mPos.rF2Vec3.rF2VehScoringInfo",                  // world position in meters
+            "mYaw.double.rF2VehScoringInfo",                   // rad, use (360-yaw*57.2978)%360 for heading in degrees
+            "mPitch.double.rF2VehScoringInfo",                 // rad
+            "mRoll.double.rF2VehScoringInfo",                  // rad
+            "mSpeed.kmh.rF2VehScoringInfo",                 // meters/sec
+            "mHeadlights.byte.rF2VehScoringInfo",              // status of headlights
+            "mPitState.byte.rF2VehScoringInfo",                // 0=none, 1=request, 2=entering, 3=stopped, 4=exiting
+            "mServerScored.byte.rF2VehScoringInfo",            // whether this vehicle is being scored by server (could be off in qualifying or racing heats)
+            "mIndividualPhase.byte.rF2VehScoringInfo",         // game phases (described below) plus 9=after formation, 10=under yellow, 11=under blue (not used)
+            "mQualification.int.rF2VehScoringInfo",            // 1-based, can be -1 when invalid
+            "mTimeIntoLap.double.rF2VehScoringInfo",           // estimated time into lap
+            "mEstimatedLapTime.double.rF2VehScoringInfo",      // estimated laptime used for 'time behind' and 'time into lap' (note: this may changed based on vehicle and setup!?)
+            "mPitGroup.byte[].rF2VehScoringInfo",              // pit group (same as team name unless pit is shared)
+            "mFlag.byte.rF2VehScoringInfo",                    // primary flag being shown to vehicle (currently only 0=green or 6=blue)
+            "mUnderYellow.byte.rF2VehScoringInfo",             // whether this car has taken a full-course caution flag at the start/finish line
+            "mCountLapFlag.byte.rF2VehScoringInfo",            // 0 = do not count lap or time, 1 = count lap but not time, 2 = count lap and time
+            "mInGarageStall.byte.rF2VehScoringInfo",           // appears to be within the correct garage stall
+            "mUpgradePack.byte[].rF2VehScoringInfo",           // Coded upgrades
+            "mSuspensionDeflection.double.rF2Wheel",           // meters
+            "mRideHeight.double.rF2Wheel",                     // meters
+            "mSuspForce.double.rF2Wheel",                      // pushrod load in Newtons
+            "mBrakeTemp.double.rF2Wheel",                      // Celsius
+            "mBrakePressure.double.rF2Wheel",                  // currently 0.0-1.0, depending on driver input and brake balance.rF2Wheel", will convert to true brake pressure (kPa) in future
+            "mRotation.double.rF2Wheel",                       // radians/sec
+            "mLateralPatchVel.double.rF2Wheel",                // lateral velocity at contact patch
+            "mLongitudinalPatchVel.double.rF2Wheel",           // longitudinal velocity at contact patch
+            "mLateralGroundVel.double.rF2Wheel",               // lateral velocity at contact patch
+            "mLongitudinalGroundVel.double.rF2Wheel",          // longitudinal velocity at contact patch
+            "mCamber.double.rF2Wheel",                         // radians (positive is left for left-side wheels, right for right-side wheels)
+            "mLateralForce.double.rF2Wheel",                   // Newtons
+            "mLongitudinalForce.double.rF2Wheel",              // Newtons
+            "mTireLoad.double.rF2Wheel",                       // Newtons
+            "mGripFract.double.rF2Wheel",                      // an approximation of what fraction of the contact patch is sliding
+            "mPressure.double.rF2Wheel",                       // kPa (tire pressure)
+            "mTemperature.double[].rF2Wheel",                  // Kelvin (subtract 273.15 to get Celsius), left/center/right (not to be confused with inside/center/outside!)
+            "mWear.double.rF2Wheel",                           // wear (0.0-1.0, fraction of maximum) ... this is not necessarily proportional with grip loss
+            "mTerrainName.byte[].rF2Wheel",                    // the material prefixes from the TDF file
+            "mSurfaceType.byte.rF2Wheel",                      // 0=dry, 1=wet, 2=grass, 3=dirt, 4=gravel, 5=rumblestrip, 6=special
+            "mFlat.byte.rF2Wheel",                             // whether tire is flat
+            "mDetached.byte.rF2Wheel",                         // whether wheel is detached
+            "mVerticalTireDeflection.double.rF2Wheel",         // how much is tire deflected from its (speed-sensitive) radius
+            "mWheelYLocation.double.rF2Wheel",                 // wheel's y location relative to vehicle y location
+            "mToe.double.rF2Wheel",                            // current toe angle w.r.t. the vehicle
+            "mTireCarcassTemperature.double.rF2Wheel",         // rough average of temperature samples from carcass (Kelvin)
+            "mTireInnerLayerTemperature.double[].rF2Wheel",    // rough average of temperature samples from innermost layer of rubber (before carcass) (Kelvin)
+            "mExpansion.byte[].rF2Wheel"                       // for future use
         };
     }
 }

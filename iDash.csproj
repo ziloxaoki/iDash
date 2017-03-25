@@ -96,6 +96,8 @@
     <Compile Include="ButtonHandler.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GameDefinition.cs" />
+    <Compile Include="rF2Data.cs" />
+    <Compile Include="RFactor2Connector.cs" />
     <Compile Include="RFactorConnector.cs" />
     <Compile Include="RFactorDataReader.cs" />
     <Compile Include="ISimConnector.cs" />

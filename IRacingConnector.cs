@@ -11,8 +11,6 @@ namespace iDash
 {
     public class IRacingConnector : ISimConnector
     {             
-        public delegate void StatusMessageHandler(string m);
-        public StatusMessageHandler StatusMessageSubscribers;
         // Globally declared SdkWrapper object
         private readonly SdkWrapper wrapper;
         private SdkWrapper.TelemetryUpdatedEventArgs telemetryInfo;
@@ -166,17 +164,6 @@ namespace iDash
             currentRpm = e.TelemetryInfo.RPM.Value;
             this.telemetryInfo = e;
             //Logger.LogMessageToFile("rpm:" + rpm + "\n");
-        }
-
-        //notify subscribers (statusbar) that a message has to be logged
-        public void NotifyStatusMessage(string args)
-        {
-            StatusMessageHandler handler = StatusMessageSubscribers;
-
-            if (handler != null)
-            {
-                handler(args + "\n");
-            }
         }
 
         public override void Dispose()

@@ -20,9 +20,6 @@ namespace iDash
             get { return (_file != null && _view != null); }
         }
 
-        public delegate void StatusMessageHandler(string m);
-        public StatusMessageHandler StatusMessageSubscribers;
-
         private MemoryMappedFile _file;
         private MemoryMappedViewAccessor _view;
 
@@ -174,7 +171,7 @@ namespace iDash
                         case "kmh":
                             if (pType.Equals("Single"))
                             {
-                                result = ((int)Math.Floor((Single)prop.GetValue(data) * 3.6)).ToString();
+                                result = ((int)Math.Floor((Single)prop.GetValue(data))).ToString();
                             }
                             break;
                         case "time":
@@ -195,18 +192,6 @@ namespace iDash
 
             return result;
         }               
-
-
-        //notify subscribers (statusbar) that a message has to be logged
-        public void NotifyStatusMessage(string args)
-        {
-            StatusMessageHandler handler = StatusMessageSubscribers;
-
-            if (handler != null)
-            {
-                handler(args + "\n");
-            }
-        }
 
         private Single RpsToRpm(Single rps)
         {

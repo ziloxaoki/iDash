@@ -38,7 +38,7 @@ namespace iDash
                         sharedmemorysize = Marshal.SizeOf(typeof(rfShared));
                         sharedMemoryReadBuffer = new byte[sharedmemorysize];
                         initialised = true;
-                        Console.WriteLine("Initialised rFactor 1 shared memory");
+                        //Console.WriteLine("Initialised rFactor 1 shared memory");
                     }
                     catch (Exception)
                     {

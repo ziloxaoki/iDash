@@ -10,10 +10,7 @@ using System.Threading.Tasks;
 namespace iDash
 {
     class RFactorConnector : ISimConnector
-    {
-        public delegate void StatusMessageHandler(string m);
-        public StatusMessageHandler StatusMessageSubscribers;
-
+    {       
         public Boolean running = false;
         private float firstRpm = 0;
         private float lastRpm = 0;
@@ -183,17 +180,6 @@ namespace iDash
             }
 
             return vehicle[0];
-        }
-
-        //notify subscribers (statusbar) that a message has to be logged
-        public void NotifyStatusMessage(string args)
-        {
-            StatusMessageHandler handler = StatusMessageSubscribers;
-
-            if (handler != null)
-            {
-                handler(args + "\n");
-            }
         }
 
         public override void Dispose()

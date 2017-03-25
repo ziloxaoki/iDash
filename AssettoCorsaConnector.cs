@@ -10,9 +10,6 @@ namespace iDash
 {
     class AssettoCorsaConnector : ISimConnector
     {
-        public delegate void StatusMessageHandler(string m);
-        public StatusMessageHandler StatusMessageSubscribers;
-
         private bool disposed = false;
         private AssettoCorsa ac;
 
@@ -189,17 +186,6 @@ namespace iDash
         {
             currentRpm = e.Physics.Rpms;            
             ph = e.Physics;
-        }
-
-        //notify subscribers (statusbar) that a message has to be logged
-        public void NotifyStatusMessage(string args)
-        {
-            StatusMessageHandler handler = StatusMessageSubscribers;
-
-            if (handler != null)
-            {
-                handler(args + "\n");
-            }
         }
 
         public override void Dispose()
