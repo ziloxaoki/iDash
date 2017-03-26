@@ -87,6 +87,13 @@ namespace iDash
                 }
                 else
                 {
+                    if(isConnected)
+                    {
+                        string s = DateTime.Now.ToString("hh:mm:ss") + ": RFactor2 closed.";
+                        NotifyStatusMessage(s);
+                        disableNotification = true;
+                    }
+
                     checkRFactor2Running();
                     isConnected = false;
                     disableNotification = false;
@@ -205,8 +212,6 @@ namespace iDash
                             }
                             TimeSpan interval = TimeSpan.FromSeconds(seconds);
                             result = interval.ToString(@"mm\.ss\.fff");
-                            if (result.Length == 0)
-                                return "00.00.00.00";
                             break;
                         case "kmh":
                             if (field.FieldType.Name.Equals("Double"))

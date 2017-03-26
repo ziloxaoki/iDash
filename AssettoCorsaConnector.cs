@@ -62,6 +62,12 @@ namespace iDash
                 }
                 else
                 {
+                    if (isConnected)
+                    {
+                        string s = DateTime.Now.ToString("hh:mm:ss") + ": Assetto Corsa closed.";
+                        NotifyStatusMessage(s);
+                    }
+
                     isConnected = false;
                     sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);                    
                 }

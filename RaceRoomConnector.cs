@@ -64,7 +64,7 @@ namespace iDash
                             NotifyStatusMessage(s);
                             isConnected = true;
 
-                            if (Map());
+                            if (Map())
                                 buffer = new Byte[Marshal.SizeOf(typeof(Shared))];
                         }
 
@@ -95,6 +95,12 @@ namespace iDash
                 else
                 {
                     sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                    if(isConnected)
+                    {
+                        string s = DateTime.Now.ToString("hh:mm:ss") + ": RaceRoom closed.";
+                        NotifyStatusMessage(s);
+                        isConnected = false;
+                    }
                 }
 
                 await Task.Delay(5);

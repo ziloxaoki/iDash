@@ -1007,7 +1007,7 @@ namespace iDash
             stopAllSimThreads();
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
-            statusBar.AppendText("Simulator disconnected.");
+            statusBar.AppendText("Simulator disconnected.\n");
             selectedSimulator = Constants.None;
             if (!isSimulatorDisconnected)
             {

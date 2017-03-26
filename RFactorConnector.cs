@@ -81,6 +81,13 @@ namespace iDash
                 else
                 {
                     isGameRunning = Utils.IsGameRunning(GameDefinition.automobilista.processName);
+
+                    if (!isConnected)
+                    {
+                        string s = DateTime.Now.ToString("hh:mm:ss") + ": Automobilista closed.";
+                        NotifyStatusMessage(s);
+                        isConnected = false;
+                    }
                 } 
 
                 if(!isConnected)
