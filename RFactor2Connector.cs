@@ -23,6 +23,7 @@ namespace iDash
 
         private bool disposed = false;
         private bool isConnected = false;
+        private bool disableNotification = false;
         private bool isGameRunning = false;
 
         // Plugin access fields
@@ -61,13 +62,16 @@ namespace iDash
                 {
                     if (!isConnected)
                     {
-                        string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to RFactor2.";
-                        NotifyStatusMessage(s);
+                        if (!disableNotification)
+                        {
+                            string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to RFactor2.";
+                            NotifyStatusMessage(s);
+                            disableNotification = true;
+                        }
                         connect();                        
                     }
-
-                    if (isConnected)
-                    {
+                    else
+                    { 
                         readGameData();
                         if (currrF2State.mNumVehicles > 0)
                         {
@@ -85,6 +89,7 @@ namespace iDash
                 {
                     checkRFactor2Running();
                     isConnected = false;
+                    disableNotification = false;
                     sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                 }
 
@@ -200,6 +205,8 @@ namespace iDash
                             }
                             TimeSpan interval = TimeSpan.FromSeconds(seconds);
                             result = interval.ToString(@"mm\.ss\.fff");
+                            if (result.Length == 0)
+                                return "00.00.00.00";
                             break;
                         case "kmh":
                             if (field.FieldType.Name.Equals("Double"))

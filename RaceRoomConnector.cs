@@ -14,10 +14,10 @@ using System.Diagnostics;
 namespace iDash
 {
     public class RaceRoomConnector : ISimConnector
-    {        
+    {
         private bool Mapped
         {
-            get { return (_file != null && _view != null); }
+            get { return (_file != null); }
         }
 
         private MemoryMappedFile _file;
@@ -27,6 +27,7 @@ namespace iDash
         private float lastRpm = 0;
         private float currentRpm = 0;
         private Shared data;
+        private byte[] buffer;
 
         private bool disposed = false;
 
@@ -63,32 +64,31 @@ namespace iDash
                             NotifyStatusMessage(s);
                             isConnected = true;
 
-                            //new Thread(new ThreadStart(Map)).Start();
-                            Map();
+                            if (Map());
+                                buffer = new Byte[Marshal.SizeOf(typeof(Shared))];
                         }
 
                         sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                     }
                     else
-                    {                        
-                        _view.Read(0, out data);
-
-                        int sessionType = data.SessionType;
-
-                        if (sessionType >= 0)
+                    {
+                        if (Read())
                         {
-                            lastRpm = RpsToRpm(data.MaxEngineRps);
-                            firstRpm = FIRST_RPM * lastRpm;
-                            //calibrate shift gear light rpm
-                            lastRpm *= 0.97f;
-                            currentRpm = RpsToRpm(data.EngineRps);
+                            if (data.SessionType >= 0)
+                            {
+                                lastRpm = RpsToRpm(data.MaxEngineRps);
+                                firstRpm = FIRST_RPM * lastRpm;
+                                //calibrate shift gear light rpm
+                                lastRpm *= 0.97f;
+                                currentRpm = RpsToRpm(data.EngineRps);
 
-                            sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
-                            send7SegmentMsg();
-                        }
-                        else
-                        {
-                            sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
+                                send7SegmentMsg();
+                            }
+                            else
+                            {
+                                sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                            }
                         }
                     }
                 }
@@ -103,37 +103,38 @@ namespace iDash
             Dispose();
         }
 
+
+        private bool Read()
+        {
+            try
+            {
+                var _view = _file.CreateViewStream();
+                BinaryReader _stream = new BinaryReader(_view);
+                buffer = _stream.ReadBytes(Marshal.SizeOf(typeof(Shared)));
+                GCHandle _handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+                data = (Shared)Marshal.PtrToStructure(_handle.AddrOfPinnedObject(), typeof(Shared));
+                _handle.Free();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         private bool Map()
         {
             try
             {
                 _file = MemoryMappedFile.OpenExisting(R3E.Constant.SharedMemoryName);
-                _view = _file.CreateViewAccessor(0, Marshal.SizeOf(typeof(Shared)));
-                NotifyStatusMessage("Memory mapped successfully");
                 return true;
             }
             catch (FileNotFoundException)
             {
                 return false;
-            }            
-        }
-
-        /*private async void Map()
-        {
-            while (!Mapped)
-            {
-                try
-                {
-                    _file = MemoryMappedFile.OpenExisting(Constant.SharedMemoryName);
-                    _view = _file.CreateViewAccessor(0, Marshal.SizeOf(typeof(Shared)));
-                    NotifyStatusMessage("Memory mapped successfully");
-                }
-                catch (FileNotFoundException)
-                {
-                }
-                await Task.Delay(1);
             }
-        }*/
+        }
 
         protected override string getTelemetryValue(string name, string type, string clazz)
         {
@@ -171,7 +172,7 @@ namespace iDash
                         case "kmh":
                             if (pType.Equals("Single"))
                             {
-                                result = ((int)Math.Floor((Single)prop.GetValue(data))).ToString();
+                                result = ((int)Math.Floor((Single)prop.GetValue(data) * 3.6)).ToString();
                             }
                             break;
                         case "time":
