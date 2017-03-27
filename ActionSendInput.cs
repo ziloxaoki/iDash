@@ -15,6 +15,7 @@ namespace iDash
         const int INPUT_HARDWARE = 2;
         const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
         const uint KEYEVENTF_KEYUP = 0x0002;
+        const uint KEYEVENTF_KEYDOWN = 0x0000;
         const uint KEYEVENTF_UNICODE = 0x0004;
         const uint KEYEVENTF_SCANCODE = 0x0008;
 
@@ -80,18 +81,22 @@ namespace iDash
         [DllImport("user32.dll", SetLastError = true)]
         static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
+        [DllImport("user32.dll")]
+        static extern int MapVirtualKey(int uCode, uint uMapType);
+
         public override void process(string action, State state)
         {
             INPUT[] inputs = null;
             ushort keycode = (ushort)Utils.ConvertCharToVirtualKey(action);
+            ushort wscan = (ushort)MapVirtualKey(keycode, 0);
             switch (state)
             {
                 case State.KeyDown:
-                    inputs = getKeyAction(keycode, false);
+                    inputs = getKeyAction(wscan, false);
                     break;
 
                 case State.KeyUp:
-                    inputs = getKeyAction(keycode, true);                    
+                    inputs = getKeyAction(wscan, true);                    
                     break;
             } 
             
@@ -101,7 +106,7 @@ namespace iDash
             }           
         }
 
-        private INPUT[] getKeyAction(ushort keycode, bool isKeyUp)
+        private INPUT[] getKeyAction(ushort key, bool isKeyUp)
         {
             INPUT[] inputs = new INPUT[]
                 {
@@ -112,9 +117,9 @@ namespace iDash
                         {
                             ki = new KEYBDINPUT
                             {
-                                wVk = keycode,
-                                wScan = 0,
-                                dwFlags = isKeyUp ? KEYEVENTF_KEYUP : 0x00,
+                                wVk = 0,
+                                wScan = key,
+                                dwFlags = (isKeyUp ? KEYEVENTF_KEYUP : KEYEVENTF_KEYDOWN) | 0x08,
                                 dwExtraInfo = GetMessageExtraInfo(),
                             }
                         }
