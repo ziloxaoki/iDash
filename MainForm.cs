@@ -888,7 +888,7 @@ namespace iDash
 
             stopAllSimThreads();
             //keep iRacing threads alive
-            stopIRacingThreads = true;
+            stopIRacingThreads = false;
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked; 
                        
