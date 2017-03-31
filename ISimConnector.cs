@@ -97,7 +97,7 @@ namespace iDash
 
                 if (!String.IsNullOrEmpty(result))
                 {
-                    result = Utils.formatString(result, strPattern);
+                    result = Utils.formatString(result.Trim(), strPattern);
                 }
             }
 

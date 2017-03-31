@@ -91,7 +91,7 @@ namespace iDash
             ushort wscan = (ushort)MapVirtualKey(keycode, 0);
             switch (state)
             {
-                case State.KeyDown:
+                case State.KeyDown | State.KeyHold:
                     inputs = getKeyAction(wscan, false);
                     break;
 
@@ -117,9 +117,9 @@ namespace iDash
                         {
                             ki = new KEYBDINPUT
                             {
-                                wVk = 0,
+                                wVk = 0, 
                                 wScan = key,
-                                dwFlags = (isKeyUp ? KEYEVENTF_KEYUP : KEYEVENTF_KEYDOWN) | 0x08,
+                                dwFlags = (isKeyUp ? KEYEVENTF_KEYUP : KEYEVENTF_KEYDOWN) | KEYEVENTF_SCANCODE,
                                 dwExtraInfo = GetMessageExtraInfo(),
                             }
                         }
