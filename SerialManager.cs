@@ -25,7 +25,7 @@ namespace iDash
         private int commandLength;        
         private byte[] serialCommand = new byte[BUFFER_SIZE];
         private SerialPort serialPort = new SerialPort(); //create of serial port
-        private static long lastArduinoResponse = 0;        
+        private static long lastArduinoResponse = -1;        
         private object readLock = new object();
         private object sendLock = new object();
 
@@ -70,11 +70,14 @@ namespace iDash
 
         private async void tryToConnect()
         {
-            HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            portNames = SerialPort.GetPortNames();
+            HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);            
 
             while (!MainForm.stopThreads)
             {
+                //check if new usb was connected
+                if(lastArduinoResponse == -1)
+                    portNames = SerialPort.GetPortNames();
+
                 if (isArduinoAlive())
                 {                    
                     await Task.Delay(WAIT_FOR_ARDUINO_DATA);
@@ -87,8 +90,14 @@ namespace iDash
                         {
                             serialPort.Close();  //close port
                         }
+                        else if (lastArduinoResponse > 0 && portNames.Length == 1)
+                        {
+                            NotifyStatusMessage("Arduino at port " + port + " disconnected.");
+                            lastArduinoResponse = 0;
+                        }
 
                         serialPort.PortName = port;    //selected name of port
+
                         if (!notificationSent.Contains(port))
                         {
                             NotifyStatusMessage("Searching for Arduino at " + port + "...");                            
@@ -103,7 +112,7 @@ namespace iDash
                         {
                             serialPort.Open();        //open serial port                
                         }
-                        catch
+                        catch(Exception e)
                         {
                             /*if (!notificationSent.Contains(port))
                             {
@@ -112,7 +121,7 @@ namespace iDash
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Warning);
                             }*/
-                            Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
+                            await Task.Delay(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
 
                             continue;                          
                         }
@@ -126,7 +135,7 @@ namespace iDash
                         if (isArduinoAlive())
                         {
                             NotifyStatusMessage("Arduino found at port " + port + "...");
-                            //if arduino found always try to reconnect to this port
+                            //if arduino found always try to reconnect to the same port
                             portNames = new string[] {port};
                             break;
                         }
@@ -215,9 +224,11 @@ namespace iDash
                     }
                 }
                 catch (Exception e)
-                {
+                {                    
                     Logger.LogExceptionToFile(e);
-                    NotifyStatusMessage("Error sending command to Arduino."); //if there are not is any COM port in PC show message
+
+                    if(lastArduinoResponse > 0)
+                        NotifyStatusMessage("Error sending command to Arduino."); //if there are not is any COM port in PC show message
                 }
             }
         }
