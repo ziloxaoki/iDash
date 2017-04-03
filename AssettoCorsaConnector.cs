@@ -16,6 +16,7 @@ namespace iDash
         private float firstRpm = 0;
         private float lastRpm = 0;
         private float currentRpm = 0;
+        private bool isInPit = false;
         private StaticInfo si;
         private Graphics gr;
         private Physics ph;
@@ -43,7 +44,7 @@ namespace iDash
 
             NotifyStatusMessage("Waiting for Assetto Corsa...");
 
-            bool isConnected = false;            
+            bool isConnected = false;       
 
             while (!MainForm.stopThreads && !MainForm.stopAssettoThreads)
             {
@@ -57,7 +58,7 @@ namespace iDash
 
                     isConnected = true;
 
-                    sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
+                    sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isInPit);
                     send7SegmentMsg();
                 }
                 else
@@ -72,7 +73,7 @@ namespace iDash
                     sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);                    
                 }
 
-                await Task.Delay(5);
+                await Task.Delay(Constants.SharedMemoryReadRate);
             }            
         }
 
@@ -180,7 +181,8 @@ namespace iDash
             firstRpm = FIRST_RPM * lastRpm;
             //calibrate shift gear light rpm
             lastRpm *= 0.97f;
-            si = e.StaticInfo;                     
+            si = e.StaticInfo;
+            isInPit = gr.IsInPit > 0;                
         }
 
         protected void GraphicsUpdated(object sender, GraphicsEventArgs e)

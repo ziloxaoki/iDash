@@ -8,6 +8,7 @@ namespace iDash
 {
     public abstract class ISimConnector : IDisposable
     {
+        private bool blink = false;
         public delegate void StatusMessageHandler(string m);
         public StatusMessageHandler StatusMessageSubscribers;
 
@@ -21,48 +22,49 @@ namespace iDash
             this.sm = sm;
         }
 
-        protected void sendRPMShiftMsg(float currentRpm, float firstRpm, float lastRpm)
+        protected void sendRPMShiftMsg(float currentRpm, float firstRpm, float lastRpm, bool isInPit)
         {
-            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }; // 1, 1, 1 = black
+            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            byte[] pattern = null;
+
+            if (isInPit)
+                pattern = Constants.pitRGB;
+            else
+                pattern = Constants.colourPattern;
+
             float rpmPerLed = (lastRpm - firstRpm) / LED_NUM_TOTAL; //rpm range per led                
             int milSec = DateTime.Now.Millisecond;
             Command rgbShift = null;
-            if (rpmPerLed > 0 && currentRpm > firstRpm - 2000)
+            if (rpmPerLed > 0)
             {
                 if (currentRpm >= firstRpm)
-                {
-                    int numActiveLeds = (int)(Math.Ceiling((currentRpm - firstRpm) / rpmPerLed)) + 1;
-
+                {                    
                     if (currentRpm < lastRpm)
                     {
+                        int numActiveLeds = (int)(Math.Ceiling((currentRpm - firstRpm) / rpmPerLed)) + 1;
+
                         if (numActiveLeds > LED_NUM_TOTAL)
                             numActiveLeds = LED_NUM_TOTAL;
-                        Array.Copy(Utils.colourPattern, 0, rpmLed, 0, numActiveLeds * 3); //each led colour has 3 bytes
+                        Array.Copy(pattern, 0, rpmLed, 0, numActiveLeds * 3); //each led colour has 3 bytes
 
                         rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
                     }
                     else //blink
                     {
-                        if (milSec < 50 || (milSec > 100 && milSec < 150) ||
-                        (milSec > 200 && milSec < 250) || (milSec > 300 && milSec < 350) ||
-                        (milSec > 400 && milSec < 450) || (milSec > 500 && milSec < 550) ||
-                        (milSec > 600 && milSec < 650) || (milSec > 700 && milSec < 750) ||
-                        (milSec > 800 && milSec < 850) || (milSec > 900 && milSec > 950))
-                        /*if (milSec < 100 || (milSec > 200 && milSec < 300) ||
-                        (milSec > 400 && milSec < 500) || (milSec > 600 && milSec < 700) ||
-                        (milSec > 800 && milSec < 900) || (milSec > 900))*/
+                        if (blink = !blink)                        
                         {
-                            rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
+                            rgbShift = new Command(Command.CMD_RGB_SHIFT, Constants.blackRGB);
                         }
                         else
                         {
-                            rgbShift = new Command(Command.CMD_RGB_SHIFT, Utils.colourPattern);
+                            rgbShift = new Command(Command.CMD_RGB_SHIFT, pattern);
                         }
                     }
                 }
-                else {
+                else
+                {
                     //clear shift lights
-                    rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
+                    rgbShift = new Command(Command.CMD_RGB_SHIFT, Constants.blackRGB);
                 }
 
                 sm.sendCommand(rgbShift, false);
@@ -109,7 +111,7 @@ namespace iDash
         {
             StringBuilder msg = new StringBuilder();
             List<string> _7SegmentData = MainForm.get7SegmentData();
-            string[] strPatterns = MainForm.getStrFormat().Split(Utils.ITEM_SEPARATOR);
+            string[] strPatterns = MainForm.getStrFormat().Split(Constants.ITEM_SEPARATOR);
 
             if (_7SegmentData.Count > 0)
             {

@@ -15,6 +15,17 @@ namespace iDash
         public static int RFactor2 = 4;
         public static int None = 5;
 
+        public static int SharedMemoryReadRate = 10;
+
+        public const char LIST_SEPARATOR = ',';
+        public const char ITEM_SEPARATOR = ';';
+        public const char SIGN_EQUALS = '=';
+        public const char SIGN_AMPERSAND = '&';
+
+        public static readonly byte[] colourPattern = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
+        public static readonly byte[] blackRGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+        public static readonly byte[] pitRGB = { 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231 };
+
         public static object[] RFactorTelemetryData = new object[]
         {
             "hour.time",

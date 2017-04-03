@@ -23,9 +23,6 @@ namespace iDash
         private MemoryMappedFile _file;
         private MemoryMappedViewAccessor _view;
 
-        private float firstRpm = 0;
-        private float lastRpm = 0;
-        private float currentRpm = 0;
         private Shared data;
         private byte[] buffer;
 
@@ -46,7 +43,7 @@ namespace iDash
         public async void start()
         {
             StringBuilder msg = new StringBuilder();
-            bool isConnected = false;
+            bool isConnected = false;            
 
             NotifyStatusMessage("Waiting for RRRE.exe...");
 
@@ -76,13 +73,26 @@ namespace iDash
                         {
                             if (data.SessionType >= 0)
                             {
-                                lastRpm = RpsToRpm(data.MaxEngineRps);
-                                firstRpm = FIRST_RPM * lastRpm;
+                                float lastRpm = RpsToRpm(data.MaxEngineRps);
+                                float firstRpm = FIRST_RPM * lastRpm;
                                 //calibrate shift gear light rpm
                                 lastRpm *= 0.95f;
-                                currentRpm = RpsToRpm(data.EngineRps);
+                                float currentRpm = RpsToRpm(data.EngineRps);
 
-                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
+                                DriverData currentPlayerData;
+                                bool isInPit = false;
+
+                                try
+                                {
+                                    currentPlayerData = getDriverData(data.VehicleInfo.SlotId);
+                                    isInPit = currentPlayerData.InPitlane > 0;
+                                }
+                                catch (Exception)
+                                {
+                                    
+                                }
+
+                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isInPit);
                                 send7SegmentMsg();
                             }
                             else
@@ -103,7 +113,7 @@ namespace iDash
                     }
                 }
 
-                await Task.Delay(5);
+                await Task.Delay(Constants.SharedMemoryReadRate);
             }
 
             Dispose();
@@ -198,7 +208,19 @@ namespace iDash
             }
 
             return result;
-        }               
+        }
+
+        private DriverData getDriverData(int slot_id)
+        {
+            foreach (DriverData driverData in data.DriverData)
+            {
+                if (driverData.DriverInfo.SlotId == slot_id)
+                {
+                    return driverData;
+                }
+            }
+            throw new Exception("no driver data for slotID " + slot_id);
+        }
 
         private Single RpsToRpm(Single rps)
         {

@@ -58,8 +58,6 @@ namespace iDash
         public HandleButtonActions handleButtonActions;
         public static bool formFinishedLoading;
 
-        private bool isSimulatorDisconnected = true;
-
 
         public MainForm()
         {
@@ -93,8 +91,7 @@ namespace iDash
 
                 sm.Init();
                 vf.InitializeJoystick();
-
-                new Thread(new ThreadStart(sendDatetimeToArduino)).Start();
+                
                 AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory + "\n");
             }
             catch (Exception e)
@@ -128,21 +125,12 @@ namespace iDash
             return -1;
         }*/
 
-        private async void sendDatetimeToArduino()
-        {
-            while (isSimulatorDisconnected)
-            {
-                sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
-                await Task.Delay(10);
-            }
-        }
-
         //parse the view dialog so 7 segment display nows which properties to show
         private void parseViews()
         {
             if (this.views.Items.Count > 0)
             {
-                string[] items = this.views.SelectedItem.ToString().Split(Utils.LIST_SEPARATOR);
+                string[] items = this.views.SelectedItem.ToString().Split(Constants.LIST_SEPARATOR);
                 lock (listLock)
                 {
                     _7Segment = new List<string>();
@@ -467,12 +455,12 @@ namespace iDash
             string viewValue = null;
 
             for (int i = 0; i < selected.SelectedItems.Count; i++) {             
-                viewValue += (string)selected.SelectedItems[i] + Utils.LIST_SEPARATOR;
+                viewValue += (string)selected.SelectedItems[i] + Constants.LIST_SEPARATOR;
             }
 
             if (viewValue != null && viewValue.Length > 0)
             {
-                viewValue += textFormat.Text + Utils.LIST_SEPARATOR + isSimConnected.Checked;
+                viewValue += textFormat.Text + Constants.LIST_SEPARATOR + isSimConnected.Checked;
                 if (!views.Items.Contains(viewValue))
                 {
                     views.Items.Add(viewValue);
@@ -539,7 +527,7 @@ namespace iDash
             if (views.SelectedIndex >= 0)
             {
                 string temp = views.SelectedItem.ToString();
-                string[] selectedValue = views.SelectedItem.ToString().Split(Utils.LIST_SEPARATOR);
+                string[] selectedValue = views.SelectedItem.ToString().Split(Constants.LIST_SEPARATOR);
                 isSimConnected.Checked = Convert.ToBoolean(selectedValue[selectedValue.Length - 1]);
                 textFormat.Text = selectedValue[selectedValue.Length - 2];
                 selected.Items.Clear();
@@ -649,12 +637,12 @@ namespace iDash
                             //send the key action to the game
                             for (int y = 0; y < bActions.Count; y++)
                             {
-                                string[] split = bActions[y].ToString().Split(Utils.SIGN_EQUALS);
+                                string[] split = bActions[y].ToString().Split(Constants.SIGN_EQUALS);
                                 bool isAntiClockwise = split[0].Contains("-");
                                 string buttonId = split[0].Replace("+", "").Replace("-", "");
                                 if (buttonId.Equals(BUTTON_PREFIX + x))
                                 {                                    
-                                    string[] commandSplit = split[1].Split(Utils.LIST_SEPARATOR);
+                                    string[] commandSplit = split[1].Split(Constants.LIST_SEPARATOR);
                                     int nextAction = 0;
 
                                     if (!buttonStateMap.ContainsKey(split[1]))
@@ -722,7 +710,7 @@ namespace iDash
             int offset = 0;
 
             foreach(string s in views2.Items) {
-                string id = s.Split(Utils.SIGN_EQUALS)[0];
+                string id = s.Split(Constants.SIGN_EQUALS)[0];
                 if (buttonId.Equals(id.Replace("+", "").Replace("-", "")))
                 {
                     /*MessageBox.Show(string.Format("Button {0} already binded.", buttonId),
@@ -752,7 +740,7 @@ namespace iDash
                     return;
                 }
 
-                string value = buttonId + Utils.SIGN_EQUALS + buttonActions.SelectedItem.ToString();
+                string value = buttonId + Constants.SIGN_EQUALS + buttonActions.SelectedItem.ToString();
 
                 if (!views2.Items.Contains(value))
                 {
@@ -884,8 +872,7 @@ namespace iDash
 
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            isSimulatorDisconnected = false;
-
+            sm.isSimulatorDisconnected = false;
             stopAllSimThreads();
             //keep iRacing threads alive
             stopIRacingThreads = false;
@@ -908,8 +895,7 @@ namespace iDash
 
         private void raceroomToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            isSimulatorDisconnected = false;
-
+            sm.isSimulatorDisconnected = false;
             stopAllSimThreads();
             //keep RaceRoom threads alive
             stopRaceRoomThreads = false;
@@ -932,8 +918,7 @@ namespace iDash
 
         private void assettoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            isSimulatorDisconnected = false;
-
+            sm.isSimulatorDisconnected = false;
             stopAllSimThreads();        
             //keep Assetto threads alive
             stopAssettoThreads = false;
@@ -956,8 +941,7 @@ namespace iDash
 
         private void rFactorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            isSimulatorDisconnected = false;
-
+            sm.isSimulatorDisconnected = false;
             stopAllSimThreads();            
             //keep rFactor threads alive
             stopRFactorThreads = false;
@@ -980,8 +964,7 @@ namespace iDash
 
         private void rFactor2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            isSimulatorDisconnected = false;
-
+            sm.isSimulatorDisconnected = false;
             stopAllSimThreads();
             //keep rFactor2 threads alive
             stopRFactor2Threads = false;
@@ -1004,16 +987,12 @@ namespace iDash
 
         private void noneToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            sm.isSimulatorDisconnected = true;
             stopAllSimThreads();
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             statusBar.AppendText("Simulator disconnected.\n");
             selectedSimulator = Constants.None;
-            if (!isSimulatorDisconnected)
-            {
-                isSimulatorDisconnected = true;
-                new Thread(new ThreadStart(sendDatetimeToArduino)).Start();
-            }
         }
 
         private void iRacingToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -1078,14 +1057,14 @@ namespace iDash
                 //button not binded yet
                 if (buttonBinded < 0)
                 {
-                    buttonAction = buttonId + (isClockWise.Checked ? "+" : "-") + Utils.SIGN_EQUALS + e.KeyCode;
+                    buttonAction = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + e.KeyCode;
                     views2.Items.Add(buttonAction);
                 }
                 else
                 {
                     string actionsBinded = views2.Items[buttonBinded].ToString().Split('=')[1];
                     buttonAction = actionsBinded + "," + e.KeyCode;
-                    views2.Items[buttonBinded] = buttonId + (isClockWise.Checked ? "+" : "-") + Utils.SIGN_EQUALS + buttonAction;
+                    views2.Items[buttonBinded] = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + buttonAction;
                 }                    
 
                 syncViews();
@@ -1105,6 +1084,11 @@ namespace iDash
         private void FormLoadComplete(object sender, EventArgs e)
         {
             formFinishedLoading = true;
-        }        
+        }
+
+        private void isTestMode_CheckedChanged(object sender, EventArgs e)
+        {
+            sm.isTestMode = isTestMode.Checked;
+        }
     }    
 }

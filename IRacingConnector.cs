@@ -18,6 +18,7 @@ namespace iDash
         private float firstRpm = 0;
         private float lastRpm = 0;
         private float currentRpm = 0;
+        private bool isOnPit = false;
 
         private bool disposed = false;
 
@@ -48,6 +49,7 @@ namespace iDash
             while (!MainForm.stopThreads && !MainForm.stopIRacingThreads)
             {
                 msg.Clear();
+              
                 if (wrapper.IsConnected)
                 {
                     if (!isConnected)
@@ -57,7 +59,7 @@ namespace iDash
                     }
                     isConnected = true;
 
-                    sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
+                    sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isOnPit);
                     send7SegmentMsg();
                 }
                 else
@@ -66,9 +68,7 @@ namespace iDash
                     sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                 }
 
-                //c = new Command(Command.CMD_RGB_SHIFT, colourPattern);
-                //sm.sendCommand(c);
-                await Task.Delay(5);
+                await Task.Delay(Constants.SharedMemoryReadRate);
             }
 
             Dispose();
@@ -141,6 +141,8 @@ namespace iDash
             }*/
             YamlQuery yLastRPM = e.SessionInfo["DriverInfo"]["DriverCarSLLastRPM"];
             YamlQuery yShiftRPM = e.SessionInfo["DriverInfo"]["DriverCarSLShiftRPM"];
+            //YamlQuery yIsOnPit = e.SessionInfo["DriverInfo"]["OnPitRoad"];             
+
             if (yShiftRPM != null)
             {
                 lastRpm = float.Parse(yShiftRPM.Value, CultureInfo.InvariantCulture.NumberFormat);                
@@ -156,13 +158,14 @@ namespace iDash
                 }
             }
 
-            firstRpm = FIRST_RPM * lastRpm;
+            firstRpm = FIRST_RPM * lastRpm;                                 
         }
 
         private void OnTelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
             currentRpm = e.TelemetryInfo.RPM.Value;
             this.telemetryInfo = e;
+            isOnPit = wrapper.GetTelemetryValue<bool>("OnPitRoad").Value;
             //Logger.LogMessageToFile("rpm:" + rpm + "\n");
         }
 

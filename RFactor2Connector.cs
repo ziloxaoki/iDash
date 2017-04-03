@@ -30,7 +30,6 @@ namespace iDash
         Mutex fileAccessMutex = null;
         MemoryMappedFile memoryMappedFile1 = null;
         MemoryMappedFile memoryMappedFile2 = null;
-        int currBuff = 0;
 
         // Shared memory buffer fields
         readonly int SHARED_MEMORY_SIZE_BYTES = Marshal.SizeOf(typeof(rF2State));
@@ -38,9 +37,9 @@ namespace iDash
         byte[] sharedMemoryReadBuffer = null;
 
         // Marshalled view
-        rF2State currrF2State;
-        rF2VehScoringInfo carData;
-        rF2Wheel wheel;
+        protected rF2State currrF2State;
+        protected rF2VehScoringInfo carData;
+        protected rF2Wheel wheel;
 
         public RFactor2Connector(SerialManager sm) : base(sm)
         {
@@ -80,7 +79,10 @@ namespace iDash
                             //calibrate shift gear light rpm
                             lastRpm *= 0.97f;
                             float currentRpm = (float)currrF2State.mEngineRPM;
-                            sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
+                            
+                            bool isInPit = carData.mPitState > 1;
+
+                            sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isInPit);
                             send7SegmentMsg();
                         }
                     }
@@ -99,10 +101,8 @@ namespace iDash
                     disableNotification = false;
                     sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                 }
-
-                //c = new Command(Command.CMD_RGB_SHIFT, colourPattern);
-                //sm.sendCommand(c);
-                await Task.Delay(5);
+                
+                await Task.Delay(Constants.SharedMemoryReadRate);
             }            
 
             Dispose();
@@ -135,7 +135,6 @@ namespace iDash
                                 sharedMemoryStream.BaseStream.Position = 0;
                                 this.sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.SHARED_MEMORY_SIZE_BYTES);
                                 buf1Current = true;
-                                this.currBuff = 1;
                             }
                         }
 
@@ -146,7 +145,6 @@ namespace iDash
                             {
                                 var sharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
                                 this.sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.SHARED_MEMORY_SIZE_BYTES);
-                                this.currBuff = 2;
                             }
                         }
                     }

@@ -12,9 +12,6 @@ namespace iDash
     class RFactorConnector : ISimConnector
     {       
         public Boolean running = false;
-        private float firstRpm = 0;
-        private float lastRpm = 0;
-        private float currentRpm = 0;
         private Boolean mapped = false;
         private RFactorDataReader gameDataReader;
         private RF1SharedMemoryReader.RF1StructWrapper wrapper;
@@ -54,12 +51,15 @@ namespace iDash
                             wrapper = (RF1SharedMemoryReader.RF1StructWrapper)rawGameData;
                             if (wrapper.data.numVehicles > 0)
                             {
-                                lastRpm = wrapper.data.engineMaxRPM;
-                                firstRpm = FIRST_RPM * lastRpm;
+                                float lastRpm = wrapper.data.engineMaxRPM;
+                                float firstRpm = FIRST_RPM * lastRpm;
                                 //calibrate shift gear light rpm
                                 lastRpm *= 0.97f;
-                                currentRpm = wrapper.data.engineRPM;                                
-                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm);
+                                float currentRpm = wrapper.data.engineRPM;
+
+                                bool isInPit = wrapper.data.vehicle[0].inPits != 0;
+
+                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isInPit);
                                 send7SegmentMsg();
 
                                 if (!isConnected)
@@ -95,7 +95,7 @@ namespace iDash
                     sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                 }
 
-                await Task.Delay(5);
+                await Task.Delay(Constants.SharedMemoryReadRate);
             }            
             
             Dispose();

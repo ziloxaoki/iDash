@@ -94,6 +94,7 @@ namespace iDash
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.amsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.isTestMode = new System.Windows.Forms.CheckBox();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -508,6 +509,7 @@ namespace iDash
             // 
             // debugTab
             // 
+            this.debugTab.Controls.Add(this.isTestMode);
             this.debugTab.Controls.Add(this.label9);
             this.debugTab.Controls.Add(this.label8);
             this.debugTab.Controls.Add(this.cmdHeader);
@@ -655,42 +657,42 @@ namespace iDash
             // iRacingToolStripMenuItem
             // 
             this.iRacingToolStripMenuItem.Name = "iRacingToolStripMenuItem";
-            this.iRacingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.iRacingToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.iRacingToolStripMenuItem.Text = "IRacing";
             this.iRacingToolStripMenuItem.Click += new System.EventHandler(this.iRacingToolStripMenuItem_Click);
             // 
             // raceroomToolStripMenuItem
             // 
             this.raceroomToolStripMenuItem.Name = "raceroomToolStripMenuItem";
-            this.raceroomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.raceroomToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.raceroomToolStripMenuItem.Text = "Raceroom";
             this.raceroomToolStripMenuItem.Click += new System.EventHandler(this.raceroomToolStripMenuItem_Click);
             // 
             // assettoToolStripMenuItem
             // 
             this.assettoToolStripMenuItem.Name = "assettoToolStripMenuItem";
-            this.assettoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.assettoToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.assettoToolStripMenuItem.Text = "Assetto Corsa";
             this.assettoToolStripMenuItem.Click += new System.EventHandler(this.assettoToolStripMenuItem_Click);
             // 
             // amsToolStripMenuItem
             // 
             this.amsToolStripMenuItem.Name = "amsToolStripMenuItem";
-            this.amsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.amsToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.amsToolStripMenuItem.Text = "Automobilista";
             this.amsToolStripMenuItem.Click += new System.EventHandler(this.rFactorToolStripMenuItem_Click);
             // 
             // rFactor2ToolStripMenuItem
             // 
             this.rFactor2ToolStripMenuItem.Name = "rFactor2ToolStripMenuItem";
-            this.rFactor2ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.rFactor2ToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.rFactor2ToolStripMenuItem.Text = "RFactor2";
             this.rFactor2ToolStripMenuItem.Click += new System.EventHandler(this.rFactor2ToolStripMenuItem_Click);
             // 
             // noneToolStripMenuItem
             // 
             this.noneToolStripMenuItem.Name = "noneToolStripMenuItem";
-            this.noneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.noneToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.noneToolStripMenuItem.Text = "None";
             this.noneToolStripMenuItem.Click += new System.EventHandler(this.noneToolStripMenuItem_Click);
             // 
@@ -709,37 +711,48 @@ namespace iDash
             // iRacingToolStripMenuItem1
             // 
             this.iRacingToolStripMenuItem1.Name = "iRacingToolStripMenuItem1";
-            this.iRacingToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.iRacingToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.iRacingToolStripMenuItem1.Text = "iRacing";
             this.iRacingToolStripMenuItem1.Click += new System.EventHandler(this.iRacingToolStripMenuItem1_Click);
             // 
             // raceRoomToolStripMenuItem1
             // 
             this.raceRoomToolStripMenuItem1.Name = "raceRoomToolStripMenuItem1";
-            this.raceRoomToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.raceRoomToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.raceRoomToolStripMenuItem1.Text = "RaceRoom";
             this.raceRoomToolStripMenuItem1.Click += new System.EventHandler(this.raceRoomToolStripMenuItem1_Click);
             // 
             // assettoToolStripMenuItem1
             // 
             this.assettoToolStripMenuItem1.Name = "assettoToolStripMenuItem1";
-            this.assettoToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.assettoToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.assettoToolStripMenuItem1.Text = "Assetto Corsa";
             this.assettoToolStripMenuItem1.Click += new System.EventHandler(this.assettoToolStripMenuItem1_Click);
             // 
             // amsToolStripMenuItem1
             // 
             this.amsToolStripMenuItem1.Name = "amsToolStripMenuItem1";
-            this.amsToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.amsToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.amsToolStripMenuItem1.Text = "Automobilista";
             this.amsToolStripMenuItem1.Click += new System.EventHandler(this.rFactorToolStripMenuItem1_Click);
             // 
             // rFactor2ToolStripMenuItem1
             // 
             this.rFactor2ToolStripMenuItem1.Name = "rFactor2ToolStripMenuItem1";
-            this.rFactor2ToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.rFactor2ToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.rFactor2ToolStripMenuItem1.Text = "RFactor2";
             this.rFactor2ToolStripMenuItem1.Click += new System.EventHandler(this.rFactor2ToolStripMenuItem1_Click);
+            // 
+            // isTestMode
+            // 
+            this.isTestMode.AutoSize = true;
+            this.isTestMode.Location = new System.Drawing.Point(814, 47);
+            this.isTestMode.Name = "isTestMode";
+            this.isTestMode.Size = new System.Drawing.Size(108, 17);
+            this.isTestMode.TabIndex = 20;
+            this.isTestMode.Text = "Enable test mode";
+            this.isTestMode.UseVisualStyleBackColor = true;
+            this.isTestMode.CheckedChanged += new System.EventHandler(this.isTestMode_CheckedChanged);
             // 
             // MainForm
             // 
@@ -838,6 +851,7 @@ namespace iDash
         private System.Windows.Forms.CheckBox isClockWise;
         private System.Windows.Forms.ToolStripMenuItem rFactor2ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rFactor2ToolStripMenuItem1;
+        private System.Windows.Forms.CheckBox isTestMode;
     }
 }
 

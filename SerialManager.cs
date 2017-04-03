@@ -19,7 +19,7 @@ namespace iDash
         private const int ARDUINO_TIMED_OUT = 500;
         private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
-        private const int WAIT_FOR_ARDUINO_DATA = 100;
+        private const int WAIT_FOR_ARDUINO_DATA = 50;
 
         //arduino command length
         private int commandLength;        
@@ -34,7 +34,9 @@ namespace iDash
         //debug mode currently set in arduino
         public DebugMode arduinoDebugMode = DebugMode.None;
         //disable messages when in Default debugging mode. This is set by the mainform. (ignore incoming data)
+        public bool isTestMode = false;
         public bool isDisabledSerial = false;
+        public bool isSimulatorDisconnected = true;
         //indicates how often a debug message need to be logged in the debug dialog
         private long lastMessageLogged = 0; 
         //show debug commands in hex or int (show as hexadecimal)
@@ -68,9 +70,35 @@ namespace iDash
             return !Utils.hasTimedOut(lastArduinoResponse, ARDUINO_TIMED_OUT);
         }
 
+        private void sendTestMsg(bool blink)
+        {
+            byte[] rpmLedBlack = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+            int milSec = DateTime.Now.Millisecond;
+
+            if (isTestMode)
+            {
+                if(blink)
+                {
+                    this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLedBlack), false);
+                }
+                else
+                {
+                    this.sendCommand(new Command(Command.CMD_RGB_SHIFT, Constants.colourPattern), false);
+                }
+            }
+            else
+            {
+                this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLedBlack), false);
+            }
+
+            this.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+        }    
+
         private async void tryToConnect()
         {
-            HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);            
+            HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            bool blink = false;
 
             while (!MainForm.stopThreads)
             {
@@ -79,8 +107,11 @@ namespace iDash
                     portNames = SerialPort.GetPortNames();
 
                 if (isArduinoAlive())
-                {                    
-                    await Task.Delay(WAIT_FOR_ARDUINO_DATA);
+                {
+                    if (isSimulatorDisconnected)
+                        sendTestMsg(blink = !blink);
+
+                    await Task.Delay(WAIT_FOR_ARDUINO_DATA);                    
                 }
                 else
                 {
