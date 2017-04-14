@@ -19,7 +19,7 @@ namespace iDash
         private const int ARDUINO_TIMED_OUT = 500;
         private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
-        private const int WAIT_FOR_ARDUINO_DATA = 50;
+        private const int WAIT_FOR_ARDUINO_DATA = ARDUINO_TIMED_OUT/5;
 
         //arduino command length
         private int commandLength;        

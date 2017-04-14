@@ -18,7 +18,7 @@ namespace iDash
         private float firstRpm = 0;
         private float lastRpm = 0;
         private float currentRpm = 0;
-        private bool isOnPit = false;
+        private int flag = 0;
 
         private bool disposed = false;
 
@@ -59,7 +59,7 @@ namespace iDash
                     }
                     isConnected = true;
 
-                    sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isOnPit);
+                    sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
                     send7SegmentMsg();
                 }
                 else
@@ -165,7 +165,22 @@ namespace iDash
         {
             currentRpm = e.TelemetryInfo.RPM.Value;
             this.telemetryInfo = e;
-            isOnPit = wrapper.GetTelemetryValue<bool>("OnPitRoad").Value;
+
+            switch (wrapper.GetTelemetryValue<int>("SessionFlags").Value)
+            {
+                case 32:
+                    flag = (int)Constants.FLAG_TYPE.BLUE_FLAG;
+                    break;
+                case 8:
+                    flag = (int)Constants.FLAG_TYPE.YELLOW_FLAG;
+                    break;
+                default:
+                    flag = 0;
+                    break;
+            }
+
+            flag = wrapper.GetTelemetryValue<bool>("OnPitRoad").Value ? 9 : flag;
+            
             //Logger.LogMessageToFile("rpm:" + rpm + "\n");
         }
 

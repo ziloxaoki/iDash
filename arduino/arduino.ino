@@ -155,17 +155,17 @@ int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT_PULLUP}, //A7 Left paddle - INPUT_PUL
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
-int BUTTON_LIMITS[8][4][2] = {{{570, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
-                              {{570, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
-                              {{450, 520}, {550, 620}, {625, 685}, {690, 745}},   //A5 Extra 1 - INPUT
-                              {{450, 520}, {550, 620}, {625, 685}, {690, 745}},   //A4 Extra 2 - INPUT                 
+int BUTTON_LIMITS[8][4][2] = {{{575, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
+                              {{575, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
+                              {{450, 520}, {550, 620}, {625, 690}, {695, 745}},   //A5 Extra 1 - INPUT
+                              {{450, 520}, {550, 620}, {625, 690}, {695, 745}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
 
 
-int AXIS[4] = {14, 15, 16, 17};
+int AXIS[4] = {14, 15, 16, 17};  //A0, A1, A2, A3
 int AXIS_LIMITS[4][2] = {{-1, 100}, {-1, 100}, {-1, 100}, {-1, 100}};
                               
 int GROUND_ANALOG_PIN = 15; //A1                                
@@ -680,6 +680,7 @@ void sendButtonStatus(byte header) {
 }
 
 void loop() {  
+//if(false){
   //Serial.print("freeMemory()=");
   //Serial.println(freeMemory());
   //haven't received Syn Ack from IDash for too long
@@ -700,7 +701,7 @@ void loop() {
     sendButtonStatus(CMD_INIT); 
   //delay(500);
   //}  
-
+//}
 //byte response[100];
 //  int offset = 0;
 //sendAnalogState(offset,response);

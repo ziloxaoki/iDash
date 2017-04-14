@@ -16,7 +16,7 @@ namespace iDash
         private float firstRpm = 0;
         private float lastRpm = 0;
         private float currentRpm = 0;
-        private bool isInPit = false;
+        private int flag = 0;
         private StaticInfo si;
         private Graphics gr;
         private Physics ph;
@@ -58,7 +58,7 @@ namespace iDash
 
                     isConnected = true;
 
-                    sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isInPit);
+                    sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
                     send7SegmentMsg();
                 }
                 else
@@ -182,7 +182,13 @@ namespace iDash
             //calibrate shift gear light rpm
             lastRpm *= 0.97f;
             si = e.StaticInfo;
-            isInPit = gr.IsInPit > 0;                
+
+            flag = (int)gr.Flag;
+
+            if (ph.PitLimiterOn > 0)
+            {
+                flag = 9;
+            }                       
         }
 
         protected void GraphicsUpdated(object sender, GraphicsEventArgs e)

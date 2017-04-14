@@ -78,12 +78,8 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="vJoyInterfaceWrap, Version=0.2.1.6, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="vJoyInterfaceWrap">
       <HintPath>packages\vJoyInterfaceWrap.dll</HintPath>
-    </Reference>
-    <Reference Include="YamlDotNet">
-      <HintPath>packages\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

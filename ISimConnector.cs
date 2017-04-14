@@ -22,15 +22,25 @@ namespace iDash
             this.sm = sm;
         }
 
-        protected void sendRPMShiftMsg(float currentRpm, float firstRpm, float lastRpm, bool isInPit)
+        protected void sendRPMShiftMsg(float currentRpm, float firstRpm, float lastRpm, int flag)
         {
-            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }; //black
             byte[] pattern = null;
 
-            if (isInPit)
-                pattern = Constants.pitRGB;
-            else
-                pattern = Constants.colourPattern;
+            switch (flag) {
+                case (int)Constants.FLAG_TYPE.YELLOW_FLAG:
+                    pattern = Constants.yellowRGB;
+                    break;
+                case (int)Constants.FLAG_TYPE.BLUE_FLAG:
+                    pattern = Constants.blueRGB;
+                    break;
+                case (int)Constants.FLAG_TYPE.INPIT_FLAG: 
+                    pattern = Constants.whiteRGB;
+                    break;
+                default:
+                    pattern = Constants.colourPattern;
+                    break;
+            }
 
             float rpmPerLed = (lastRpm - firstRpm) / LED_NUM_TOTAL; //rpm range per led                
             int milSec = DateTime.Now.Millisecond;
@@ -103,7 +113,10 @@ namespace iDash
                 }
             }
 
-            return result;
+            if (!String.IsNullOrEmpty(result))
+                return result;
+
+            return "00.00.00.00";
         }
 
         //needs to wait until MainForm 7Segment is loaded

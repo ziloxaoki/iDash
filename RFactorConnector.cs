@@ -54,12 +54,12 @@ namespace iDash
                                 float lastRpm = wrapper.data.engineMaxRPM;
                                 float firstRpm = FIRST_RPM * lastRpm;
                                 //calibrate shift gear light rpm
-                                lastRpm *= 0.97f;
+                                lastRpm *= 0.95f;
                                 float currentRpm = wrapper.data.engineRPM;
 
-                                bool isInPit = wrapper.data.vehicle[0].inPits != 0;
+                                int flag = wrapper.data.vehicle[0].inPits > 0 ? 9 : 0;
 
-                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isInPit);
+                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
                                 send7SegmentMsg();
 
                                 if (!isConnected)

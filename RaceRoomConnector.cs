@@ -79,20 +79,27 @@ namespace iDash
                                 lastRpm *= 0.95f;
                                 float currentRpm = RpsToRpm(data.EngineRps);
 
-                                DriverData currentPlayerData;
-                                bool isInPit = false;
+                                int flag = 0;
 
                                 try
                                 {
-                                    currentPlayerData = getDriverData(data.VehicleInfo.SlotId);
-                                    isInPit = currentPlayerData.InPitlane > 0;
+                                    if (data.Flags.Blue > 0)
+                                    {
+                                        flag = (int)Constants.FLAG_TYPE.BLUE_FLAG;
+                                    }
+                                    if (data.Flags.Yellow > 0)
+                                    {
+                                        flag = (int)Constants.FLAG_TYPE.YELLOW_FLAG;
+                                    }
+
+                                    flag = data.InPitlane > 0 ? 9 : flag;
                                 }
                                 catch (Exception)
                                 {
                                     
                                 }
 
-                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isInPit);
+                                sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
                                 send7SegmentMsg();
                             }
                             else

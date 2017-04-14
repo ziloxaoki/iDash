@@ -79,10 +79,22 @@ namespace iDash
                             //calibrate shift gear light rpm
                             lastRpm *= 0.97f;
                             float currentRpm = (float)currrF2State.mEngineRPM;
-                            
-                            bool isInPit = carData.mPitState > 1;
 
-                            sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, isInPit);
+                            int flag = 0;
+
+                            if (carData.mFlag == 6)
+                            {
+                                flag = (int)Constants.FLAG_TYPE.BLUE_FLAG; 
+                            }
+
+                            if (currrF2State.mYellowFlagState > 0)
+                            {
+                                flag = (int)Constants.FLAG_TYPE.YELLOW_FLAG;
+                            }
+
+                            flag = currrF2State.mSpeedLimiter > 0 ? 9 : flag;
+
+                            sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
                             send7SegmentMsg();
                         }
                     }
