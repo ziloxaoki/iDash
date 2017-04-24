@@ -166,6 +166,7 @@ namespace iDash
                         if (isArduinoAlive())
                         {
                             NotifyStatusMessage("Arduino found at port " + port + "...");
+                            Logger.LogMessageToFile("Arduino connected to port " + port, true);
                             //if arduino found always try to reconnect to the same port
                             portNames = new string[] {port};
                             break;

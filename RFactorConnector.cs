@@ -34,8 +34,6 @@ namespace iDash
             Object rawGameData;
             NotifyStatusMessage("Waiting for RFactor...");
 
-            isGameRunning = Utils.IsGameRunning(GameDefinition.automobilista.processName);
-
             while (!MainForm.stopThreads && !MainForm.stopRFactorThreads)
             {                
                 if (isGameRunning)
@@ -82,7 +80,7 @@ namespace iDash
                 {
                     isGameRunning = Utils.IsGameRunning(GameDefinition.automobilista.processName);
 
-                    if (!isConnected)
+                    if (isConnected)
                     {
                         string s = DateTime.Now.ToString("hh:mm:ss") + ": Automobilista closed.";
                         NotifyStatusMessage(s);
