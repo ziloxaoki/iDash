@@ -96,14 +96,17 @@ namespace iDash
                     break;
 
                 case State.KeyUp:
-                    inputs = getKeyAction(wscan, true);                    
+                    inputs = getKeyAction(wscan, false);
+                    SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+                    inputs = getKeyAction(wscan, true);
+                    SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
                     break;
             } 
             
-            if(inputs != null)
+            /*if(inputs != null)
             {
                 SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
-            }           
+            }*/           
         }
 
         private INPUT[] getKeyAction(ushort key, bool isKeyUp)
@@ -119,8 +122,8 @@ namespace iDash
                             {
                                 wVk = 0, 
                                 wScan = key,
-                                //dwFlags = (isKeyUp ? KEYEVENTF_KEYUP : KEYEVENTF_KEYDOWN) | KEYEVENTF_SCANCODE,
-                                dwFlags = KEYEVENTF_KEYDOWN | KEYEVENTF_SCANCODE,
+                                dwFlags = (isKeyUp ? KEYEVENTF_KEYUP : KEYEVENTF_KEYDOWN) | KEYEVENTF_SCANCODE,
+                                //dwFlags = KEYEVENTF_KEYDOWN | KEYEVENTF_SCANCODE,
                                 dwExtraInfo = GetMessageExtraInfo(),
                             }
                         }
