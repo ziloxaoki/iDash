@@ -19,6 +19,7 @@ namespace iDash
         private const int WAIT_ARDUINO_SET_DEBUG_MODE = 100;
         private const int WAIT_UI_FREQUENCY = 1000;
         private const int WAIT_THREADS_TO_CLOSE = 3500;
+        public const string UPDATE_BUTTON_VOLTAGE = "UPDATE_BUTTON_VOLTAGE";
 
         private SerialManager sm;
         private ButtonHandler bh;
@@ -302,7 +303,15 @@ namespace iDash
 
         public void AppendToDebugDialog(String s)
         {
-            debugData.AppendText(s);
+            if (s.StartsWith(UPDATE_BUTTON_VOLTAGE))
+            {
+                string[] split = s.Split(':');
+                bPressed.Text = split[1];
+            }
+            else
+            {
+                debugData.AppendText(s);
+            }
         }
 
         public void UpdateDebugData(string s)
@@ -345,6 +354,8 @@ namespace iDash
                 state[0] = (byte)debugModes.SelectedIndex;
                 sm.formDebugMode = (DebugMode)debugModes.SelectedIndex;
             }
+
+            bPressed.Text = "Buttons voltage...";
         }
 
         private void debugData_TextChanged(object sender, EventArgs e)

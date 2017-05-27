@@ -28,6 +28,7 @@ namespace iDash
         private static long lastArduinoResponse = -1;        
         private object readLock = new object();
         private object sendLock = new object();
+        private byte[] voltage = {0,0,0};
 
         //debug mode set on form
         public DebugMode formDebugMode = DebugMode.None;   
@@ -202,6 +203,17 @@ namespace iDash
                     case Command.CMD_BUTTON_STATUS:                            
                         NotifyCommandReceived(command);
                         break;
+                    //Arduino button voltage
+                    case Command.CMD_DEBUG_BUTTON:
+                        StringBuilder sb = new StringBuilder();
+                        byte[] cmd = command.getData();
+                        for (int x = 1; x < cmd.Length - 1; x++) {
+                            int pin = cmd[x];
+                            int voltage = (cmd[++x] * 256) + cmd[++x];
+                            sb.Append(String.Format("pin {0}={1}  ", pin, voltage));
+                        }
+                        NotifyDebugMessage(String.Format(MainForm.UPDATE_BUTTON_VOLTAGE + ":{0}",sb.ToString()));
+                        break;
                     //Arduino response when crc command failed
                     case Command.CMD_INVALID:
                         break;
@@ -212,7 +224,7 @@ namespace iDash
                     if (isDisabledSerial) {
                         if (command.getRawData()[0] == Command.CMD_INIT_DEBUG) {
                             NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", 
-                                Utils.byteArrayToString(command.getRawData(), asHex), 
+                                Utils.byteArrayToString(command.getRawData(), false), 
                                 type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
                         }

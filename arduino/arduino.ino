@@ -113,6 +113,7 @@ const byte CMD_7_SEGS = (byte)'B'; //66d 42h
 const byte CMD_SYN_ACK = (byte)'a'; //97d 61h
 const byte CMD_RGB_SHIFT = (byte)'C'; //67d 43h
 const byte CMD_BUTTON_STATUS = (byte)'D'; //68d 44h
+const byte CMD_DEBUG_BUTTON = 202; //CAh
 const byte CMD_INVALID = (byte)0xef; //239d EFh
 
 // WS2812b chained RGBLEDS count
@@ -144,21 +145,21 @@ int BUTTON_PINS[] = { BUTTON_PIN_1, BUTTON_PIN_2, BUTTON_PIN_3, BUTTON_PIN_4, BU
 
 const int EXTRA_BUTTONS_TOTAL = 4;  //Extra pins. Each pin can handle multiple buttons
 
-int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT_PULLUP}, //A7 Left paddle - INPUT_PULLUP
-                                {20, INPUT_PULLUP}, //A6 Right Paddle - INPUT_PULLUP
-                                {19, INPUT},        //A5 Extra 1 - INPUT
-                                {18, INPUT},        //A4 Extra 2 - INPUT
-                                {17, INPUT_PULLUP},        //A3 Toggle switch up
-                                {16, INPUT_PULLUP},        //A2 Toggle switch down
-                                {15, INPUT_PULLUP},        //A1 Toggle switch left
-                                {14, INPUT_PULLUP}};       //A0 Toggle switch right
+int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT_PULLUP},  //A7 Left paddle - INPUT_PULLUP
+                                {20, INPUT_PULLUP},  //A6 Right Paddle - INPUT_PULLUP
+                                {19, INPUT},         //A5 Extra 1 - INPUT
+                                {18, INPUT},         //A4 Extra 2 - INPUT
+                                {17, INPUT_PULLUP},  //A3 Toggle switch up
+                                {16, INPUT_PULLUP},  //A2 Toggle switch down
+                                {15, INPUT_PULLUP},  //A1 Toggle switch left
+                                {14, INPUT_PULLUP}}; //A0 Toggle switch right
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
 int BUTTON_LIMITS[8][4][2] = {{{575, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
                               {{575, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
-                              {{450, 520}, {550, 620}, {625, 690}, {695, 745}},   //A5 Extra 1 - INPUT
-                              {{450, 520}, {550, 620}, {625, 690}, {695, 745}},   //A4 Extra 2 - INPUT                 
+                              {{450, 530}, {550, 620}, {625, 690}, {695, 745}},   //A5 Extra 1 - INPUT
+                              {{450, 530}, {550, 620}, {625, 690}, {695, 745}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
@@ -679,6 +680,31 @@ void sendButtonStatus(byte header) {
   sendDataToSerial(offset, response);
 }
 
+void sendButtonVoltage(byte header) {
+  byte response[20];
+  int offset = 0;
+   
+  response[offset++] = header;
+  response[offset++] = CMD_DEBUG_BUTTON;
+
+  int btn = 0;
+  
+  for(int i = 0; i < EXTRA_BUTTONS_TOTAL; i++) {
+    // read the state of the switch into a local variable:
+    int pin = EXTRA_BUTTONS_INIT[i][0];
+    int reading = analogRead(pin);    
+
+    if (reading > 50) {
+      response[offset++]  = pin;
+      response[offset++]  = reading / 256; 
+      response[offset++]  = reading % 256;
+    }
+  }
+  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = CMD_END;   
+  sendDataToSerial(offset, response);
+}
+
 void loop() {  
 //if(false){
   //Serial.print("freeMemory()=");
@@ -696,6 +722,10 @@ void loop() {
   }
   
   processData();
+
+  if (debugMode > 0) {
+    sendButtonVoltage(CMD_INIT);
+  }
   
   //if(isConnected) {
     sendButtonStatus(CMD_INIT); 

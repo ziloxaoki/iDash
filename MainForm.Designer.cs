@@ -70,6 +70,8 @@ namespace iDash
             this.buttonActions = new System.Windows.Forms.ListBox();
             this.buttonsActive = new System.Windows.Forms.ListBox();
             this.debugTab = new System.Windows.Forms.TabPage();
+            this.bPressed = new System.Windows.Forms.Label();
+            this.isTestMode = new System.Windows.Forms.CheckBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.cmdHeader = new System.Windows.Forms.RichTextBox();
@@ -94,7 +96,6 @@ namespace iDash
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.amsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.isTestMode = new System.Windows.Forms.CheckBox();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -509,6 +510,7 @@ namespace iDash
             // 
             // debugTab
             // 
+            this.debugTab.Controls.Add(this.bPressed);
             this.debugTab.Controls.Add(this.isTestMode);
             this.debugTab.Controls.Add(this.label9);
             this.debugTab.Controls.Add(this.label8);
@@ -529,6 +531,26 @@ namespace iDash
             this.debugTab.TabIndex = 1;
             this.debugTab.Text = "Debug";
             this.debugTab.UseVisualStyleBackColor = true;
+            // 
+            // bPressed
+            // 
+            this.bPressed.AutoSize = true;
+            this.bPressed.Location = new System.Drawing.Point(302, 75);
+            this.bPressed.Name = "bPressed";
+            this.bPressed.Size = new System.Drawing.Size(90, 13);
+            this.bPressed.TabIndex = 21;
+            this.bPressed.Text = "Buttons voltage...";
+            // 
+            // isTestMode
+            // 
+            this.isTestMode.AutoSize = true;
+            this.isTestMode.Location = new System.Drawing.Point(773, 48);
+            this.isTestMode.Name = "isTestMode";
+            this.isTestMode.Size = new System.Drawing.Size(108, 17);
+            this.isTestMode.TabIndex = 20;
+            this.isTestMode.Text = "Enable test mode";
+            this.isTestMode.UseVisualStyleBackColor = true;
+            this.isTestMode.CheckedChanged += new System.EventHandler(this.isTestMode_CheckedChanged);
             // 
             // label9
             // 
@@ -603,7 +625,7 @@ namespace iDash
             // 
             // clearData
             // 
-            this.clearData.Location = new System.Drawing.Point(689, 56);
+            this.clearData.Location = new System.Drawing.Point(199, 54);
             this.clearData.Name = "clearData";
             this.clearData.Size = new System.Drawing.Size(97, 34);
             this.clearData.TabIndex = 12;
@@ -743,17 +765,6 @@ namespace iDash
             this.rFactor2ToolStripMenuItem1.Text = "RFactor2";
             this.rFactor2ToolStripMenuItem1.Click += new System.EventHandler(this.rFactor2ToolStripMenuItem1_Click);
             // 
-            // isTestMode
-            // 
-            this.isTestMode.AutoSize = true;
-            this.isTestMode.Location = new System.Drawing.Point(814, 47);
-            this.isTestMode.Name = "isTestMode";
-            this.isTestMode.Size = new System.Drawing.Size(108, 17);
-            this.isTestMode.TabIndex = 20;
-            this.isTestMode.Text = "Enable test mode";
-            this.isTestMode.UseVisualStyleBackColor = true;
-            this.isTestMode.CheckedChanged += new System.EventHandler(this.isTestMode_CheckedChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -852,6 +863,7 @@ namespace iDash
         private System.Windows.Forms.ToolStripMenuItem rFactor2ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rFactor2ToolStripMenuItem1;
         private System.Windows.Forms.CheckBox isTestMode;
+        private System.Windows.Forms.Label bPressed;
     }
 }
 

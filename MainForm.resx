@@ -118,12 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="label9.Text" xml:space="preserve">
-    <value>CMD_INIT = 200;             CMD_INIT_DEBUG = 201;
-CMD_SET_DEBUG_MODE = 11;    CMD_RESPONSE_SET_DEBUG_MODE = 12;
+    <value>CMD_SET_DEBUG_MODE = 11;    CMD_RESPONSE_SET_DEBUG_MODE = 12;
 CMD_SYN = 65;               CMD_7_SEGS = 66;
-CMD_SYN_ACK = 97;           CMD_RGB_SHIFT = 67;
-CMD_BUTTON_STATUS = 68;     CMD_INVALID = 239;
-CMD_END = 126;</value>
+CMD_RGB_SHIFT = 67;         CMD_BUTTON_STATUS = 68;
+CMD_SYN_ACK = 97;           CMD_END = 126;
+CMD_INIT = 200;             CMD_INIT_DEBUG = 201;
+CMD_DEBUG_BUTTON = 202;     CMD_INVALID = 239;</value>
   </data>
   <metadata name="mainmenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>

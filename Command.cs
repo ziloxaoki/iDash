@@ -8,8 +8,9 @@ namespace iDash
         private byte[] data;
         private byte crc;
         //BC e BF
-        public const byte CMD_INIT = 200; //94d 5Eh
-        public const byte CMD_INIT_DEBUG = 201; //95d 5Fh
+        public const byte CMD_INIT = 200; //C8h
+        public const byte CMD_INIT_DEBUG = 201; //C9h
+        public const byte CMD_DEBUG_BUTTON = 202; //CAh
         public const byte CMD_END = (byte)'~'; //126d 7Eh
         public const byte CMD_SET_DEBUG_MODE = 11;
         public const byte CMD_RESPONSE_SET_DEBUG_MODE = 12;
@@ -105,6 +106,10 @@ namespace iDash
                 case CMD_BUTTON_STATUS:
                     result = "CMD_BUTTON_STATUS";
                     break; //68d 44h
+
+                case CMD_DEBUG_BUTTON:
+                    result = "CMD_DEBUG_BUTTON";
+                    break;
 
                 case CMD_INVALID:
                     result = "CMD_INVALID";
