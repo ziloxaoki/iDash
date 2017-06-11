@@ -28,7 +28,6 @@ namespace iDash
         private static long lastArduinoResponse = -1;        
         private object readLock = new object();
         private object sendLock = new object();
-        private byte[] voltage = {0,0,0};
 
         //debug mode set on form
         public DebugMode formDebugMode = DebugMode.None;   
@@ -54,6 +53,8 @@ namespace iDash
         private bool disposed = false;
 
         private string[] portNames;
+        private int[,] voltages = new int[8,3];
+        private int MIN_VOLTAGE = 100;
 
         public void Init()
         {
@@ -182,7 +183,46 @@ namespace iDash
         {
             Command synack = new Command(Command.CMD_SYN_ACK, new byte[0]);
             sendCommand(synack, true);
-        }        
+        }    
+        
+        private int updateVoltageLimits(int pinNumber, int voltage)
+        {
+            for (int x=0; x < voltages.Length; x++)
+            {
+                if(voltages[x,0] == 0 || voltages[x,0] == pinNumber)
+                {
+                    if (voltage > MIN_VOLTAGE)
+                    {
+                        //lower
+                        if (voltages[x, 1] > voltage || voltages[x, 1] < MIN_VOLTAGE)
+                        {
+                            voltages[x, 1] = voltage;
+                        }
+
+                        //higher
+                        if (voltages[x, 2] < voltage || voltages[x, 2] < MIN_VOLTAGE)
+                        {
+                            voltages[x, 2] = voltage;
+                        }
+                        
+                    }
+                    else
+                    {
+                        voltages[x, 1] = voltage;
+                        voltages[x, 2] = voltage;
+                    }
+
+                    voltages[x, 0] = pinNumber;
+                    return x;
+                }
+                else
+                {
+
+                }
+            }
+
+            return 0;
+        }    
 
         private string processCommand(Command command)
         {
@@ -210,7 +250,11 @@ namespace iDash
                         for (int x = 1; x < cmd.Length - 1; x++) {
                             int pin = cmd[x];
                             int voltage = (cmd[++x] * 256) + cmd[++x];
-                            sb.Append(String.Format("pin {0}={1}  ", pin, voltage));
+                            updateVoltageLimits(pin, voltage);                            
+                        }
+                        for (int x=0; x < 8; x++)
+                        {
+                            sb.Append(String.Format("pin {0}={1}-{2}  ", voltages[x, 0], voltages[x, 1], voltages[x, 2]));
                         }
                         NotifyDebugMessage(String.Format(MainForm.UPDATE_BUTTON_VOLTAGE + ":{0}",sb.ToString()));
                         break;

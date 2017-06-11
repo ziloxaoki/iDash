@@ -165,6 +165,7 @@ int BUTTON_LIMITS[8][4][2] = {{{575, 900}, {-1, -1}, {-1, -1}, {-1, -1}},       
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
 
+int RESET_BUTTOM_LIMITS[] = {850, 870};  //mapped to pin 18
 
 int AXIS[4] = {14, 15, 16, 17};  //A0, A1, A2, A3
 int AXIS_LIMITS[4][2] = {{-1, 100}, {-1, 100}, {-1, 100}, {-1, 100}};
@@ -362,6 +363,13 @@ bool isValidSignal(bool isHigh, int pinOffset) {
   return false;
 }
 
+void arduinoReset() // Restarts program from beginning but does not reset the peripherals and registers
+{
+  asm volatile ("  jmp 0");  
+}
+
+void(* resetFunc) (void) = 0;
+
 void rotEncoder1(){
   //cli(); //stop interrupts happening before we read pin values  
   int pinOffset = 0;
@@ -458,6 +466,11 @@ int sendAnalogState(int offset, byte *response) {
     // read the state of the switch into a local variable:
     int reading = analogRead(EXTRA_BUTTONS_INIT[i][0]); 
 
+    if((reading > RESET_BUTTOM_LIMITS[0]) && (reading < RESET_BUTTOM_LIMITS[1])){
+      resetFunc();
+      return;
+    }
+
 //Serial.print(i);
 //Serial.print("=");
 //Serial.println(reading);
@@ -516,6 +529,12 @@ int sendAnalogState2(int offset, byte *response) {
 }
 
 int sendButtonState(int offset, byte *response) {  
+
+  /*if(digitalState(BUTTON_PINS[0]) == LOW && digitalState(BUTTON_PINS[1]) == LOW) {
+    resetFunc();
+    return;
+  }*/
+  
   for (int i = 0; i < ENABLED_BUTTONS_COUNT; i++) {      
     response[offset++] = digitalState(BUTTON_PINS[i]) == HIGH ? 0 : 1;
   }   
@@ -694,11 +713,9 @@ void sendButtonVoltage(byte header) {
     int pin = EXTRA_BUTTONS_INIT[i][0];
     int reading = analogRead(pin);    
 
-    if (reading > 50) {
-      response[offset++]  = pin;
-      response[offset++]  = reading / 256; 
-      response[offset++]  = reading % 256;
-    }
+    response[offset++]  = pin;
+    response[offset++]  = reading / 256; 
+    response[offset++]  = reading % 256;
   }
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;   
