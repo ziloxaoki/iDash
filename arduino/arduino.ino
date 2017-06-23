@@ -196,7 +196,6 @@ long lastRotaryStateChange = 0;
 volatile long lastRotaryBounce = 0;
 long lastTimeReceivedByte = 0;
 
-//bool isConnected = false;
 int debugMode = 0;
 const byte INVALID_COMMAND_HEADER = 0xEF;
 bool isInterruptDisabled[] = {false,false};
@@ -551,7 +550,6 @@ void processCommand(byte *buffer, int commandLength) {
     
     //syn ack
     case CMD_SYN_ACK : 
-      //isConnected = true;
       sendHandshacking();  
       break;
 
@@ -701,17 +699,26 @@ void sendButtonVoltage(byte header) {
   sendDataToSerial(offset, response);
 }
 
+void reAttachInterrupts() {
+  if (isInterruptDisabled[0] == true && digitalState(encoderPinA[0]) != LOW) {
+    lastRotaryBounce = millis();
+    attachInterrupt(digitalPinToInterrupt(encoderPinA[0]), rotEncoder1, LOW);
+    isInterruptDisabled[0] = false;
+  } 
+
+  if (isInterruptDisabled[1] == true && digitalState(encoderPinA[1]) != LOW) {
+    lastRotaryBounce = millis();
+    attachInterrupt(digitalPinToInterrupt(encoderPinA[1]), rotEncoder2, LOW);
+    isInterruptDisabled[1] = false;
+  }
+}
+
 void loop() {  
-//if(false){
-  //Serial.print("freeMemory()=");
-  //Serial.println(freeMemory());
   //haven't received Syn Ack from IDash for too long
-  if(millis() - lastTimeReceivedByte > 1000 /*|| !isConnected*/) {
+  if(millis() - lastTimeReceivedByte > 1000) {
     resetTM1637_MAX7221();
     resetWS2812B();  
-    //testWS2812B();
-    //isConnected = false;  
-    //isDebugMode = false;  
+    //testWS2812B();  
     debugMode = 0;  
     //sendHandshacking();   
     delay(50);
@@ -725,15 +732,5 @@ void loop() {
   
   sendButtonStatus(CMD_INIT); 
 
-  if (isInterruptDisabled[0] == true && millis() - lastRotaryBounce > 100) {
-    lastRotaryBounce = millis();
-    attachInterrupt(digitalPinToInterrupt(encoderPinA[0]), rotEncoder1, LOW);
-    isInterruptDisabled[0] = false;
-  } 
-
-  if (isInterruptDisabled[1] == true && millis() - lastRotaryBounce > 100) {
-    lastRotaryBounce = millis();
-    attachInterrupt(digitalPinToInterrupt(encoderPinA[1]), rotEncoder2, LOW);
-    isInterruptDisabled[1] = false;
-  }
+  reAttachInterrupts();
 }
