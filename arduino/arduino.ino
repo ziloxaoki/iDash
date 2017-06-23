@@ -165,7 +165,7 @@ int BUTTON_LIMITS[8][4][2] = {{{575, 900}, {-1, -1}, {-1, -1}, {-1, -1}},       
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
 
-int RESET_BUTTOM_LIMITS[] = {850, 870};  //mapped to pin 18
+int RESET_BUTTOM_LIMITS[] = {850, 870};
 
 int AXIS[4] = {14, 15, 16, 17};  //A0, A1, A2, A3
 int AXIS_LIMITS[4][2] = {{-1, 100}, {-1, 100}, {-1, 100}, {-1, 100}};
@@ -199,6 +199,7 @@ long lastTimeReceivedByte = 0;
 //bool isConnected = false;
 int debugMode = 0;
 const byte INVALID_COMMAND_HEADER = 0xEF;
+bool isInterruptDisabled[] = {false,false};
 //long lastMessageSent = 0;
 
 int asize(byte* b) {
@@ -371,49 +372,33 @@ void arduinoReset() // Restarts program from beginning but does not reset the pe
 void(* resetFunc) (void) = 0;
 
 void rotEncoder1(){
-  //cli(); //stop interrupts happening before we read pin values  
+  detachInterrupt(digitalPinToInterrupt(encoderPinA[0]));
+  isInterruptDisabled[0] = true;
   int pinOffset = 0;
   if(millis() - lastRotaryBounce > 10) {
     int pinB = digitalState(encoderPinB[pinOffset]);
-
-    //anti bounce incorrect reading. First reading is lost but prevent incorrect reading.
-    //if (isValidSignal(pinB, pinOffset)) {  
-      if(pinB == HIGH) {    
-        encoderPos[pinOffset]++;  
-//        Serial.println("Anticlockwise");
-//        Serial.flush();
-      } else{
-        encoderPos[pinOffset]--;
-//        Serial.println("Clockwise");
-//        Serial.flush();
-      }
-    //}
+    if(pinB == HIGH) {    
+      encoderPos[pinOffset]++;  
+    } else{
+      encoderPos[pinOffset]--;
+    }
   }  
   lastRotaryBounce = millis();
-  //sei(); //restart interrupts
 }
 
 void rotEncoder2(){
-  //cli(); //stop interrupts happening before we read pin values  
+  detachInterrupt(digitalPinToInterrupt(encoderPinA[1]));
+  isInterruptDisabled[1] = true;
   int pinOffset = 1;
   if(millis() - lastRotaryBounce > 10) {
     int pinB = digitalState(encoderPinB[pinOffset]);
-
-    //anti bounce incorrect reading. First reading is lost but prevent incorrect reading.
-    //if (isValidSignal(pinB, pinOffset)) {  
-      if(pinB == HIGH) {    
-        encoderPos[pinOffset]++;  
-        //Serial.println("Clockwise");
-        //Serial.flush();
-      } else{
-        encoderPos[pinOffset]--;
-        //Serial.println("Anticlockwise");
-        //Serial.flush();
-      }
-    //}
+    if(pinB == HIGH) {    
+      encoderPos[pinOffset]++;  
+    } else{
+      encoderPos[pinOffset]--;
+    }
   }  
   lastRotaryBounce = millis();
-  //sei(); //restart interrupts
 }
 
 
@@ -529,12 +514,6 @@ int sendAnalogState2(int offset, byte *response) {
 }
 
 int sendButtonState(int offset, byte *response) {  
-
-  /*if(digitalState(BUTTON_PINS[0]) == LOW && digitalState(BUTTON_PINS[1]) == LOW) {
-    resetFunc();
-    return;
-  }*/
-  
   for (int i = 0; i < ENABLED_BUTTONS_COUNT; i++) {      
     response[offset++] = digitalState(BUTTON_PINS[i]) == HIGH ? 0 : 1;
   }   
@@ -744,12 +723,17 @@ void loop() {
     sendButtonVoltage(CMD_INIT);
   }
   
-  //if(isConnected) {
-    sendButtonStatus(CMD_INIT); 
-  //delay(500);
-  //}  
-//}
-//byte response[100];
-//  int offset = 0;
-//sendAnalogState(offset,response);
+  sendButtonStatus(CMD_INIT); 
+
+  if (isInterruptDisabled[0] == true && millis() - lastRotaryBounce > 100) {
+    lastRotaryBounce = millis();
+    attachInterrupt(digitalPinToInterrupt(encoderPinA[0]), rotEncoder1, LOW);
+    isInterruptDisabled[0] = false;
+  } 
+
+  if (isInterruptDisabled[1] == true && millis() - lastRotaryBounce > 100) {
+    lastRotaryBounce = millis();
+    attachInterrupt(digitalPinToInterrupt(encoderPinA[1]), rotEncoder2, LOW);
+    isInterruptDisabled[1] = false;
+  }
 }
