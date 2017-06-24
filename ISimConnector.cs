@@ -8,7 +8,6 @@ namespace iDash
 {
     public abstract class ISimConnector : IDisposable
     {
-        private bool blink = false;
         public delegate void StatusMessageHandler(string m);
         public StatusMessageHandler StatusMessageSubscribers;
 
@@ -24,7 +23,8 @@ namespace iDash
 
         protected void sendRPMShiftMsg(float currentRpm, float firstRpm, float lastRpm, int flag)
         {
-            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }; //black
+            //black, last byte indicate state - 0 = no blink, 1 = blink
+            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; 
             byte[] pattern = null;
 
             switch (flag) {
@@ -43,40 +43,42 @@ namespace iDash
             }
 
             float rpmPerLed = (lastRpm - firstRpm) / LED_NUM_TOTAL; //rpm range per led                
-            int milSec = DateTime.Now.Millisecond;
+           
             Command rgbShift = null;
             if (rpmPerLed > 0)
             {
                 if (currentRpm >= firstRpm)
-                {                    
+                {
+                    int numActiveLeds = (int)(Math.Ceiling((currentRpm - firstRpm) / rpmPerLed)) + 1;
+
+                    if (numActiveLeds > LED_NUM_TOTAL)
+                        numActiveLeds = LED_NUM_TOTAL;
+                    Array.Copy(pattern, 0, rpmLed, 0, numActiveLeds * 3); //each led colour has 3 bytes
+                             
                     if (currentRpm < lastRpm)
                     {
-                        int numActiveLeds = (int)(Math.Ceiling((currentRpm - firstRpm) / rpmPerLed)) + 1;
-
-                        if (numActiveLeds > LED_NUM_TOTAL)
-                            numActiveLeds = LED_NUM_TOTAL;
-                        Array.Copy(pattern, 0, rpmLed, 0, numActiveLeds * 3); //each led colour has 3 bytes
-
-                        rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
+                        rpmLed[rpmLed.Length - 1] = 0;
                     }
                     else //blink
                     {
-                        if (blink = !blink)                        
-                        {
-                            rgbShift = new Command(Command.CMD_RGB_SHIFT, Constants.blackRGB);
-                        }
-                        else
-                        {
-                            rgbShift = new Command(Command.CMD_RGB_SHIFT, pattern);
-                        }
-                    }
+                        rpmLed[rpmLed.Length - 1] = 1;
+                    }                    
                 }
                 else
                 {
-                    //clear shift lights
-                    rgbShift = new Command(Command.CMD_RGB_SHIFT, Constants.blackRGB);
+                    if (flag > 0)
+                    {
+                        Array.Copy(pattern, 0, rpmLed, 0, pattern.Length);
+                    }
+                    else
+                    {
+                        //clear shift lights
+                        Array.Copy(Constants.blackRGB, 0, rpmLed, 0, Constants.blackRGB.Length);                        
+                    }
                 }
-
+                
+                //Array.Copy(pattern, 0, rpmLed, 0, pattern.Length);
+                rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
                 sm.sendCommand(rgbShift, false);
             }
         }

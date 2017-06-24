@@ -186,7 +186,7 @@ namespace iDash
             }
             firstRpm = FIRST_RPM * lastRpm;
             //calibrate shift gear light rpm
-            lastRpm *= 0.97f;
+            lastRpm *= 0.95f;
             si = e.StaticInfo;
 
             flag = (int)gr.Flag;

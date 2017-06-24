@@ -131,6 +131,10 @@ int WS2812B_RGBLEDCOUNT = 16;
 int WS2812B_RIGHTTOLEFT = 1; 
 // WS2812b chained RGBLEDS pins
 #define WS2812B_DATAPIN 12
+unsigned long lastBlinkTime = 0;
+bool isLedBlack = true;
+bool isBlinking = false;
+byte ledBuffer[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 Adafruit_NeoPixel WS2812B_strip = Adafruit_NeoPixel(WS2812B_RGBLEDCOUNT, WS2812B_DATAPIN, NEO_GRB + NEO_KHZ800);
 
@@ -258,33 +262,61 @@ void sendToTM1637_MAX7221(byte *buffer) {
 #endif
 
 void resetWS2812B() {
-  byte v[] = {' ',' ',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; 
-  sendToWS2812B(v);
+  byte v[] = {' ',' ',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  updateLedBuffer(v);
 }
 
 void testWS2812B() {
-  byte v[] = {CMD_INIT,CMD_RGB_SHIFT, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
-  sendToWS2812B(v);
+  byte v[] = {' ', ' ', 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1};
+  updateLedBuffer(v);
 }
 
-void sendToWS2812B(byte *buffer) {
+void updateLedBuffer(byte *buffer) {
   //first char(0) is the command start and second char is the command header 
   uint8_t k = 2;
+  uint8_t l = 0;
+  //last byte indicates blink mode, 0 = no blink and 1 = blink
+  isBlinking = buffer[(WS2812B_RGBLEDCOUNT * 3) + k] == 1;  
+    
   for (uint8_t j = 0; j < WS2812B_RGBLEDCOUNT; j++) {
-    uint8_t r = buffer[k++];    
-    uint8_t g = buffer[k++];
-    uint8_t b = buffer[k++];
-    if (WS2812B_RIGHTTOLEFT == 1) {
-      WS2812B_strip.setPixelColor(WS2812B_RGBLEDCOUNT - j - 1, r, g, b);
-    }
-    else {
-      WS2812B_strip.setPixelColor(j, r, g, b);
+    ledBuffer[l++] = buffer[k++];    
+    ledBuffer[l++] = buffer[k++];
+    ledBuffer[l++] = buffer[k++];
+  }  
+}
+
+void sendToWS2812B() {
+  uint8_t k = 0;
+
+  if(isBlinking) {
+    if(millis() - lastBlinkTime > 100) {
+      isLedBlack = !isLedBlack;
+      lastBlinkTime = millis();
     }
   }
   
+  for (uint8_t j = 0; j < WS2812B_RGBLEDCOUNT; j++) {
+
+    uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
+
+    if(!isBlinking || isLedBlack) {
+      r = ledBuffer[k++];    
+      g = ledBuffer[k++];
+      b = ledBuffer[k++];
+    } 
+    
+    if (WS2812B_RIGHTTOLEFT == 1) {
+      WS2812B_strip.setPixelColor(WS2812B_RGBLEDCOUNT - j - 1, r, g, b);
+    } else {
+      WS2812B_strip.setPixelColor(j, r, g, b);
+    }
+  }  
+  
   if (WS2812B_RGBLEDCOUNT > 0) {
     WS2812B_strip.show();
-  }
+  }  
 }
 
 void setup()
@@ -551,7 +583,7 @@ void processCommand(byte *buffer, int commandLength) {
 #endif
 
     case CMD_RGB_SHIFT :
-      sendToWS2812B(buffer);      
+      updateLedBuffer(buffer);      
       break;
   }  
 
@@ -727,6 +759,7 @@ void loop() {
   }
   
   sendButtonStatus(CMD_INIT); 
+  sendToWS2812B();
 
   reAttachInterrupts();
 }
