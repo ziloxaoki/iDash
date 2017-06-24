@@ -58,7 +58,10 @@ namespace iDash
                                 int flag = wrapper.data.vehicle[0].inPits > 0 ? 9 : 0;
 
                                 sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                                send7SegmentMsg();
+                                if (sm.arduinoHas7Seg == Utils.DASH)
+                                {
+                                    send7SegmentMsg();
+                                }
 
                                 if (!isConnected)
                                 {

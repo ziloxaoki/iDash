@@ -20,6 +20,7 @@ namespace iDash
         private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
         private const int WAIT_FOR_ARDUINO_DATA = ARDUINO_TIMED_OUT/5;
+        public int arduinoHas7Seg = 0;
 
         //arduino command length
         private int commandLength;        
@@ -94,7 +95,10 @@ namespace iDash
                 this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLedBlack), false);
             }
 
-            this.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+            if (arduinoHas7Seg == Utils.DASH)
+            {
+                this.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+            }
         }    
 
         private async void tryToConnect()
@@ -234,6 +238,7 @@ namespace iDash
                 {
                     //ACK message sent by Arduino
                     case Command.CMD_SYN:
+                        arduinoHas7Seg = command.getData()[1];
                         break;
                     //Arduino response to the set debug mode command
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:

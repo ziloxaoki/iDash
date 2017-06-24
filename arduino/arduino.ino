@@ -1,10 +1,17 @@
+#define INCLUDE_LED
+#define TYPE 0; //0 = Dash, 1 = Button Box
+
 #include <avr/pgmspace.h>
 #include <EEPROM.h>
 #include <SPI.h>
 #include "Arduino.h"
 #include <avr/pgmspace.h>
+
+#ifdef INCLUDE_LED
 #include "LedControl.h"
 #include <TM1637Display.h>
+#endif
+
 #include <Adafruit_NeoPixel.h>
 #include <MemoryFree.h>
 
@@ -34,7 +41,7 @@
 //
 // -------------------------------------------------------------------------------------------------------
 
-
+#ifdef INCLUDE_LED
 // Number of Connected TM1637 modules
 // 0 disabled, > 0 enabled
 int TM1637_ENABLEDMODULES = 1;
@@ -82,6 +89,7 @@ int MAX7221_ENABLEDMODULES = 2;
 #define MAX7221_LOAD 10
 LedControl MAX7221 = LedControl(MAX7221_DATA, MAX7221_CLK, MAX7221_LOAD, MAX7221_ENABLEDMODULES);
 
+#endif
 /*
 struct ScreenItem {
 public:
@@ -169,8 +177,6 @@ int RESET_BUTTOM_LIMITS[] = {850, 870};
 
 int AXIS[4] = {14, 15, 16, 17};  //A0, A1, A2, A3
 int AXIS_LIMITS[4][2] = {{-1, 100}, {-1, 100}, {-1, 100}, {-1, 100}};
-                              
-int GROUND_ANALOG_PIN = 15; //A1                                
 
 int extra_button_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int extra_button_last_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   // the previous reading from the input pin               
@@ -189,8 +195,8 @@ const int encoderPinB[] = {4,5};
 
 volatile int encoderPos[] = {15000, 15000};
 volatile int orientation[] = {0, 0};
-int lastPos[] = {15000, 15000};
-byte lastState[] = {0, 0};
+int lastRotaryPos[] = {15000, 15000};
+byte lastRotaryState[] = {0, 0};
 long lastRotaryStateChange = 0;
 
 volatile long lastRotaryBounce = 0;
@@ -199,41 +205,6 @@ long lastTimeReceivedByte = 0;
 int debugMode = 0;
 const byte INVALID_COMMAND_HEADER = 0xEF;
 bool isInterruptDisabled[] = {false,false};
-//long lastMessageSent = 0;
-
-int asize(byte* b) {
-  return sizeof(b) / sizeof(byte);
-}
-
-int acopy(byte* orig, byte* dest, int length) {
-  for(int x = 0; x < length; x++) {
-    dest[x] = orig[x];
-  }
-}
-
-
-byte MAX7221_ByteReorder(byte x)
-{
-  x = ((x >> 1) & 0x55) | ((x << 1) & 0xaa);
-  x = ((x >> 2) & 0x33) | ((x << 2) & 0xcc);
-  x = ((x >> 4) & 0x0f) | ((x << 4) & 0xf0);
-  return (x >> 1) | ((x & 1) << 7);
-}
-
-void resetTM1637_MAX7221() {
-  byte v[] = {' ',' ',0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111};
-  sendToTM1637_MAX7221(v);
-}
-
-void resetWS2812B() {
-  byte v[] = {' ',' ',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; 
-  sendToWS2812B(v);
-}
-
-void testWS2812B() {
-  byte v[] = {CMD_INIT,CMD_RGB_SHIFT, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
-  sendToWS2812B(v);
-}
 
 void convertHexToString(int offset, byte *buffer) {
   int i = 0;
@@ -245,6 +216,20 @@ void convertHexToString(int offset, byte *buffer) {
   }   
  
   Serial.println('*'); 
+}
+
+#ifdef INCLUDE_LED
+byte MAX7221_ByteReorder(byte x)
+{
+  x = ((x >> 1) & 0x55) | ((x << 1) & 0xaa);
+  x = ((x >> 2) & 0x33) | ((x << 2) & 0xcc);
+  x = ((x >> 4) & 0x0f) | ((x << 4) & 0xf0);
+  return (x >> 1) | ((x & 1) << 7);
+}
+
+void resetTM1637_MAX7221() {
+  byte v[] = {' ',' ',0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111};
+  sendToTM1637_MAX7221(v);
 }
 
 void sendToTM1637_MAX7221(byte *buffer) {
@@ -269,6 +254,17 @@ void sendToTM1637_MAX7221(byte *buffer) {
       }
     }
   }
+}
+#endif
+
+void resetWS2812B() {
+  byte v[] = {' ',' ',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; 
+  sendToWS2812B(v);
+}
+
+void testWS2812B() {
+  byte v[] = {CMD_INIT,CMD_RGB_SHIFT, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
+  sendToWS2812B(v);
 }
 
 void sendToWS2812B(byte *buffer) {
@@ -296,26 +292,26 @@ void setup()
   //Serial.begin(19200);
   Serial.begin(38400);
   // TM1637 INIT
+#ifdef INCLUDE_LED  
   for (int i = 0; i < TM1637_ENABLEDMODULES; i++) {
     //TM1637_screens[i]->init();
     TM1637_screens[i]->setBrightness(0x0f);
     //TM1637_screens[i]->clearDisplay();
   }
-
   
-  // WS2812B INIT
-  if (WS2812B_RGBLEDCOUNT > 0) {
-    WS2812B_strip.setBrightness(16);
-    WS2812B_strip.begin();    
-    WS2812B_strip.show();
-  }
-
-
   // MAX7221 7SEG INIT
   for (int i = 0; i < MAX7221_ENABLEDMODULES; i++) {
     MAX7221.shutdown(i, false);
     MAX7221.setIntensity(i, 15);
     MAX7221.clearDisplay(i);
+  }
+#endif  
+
+  // WS2812B INIT
+  if (WS2812B_RGBLEDCOUNT > 0) {
+    WS2812B_strip.setBrightness(16);
+    WS2812B_strip.begin();    
+    WS2812B_strip.show();
   }
 
   // EXTERNAL BUTTONS INIT
@@ -405,24 +401,24 @@ int sendRotaryState(int offset, byte *response) {
   for(int i = 0; i < TOTAL_ROTARY; i++) {                  
 
     if(millis() - lastRotaryStateChange > 50) {  
-      if(encoderPos[i] != lastPos[i]) {      
-        if(lastPos[i] < encoderPos[i]) {  
+      if(encoderPos[i] != lastRotaryPos[i]) {      
+        if(lastRotaryPos[i] < encoderPos[i]) {  
           //turn left
-          lastState[i] = 1;    
+          lastRotaryState[i] = 1;    
         } else {     
           //turn right          
-          lastState[i] = 2;       
+          lastRotaryState[i] = 2;       
         }
-        lastPos[i] = encoderPos[i];        
+        lastRotaryPos[i] = encoderPos[i];        
 
         lastRotaryStateChange = millis();
       } else {
         //not pressed
-        lastState[i] = 0;     
+        lastRotaryState[i] = 0;     
       }  
     }
 
-    switch(lastState[i]) {
+    switch(lastRotaryState[i]) {
       case 0:
         response[offset++] = 0;
         response[offset++] = 0; 
@@ -453,12 +449,7 @@ int sendAnalogState(int offset, byte *response) {
     if((reading > RESET_BUTTOM_LIMITS[0]) && (reading < RESET_BUTTOM_LIMITS[1])){
       resetFunc();
       return;
-    }
-
-//Serial.print(i);
-//Serial.print("=");
-//Serial.println(reading);
-//delay(500);    
+    }   
 
     for(int x = 0; x < MAXIMUM_BUTTONS_PER_ANALOG; x++) {
       int tmpButtonState = LOW;             // the current reading from the input pin
@@ -552,10 +543,12 @@ void processCommand(byte *buffer, int commandLength) {
     case CMD_SYN_ACK : 
       sendHandshacking();  
       break;
-
+      
+#ifdef INCLUDE_LED  
     case CMD_7_SEGS :    
       sendToTM1637_MAX7221(buffer);      
       break;
+#endif
 
     case CMD_RGB_SHIFT :
       sendToWS2812B(buffer);      
@@ -651,6 +644,7 @@ void sendHandshacking() {
   //handshaking
   response[offset++] = CMD_INIT;
   response[offset++] = CMD_SYN;
+  response[offset++] = TYPE;
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
   
@@ -716,7 +710,9 @@ void reAttachInterrupts() {
 void loop() {  
   //haven't received Syn Ack from IDash for too long
   if(millis() - lastTimeReceivedByte > 1000) {
+#ifdef INCLUDE_LED      
     resetTM1637_MAX7221();
+#endif    
     resetWS2812B();  
     //testWS2812B();  
     debugMode = 0;  

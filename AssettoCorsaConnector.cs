@@ -59,7 +59,10 @@ namespace iDash
                     isConnected = true;
 
                     sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                    send7SegmentMsg();
+                    if (sm.arduinoHas7Seg == Utils.DASH)
+                    {
+                        send7SegmentMsg();
+                    }
                 }
                 else
                 {
@@ -70,7 +73,10 @@ namespace iDash
                     }
 
                     isConnected = false;
-                    sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);                    
+                    if (sm.arduinoHas7Seg == Utils.DASH)
+                    {
+                        sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                    }
                 }
 
                 await Task.Delay(Constants.SharedMemoryReadRate);

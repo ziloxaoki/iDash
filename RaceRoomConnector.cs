@@ -21,7 +21,6 @@ namespace iDash
         }
 
         private MemoryMappedFile _file;
-        private MemoryMappedViewAccessor _view;
 
         private Shared data;
         private byte[] buffer;
@@ -65,7 +64,10 @@ namespace iDash
                                 buffer = new Byte[Marshal.SizeOf(typeof(Shared))];
                         }
 
-                        sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        if (sm.arduinoHas7Seg == Utils.DASH)
+                        {
+                            sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        }
                     }
                     else
                     {
@@ -100,11 +102,17 @@ namespace iDash
                                 }
 
                                 sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                                send7SegmentMsg();
+                                if (sm.arduinoHas7Seg == Utils.DASH)
+                                {
+                                    send7SegmentMsg();
+                                }
                             }
                             else
                             {
-                                sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                                if (sm.arduinoHas7Seg == Utils.DASH)
+                                {
+                                    sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                                }
                             }
                         }
                     }
@@ -246,8 +254,6 @@ namespace iDash
             {
                 if (disposing)
                 {
-                    if (_view != null)
-                        _view.Dispose();
                     if (_file != null)
                         _file.Dispose();
                 }

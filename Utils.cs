@@ -12,7 +12,9 @@ namespace iDash
     public class Utils
     {
         [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern short VkKeyScan(char ch);        
+        private static extern short VkKeyScan(char ch);
+        public const byte DASH = 0;
+        public const byte BUTTON_BOX = 1;      
 
         public const byte TM1637_COLON_BIT = 128;
         //public const byte TM1637_CHAR_SPACE = 0;

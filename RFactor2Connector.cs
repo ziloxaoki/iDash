@@ -95,7 +95,10 @@ namespace iDash
                             flag = currrF2State.mSpeedLimiter > 0 ? 9 : flag;
 
                             sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                            send7SegmentMsg();
+                            if (sm.arduinoHas7Seg == Utils.DASH)
+                            {                                
+                                send7SegmentMsg();
+                            }
                         }
                     }
                 }
@@ -111,7 +114,10 @@ namespace iDash
                     checkRFactor2Running();
                     isConnected = false;
                     disableNotification = false;
-                    sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                    if (sm.arduinoHas7Seg == Utils.DASH)
+                    {
+                        sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                    }
                 }
                 
                 await Task.Delay(Constants.SharedMemoryReadRate);
