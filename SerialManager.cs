@@ -73,29 +73,22 @@ namespace iDash
             return !Utils.hasTimedOut(lastArduinoResponse, ARDUINO_TIMED_OUT);
         }
 
-        private void sendTestMsg(bool blink)
+        private void sendDefaultMsg()
         {
-            byte[] rpmLedBlack = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            byte[] rpmLedBlack = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Constants.LED_BLINK };
 
             int milSec = DateTime.Now.Millisecond;
 
             if (isTestMode)
             {
-                if(blink)
-                {
-                    this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLedBlack), false);
-                }
-                else
-                {
-                    this.sendCommand(new Command(Command.CMD_RGB_SHIFT, Constants.colourPattern), false);
-                }
+                this.sendCommand(new Command(Command.CMD_RGB_SHIFT, Constants.colourPattern), false);
             }
             else
             {
                 this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLedBlack), false);
             }
 
-            if (arduinoHas7Seg == Utils.DASH)
+            if (arduinoHas7Seg == Constants.DASH)
             {
                 this.sendCommand(Utils.getDisconnectedMsgCmd(), false);
             }
@@ -104,7 +97,6 @@ namespace iDash
         private async void tryToConnect()
         {
             HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            bool blink = false;
 
             while (!MainForm.stopThreads)
             {
@@ -115,7 +107,9 @@ namespace iDash
                 if (isArduinoAlive())
                 {
                     if (isSimulatorDisconnected)
-                        sendTestMsg(blink = !blink);
+                    {
+                        sendDefaultMsg();
+                    }
 
                     await Task.Delay(WAIT_FOR_ARDUINO_DATA);                    
                 }
@@ -151,6 +145,7 @@ namespace iDash
                         }
                         catch(Exception e)
                         {
+                            Logger.LogExceptionToFile(e);
                             /*if (!notificationSent.Contains(port))
                             {
                                 MessageBox.Show(String.Format("Port {0} already in use", port),

@@ -53,13 +53,14 @@ namespace iDash
                     if (!isConnected)
                     {
                         string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to Assetto Corsa.";
+                        Logger.LogMessageToFile("Connected to Assetto Corsa" , true);
                         NotifyStatusMessage(s);
                     }
 
                     isConnected = true;
 
                     sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                    if (sm.arduinoHas7Seg == Utils.DASH)
+                    if (sm.arduinoHas7Seg == Constants.DASH)
                     {
                         send7SegmentMsg();
                     }
@@ -73,7 +74,7 @@ namespace iDash
                     }
 
                     isConnected = false;
-                    if (sm.arduinoHas7Seg == Utils.DASH)
+                    if (sm.arduinoHas7Seg == Constants.DASH)
                     {
                         sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                     }

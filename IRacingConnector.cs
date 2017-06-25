@@ -55,12 +55,13 @@ namespace iDash
                     if (!isConnected)
                     {
                         string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to iRacing.";
+                        Logger.LogMessageToFile("Connected to iRacing", true);
                         NotifyStatusMessage(s);
                     }
                     isConnected = true;
 
                     sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                    if (sm.arduinoHas7Seg == Utils.DASH)
+                    if (sm.arduinoHas7Seg == Constants.DASH)
                     {
                         send7SegmentMsg();
                     }
@@ -68,7 +69,7 @@ namespace iDash
                 else
                 {
                     isConnected = false;
-                    if (sm.arduinoHas7Seg == Utils.DASH)
+                    if (sm.arduinoHas7Seg == Constants.DASH)
                     {
                         sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                     }

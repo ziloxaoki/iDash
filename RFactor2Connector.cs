@@ -64,6 +64,7 @@ namespace iDash
                         if (!disableNotification)
                         {
                             string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to RFactor2.";
+                            Logger.LogMessageToFile("Connected to RFactor2", true);
                             NotifyStatusMessage(s);
                             disableNotification = true;
                         }
@@ -95,7 +96,7 @@ namespace iDash
                             flag = currrF2State.mSpeedLimiter > 0 ? 9 : flag;
 
                             sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                            if (sm.arduinoHas7Seg == Utils.DASH)
+                            if (sm.arduinoHas7Seg == Constants.DASH)
                             {                                
                                 send7SegmentMsg();
                             }
@@ -114,7 +115,7 @@ namespace iDash
                     checkRFactor2Running();
                     isConnected = false;
                     disableNotification = false;
-                    if (sm.arduinoHas7Seg == Utils.DASH)
+                    if (sm.arduinoHas7Seg == Constants.DASH)
                     {
                         sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                     }

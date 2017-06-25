@@ -8,14 +8,19 @@ namespace iDash
 {
     class Constants
     {
-        public static int IRacing = 0;
-        public static int Raceroom = 1;
-        public static int Assetto = 2;
-        public static int RFactor = 3;
-        public static int RFactor2 = 4;
-        public static int None = 5;
+        public const byte DASH = 0;
+        public const byte BUTTON_BOX = 1;
+        public const byte LED_NO_BLINK = 0;
+        public const byte LED_BLINK = 1;
 
-        public static int SharedMemoryReadRate = 10;
+        public const int IRacing = 0;
+        public const int Raceroom = 1;
+        public const int Assetto = 2;
+        public const int RFactor = 3;
+        public const int RFactor2 = 4;
+        public const int None = 5;
+
+        public const int SharedMemoryReadRate = 10;
 
         public const char LIST_SEPARATOR = ',';
         public const char ITEM_SEPARATOR = ';';

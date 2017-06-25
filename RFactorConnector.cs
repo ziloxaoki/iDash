@@ -58,7 +58,7 @@ namespace iDash
                                 int flag = wrapper.data.vehicle[0].inPits > 0 ? 9 : 0;
 
                                 sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                                if (sm.arduinoHas7Seg == Utils.DASH)
+                                if (sm.arduinoHas7Seg == Constants.DASH)
                                 {
                                     send7SegmentMsg();
                                 }
@@ -66,6 +66,7 @@ namespace iDash
                                 if (!isConnected)
                                 {
                                     string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to Automobilista.";
+                                    Logger.LogMessageToFile("Connected to Automobilista", true);
                                     NotifyStatusMessage(s);
                                     isConnected = true;
                                 }

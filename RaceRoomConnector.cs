@@ -64,7 +64,7 @@ namespace iDash
                                 buffer = new Byte[Marshal.SizeOf(typeof(Shared))];
                         }
 
-                        if (sm.arduinoHas7Seg == Utils.DASH)
+                        if (sm.arduinoHas7Seg == Constants.DASH)
                         {
                             sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                         }
@@ -102,14 +102,14 @@ namespace iDash
                                 }
 
                                 sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                                if (sm.arduinoHas7Seg == Utils.DASH)
+                                if (sm.arduinoHas7Seg == Constants.DASH)
                                 {
                                     send7SegmentMsg();
                                 }
                             }
                             else
                             {
-                                if (sm.arduinoHas7Seg == Utils.DASH)
+                                if (sm.arduinoHas7Seg == Constants.DASH)
                                 {
                                     sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                                 }
@@ -123,6 +123,7 @@ namespace iDash
                     if(isConnected)
                     {
                         string s = DateTime.Now.ToString("hh:mm:ss") + ": RaceRoom closed.";
+                        Logger.LogMessageToFile("Connected to RaceRoom", true);
                         NotifyStatusMessage(s);
                         isConnected = false;
                     }
