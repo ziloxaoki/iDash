@@ -52,7 +52,9 @@ namespace iDash
                     int numActiveLeds = (int)(Math.Ceiling((currentRpm - firstRpm) / rpmPerLed)) + 1;
 
                     if (numActiveLeds > LED_NUM_TOTAL)
+                    {
                         numActiveLeds = LED_NUM_TOTAL;
+                    }
                     Array.Copy(pattern, 0, rpmLed, 0, numActiveLeds * 3); //each led colour has 3 bytes
                              
                     if (currentRpm < lastRpm)
@@ -69,6 +71,7 @@ namespace iDash
                     if (flag > 0)
                     {
                         Array.Copy(pattern, 0, rpmLed, 0, pattern.Length);
+                        rpmLed[rpmLed.Length - 1] = Constants.LED_BLINK;
                         Utils.resetArray(0, 8, rpmLed);
                         Utils.resetArray(rpmLed.Length - 10, rpmLed.Length - 2, rpmLed);
                     }
