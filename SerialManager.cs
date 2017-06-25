@@ -75,18 +75,17 @@ namespace iDash
 
         private void sendDefaultMsg()
         {
-            byte[] rpmLedBlack = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Constants.LED_BLINK };
+            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Constants.LED_NO_BLINK };
 
             int milSec = DateTime.Now.Millisecond;
 
             if (isTestMode)
             {
-                this.sendCommand(new Command(Command.CMD_RGB_SHIFT, Constants.colourPattern), false);
+                Array.Copy(Constants.colourPattern, 0, rpmLed, 0, Constants.colourPattern.Length);
+                rpmLed[rpmLed.Length - 1] = Constants.LED_BLINK;
             }
-            else
-            {
-                this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLedBlack), false);
-            }
+
+            this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLed), false);
 
             if (arduinoHas7Seg == Constants.DASH)
             {

@@ -24,7 +24,7 @@ namespace iDash
         protected void sendRPMShiftMsg(float currentRpm, float firstRpm, float lastRpm, int flag)
         {
             //black, last byte indicate state - 0 = no blink, 1 = blink
-            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }; 
+            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Constants.LED_BLINK }; 
             byte[] pattern = null;
 
             switch (flag) {
@@ -57,11 +57,11 @@ namespace iDash
                              
                     if (currentRpm < lastRpm)
                     {
-                        rpmLed[rpmLed.Length - 1] = 0;
+                        rpmLed[rpmLed.Length - 1] = Constants.LED_NO_BLINK;
                     }
                     else //blink
                     {
-                        rpmLed[rpmLed.Length - 1] = 1;
+                        rpmLed[rpmLed.Length - 1] = Constants.LED_BLINK;
                     }                    
                 }
                 else
