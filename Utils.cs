@@ -348,6 +348,14 @@ namespace iDash
             }
         }
 
+        public static void resetArray(int start, int end, byte[] array)
+        {
+            for (int i = start; i <= end; i++)
+            {
+                array[i] = 0;
+            }
+        }
+
         public static T[] getSubArray<T>(T[] array, int from, int length)
         {
             T[] result = new T[length];
