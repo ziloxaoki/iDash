@@ -518,8 +518,8 @@ namespace iDash
 
     public enum DebugMode
     {
-        None, //0
-        Default, //1
-        Verbose //2
+        None = 0,
+        Default = 1,
+        Verbose = 2
     }
 }

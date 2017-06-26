@@ -62,12 +62,12 @@ namespace iDash
 
         public MainForm()
         {
-            Logger.LogMessageToFile("Initializing IDash.", true);
+            Logger.LogMessageToFile("Initializing IDash.", true);            
             try {
                 this.appendToStatusBar = new AppendToStatusBarDelegate(UpdateStatusBar);
                 this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
                 //Action Handlers have a pointer to Form, so they can only be initialized after the form.
-                InitializeComponent();
+                InitializeComponent();                
 
                 this.Shown += new System.EventHandler(FormLoadComplete);
 
@@ -94,6 +94,7 @@ namespace iDash
                 vf.InitializeJoystick();
                 
                 AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory + "\n");
+                this.debugModes.DataSource = Enum.GetValues(typeof(iDash.DebugMode)); //fix for designer. Cannot declare it in MainForm.Designer
             }
             catch (Exception e)
             {
