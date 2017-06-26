@@ -94,7 +94,7 @@ namespace iDash
                                         flag = (int)Constants.FLAG_TYPE.YELLOW_FLAG;
                                     }
 
-                                    flag = data.InPitlane > 0 ? 9 : flag;
+                                    flag = data.InPitlane > 0 ? (int)Constants.FLAG_TYPE.IN_PIT_FLAG : flag;
                                 }
                                 catch (Exception)
                                 {

@@ -194,7 +194,7 @@ namespace iDash
 
             if (ph.PitLimiterOn > 0)
             {
-                flag = 9;
+                flag = (int)Constants.FLAG_TYPE.IN_PIT_FLAG;
             }                       
         }
 

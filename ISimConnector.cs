@@ -24,22 +24,22 @@ namespace iDash
         protected void sendRPMShiftMsg(float currentRpm, float firstRpm, float lastRpm, int flag)
         {
             //black, last byte indicate state - 0 = no blink, 1 = blink
-            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Constants.LED_NO_BLINK }; 
-            byte[] pattern = null;
+            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Constants.LED_NO_BLINK };
+            byte[] pattern = new byte[rpmLed.Length - 1];
 
-            switch (flag) {
-                case (int)Constants.FLAG_TYPE.YELLOW_FLAG:
-                    pattern = Constants.yellowRGB;
-                    break;
-                case (int)Constants.FLAG_TYPE.BLUE_FLAG:
-                    pattern = Constants.blueRGB;
-                    break;
-                case (int)Constants.FLAG_TYPE.INPIT_FLAG: 
-                    pattern = Constants.whiteRGB;
-                    break;
-                default:
-                    pattern = Constants.colourPattern;
-                    break;
+            Array.Copy(Constants.rpmPattern, 0, pattern, 0, pattern.Length);
+            int ledOffset = 0;
+
+            if ((flag & (int)Constants.FLAG_TYPE.YELLOW_FLAG) != 0) {
+                Array.Copy(Constants.yellowRGB, 0, pattern, ledOffset, pattern.Length);
+                ledOffset++;
+            }
+            if ((flag & (int)Constants.FLAG_TYPE.BLUE_FLAG) != 0) {
+                Array.Copy(Constants.blueRGB, 0, pattern, ledOffset, pattern.Length - (2 * ledOffset));
+                ledOffset++;
+            }
+            if (((flag & (int)Constants.FLAG_TYPE.IN_PIT_FLAG) != 0) || ((flag & (int)Constants.FLAG_TYPE.SPEED_LIMITER) != 0)) {
+                Array.Copy(Constants.whiteRGB, 0, pattern, ledOffset, pattern.Length - (2 * ledOffset));
             }
 
             float rpmPerLed = (lastRpm - firstRpm) / LED_NUM_TOTAL; //rpm range per led                
@@ -72,8 +72,6 @@ namespace iDash
                     {
                         Array.Copy(pattern, 0, rpmLed, 0, pattern.Length);
                         rpmLed[rpmLed.Length - 1] = Constants.LED_BLINK;
-                        Utils.resetArray(0, 8, rpmLed);
-                        Utils.resetArray(rpmLed.Length - 10, rpmLed.Length - 2, rpmLed);
                     }
                     else
                     {

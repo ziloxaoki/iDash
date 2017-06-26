@@ -55,7 +55,7 @@ namespace iDash
                                 lastRpm *= 0.95f;
                                 float currentRpm = wrapper.data.engineRPM;
 
-                                int flag = wrapper.data.vehicle[0].inPits > 0 ? 9 : 0;
+                                int flag = wrapper.data.vehicle[0].inPits > 0 ? (int)Constants.FLAG_TYPE.IN_PIT_FLAG : 0;
 
                                 sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
                                 if (sm.arduinoHas7Seg == Constants.DASH)

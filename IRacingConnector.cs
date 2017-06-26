@@ -182,11 +182,11 @@ namespace iDash
                     flag = (int)Constants.FLAG_TYPE.YELLOW_FLAG;
                     break;
                 default:
-                    flag = 0;
+                    flag = (int)Constants.FLAG_TYPE.NO_FLAG;
                     break;
             }
 
-            flag = wrapper.GetTelemetryValue<bool>("OnPitRoad").Value ? 9 : flag;
+            flag = ((int)wrapper.GetTelemetryValue<int>("EngineWarnings").Value & 0x10) == 0x10 ? (int)Constants.FLAG_TYPE.SPEED_LIMITER : flag;
             
             //Logger.LogMessageToFile("rpm:" + rpm + "\n");
         }

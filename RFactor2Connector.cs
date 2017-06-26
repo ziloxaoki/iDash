@@ -93,7 +93,7 @@ namespace iDash
                                 flag = (int)Constants.FLAG_TYPE.YELLOW_FLAG;
                             }
 
-                            flag = currrF2State.mSpeedLimiter > 0 ? 9 : flag;
+                            flag = currrF2State.mSpeedLimiter > 0 ? (int)Constants.FLAG_TYPE.SPEED_LIMITER : flag;
 
                             sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
                             if (sm.arduinoHas7Seg == Constants.DASH)

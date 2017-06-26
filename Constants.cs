@@ -27,22 +27,23 @@ namespace iDash
         public const char SIGN_EQUALS = '=';
         public const char SIGN_AMPERSAND = '&';
 
-        public static readonly byte[] colourPattern = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
+        public static readonly byte[] rpmPattern = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
         public static readonly byte[] blackRGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-        public static readonly byte[] whiteRGB = { 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231 };
-        public static readonly byte[] yellowRGB = { 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0 };
-        public static readonly byte[] blueRGB = { 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255 };
+        public static readonly byte[] whiteRGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+        public static readonly byte[] yellowRGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+        public static readonly byte[] blueRGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
         public enum FLAG_TYPE
         {
             NO_FLAG = 0,
             BLUE_FLAG = 1,
             YELLOW_FLAG = 2,
-            BLACK_FLAG = 3,
-            WHITE_FLAG = 4,
-            CHECKERED_FLAG = 5,
-            PENALTY_FLAG = 6,
-            INPIT_FLAG = 9
+            BLACK_FLAG = 8,
+            WHITE_FLAG = 16,
+            CHECKERED_FLAG = 32,
+            PENALTY_FLAG = 64,
+            SPEED_LIMITER = 128,
+            IN_PIT_FLAG = 256
         }
 
         public static object[] RFactorTelemetryData = new object[]
@@ -199,7 +200,12 @@ namespace iDash
             "DCLapStatus.int",
             "DisplayUnits.int",
             "DriverMarker.bool",
-            "EngineWarnings.bitfield",
+            "EngineWarnings.bitfield",  //irsdk_waterTempWarning = 0x01,
+                                        //irsdk_fuelPressureWarning = 0x02,
+                                        //irsdk_oilPressureWarning = 0x04,
+                                        //irsdk_engineStalled = 0x08,
+                                        //irsdk_pitSpeedLimiter = 0x10,
+                                        //irsdk_revLimiterActive = 0x20,
             "EnterExitReset.int",
             "FogLevel.float",
             "FrameRate.float",

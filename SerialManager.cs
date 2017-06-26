@@ -81,7 +81,7 @@ namespace iDash
 
             if (isTestMode)
             {
-                Array.Copy(Constants.colourPattern, 0, rpmLed, 0, Constants.colourPattern.Length);
+                Array.Copy(Constants.rpmPattern, 0, rpmLed, 0, Constants.rpmPattern.Length);
                 rpmLed[rpmLed.Length - 1] = Constants.LED_BLINK;
             }
 
