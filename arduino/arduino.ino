@@ -432,7 +432,7 @@ void rotEncoder2(){
 int sendRotaryState(int offset, byte *response) {  
   for(int i = 0; i < TOTAL_ROTARY; i++) {                  
 
-    if(millis() - lastRotaryStateChange > 50) {  
+    if(millis() - lastRotaryStateChange > 30) {  
       if(encoderPos[i] != lastRotaryPos[i]) {      
         if(lastRotaryPos[i] < encoderPos[i]) {  
           //turn left
