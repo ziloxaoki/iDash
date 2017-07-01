@@ -81,6 +81,9 @@ namespace iDash
             this.debugModes = new System.Windows.Forms.ComboBox();
             this.clearData = new System.Windows.Forms.Button();
             this.debugData = new System.Windows.Forms.RichTextBox();
+            this.configurationTab = new System.Windows.Forms.TabPage();
+            this.devicesCombobox = new System.Windows.Forms.ComboBox();
+            this.devicesLabel = new System.Windows.Forms.Label();
             this.statusBar = new System.Windows.Forms.RichTextBox();
             this.mainmenu = new System.Windows.Forms.MenuStrip();
             this.simulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,12 +99,14 @@ namespace iDash
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.amsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
             this.tm1637.SuspendLayout();
             this.buttons.SuspendLayout();
             this.debugTab.SuspendLayout();
+            this.configurationTab.SuspendLayout();
             this.mainmenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -137,6 +142,7 @@ namespace iDash
             // 
             this.mainTab.Controls.Add(this.settingsTab);
             this.mainTab.Controls.Add(this.debugTab);
+            this.mainTab.Controls.Add(this.configurationTab);
             this.mainTab.Location = new System.Drawing.Point(3, 27);
             this.mainTab.Name = "mainTab";
             this.mainTab.SelectedIndex = 0;
@@ -612,12 +618,12 @@ namespace iDash
             // 
             // debugModes
             // 
-            this.debugModes.FormattingEnabled = true;            
+            this.debugModes.FormattingEnabled = true;
             this.debugModes.Location = new System.Drawing.Point(9, 67);
             this.debugModes.Name = "debugModes";
             this.debugModes.Size = new System.Drawing.Size(165, 21);
             this.debugModes.TabIndex = 13;
-            this.debugModes.SelectedIndexChanged += new System.EventHandler(this.debugModes_SelectedIndexChanged);            
+            this.debugModes.SelectedIndexChanged += new System.EventHandler(this.debugModes_SelectedIndexChanged);
             // 
             // clearData
             // 
@@ -637,6 +643,43 @@ namespace iDash
             this.debugData.TabIndex = 10;
             this.debugData.Text = "";
             this.debugData.TextChanged += new System.EventHandler(this.debugData_TextChanged);
+            // 
+            // configurationTab
+            // 
+            this.configurationTab.Controls.Add(this.textBox1);
+            this.configurationTab.Controls.Add(this.devicesCombobox);
+            this.configurationTab.Controls.Add(this.devicesLabel);
+            this.configurationTab.Location = new System.Drawing.Point(4, 22);
+            this.configurationTab.Name = "configurationTab";
+            this.configurationTab.Padding = new System.Windows.Forms.Padding(3);
+            this.configurationTab.Size = new System.Drawing.Size(1564, 734);
+            this.configurationTab.TabIndex = 2;
+            this.configurationTab.Text = "Configuration";
+            this.configurationTab.UseVisualStyleBackColor = true;
+            // 
+            // devicesCombobox
+            // 
+            this.devicesCombobox.FormattingEnabled = true;
+            this.devicesCombobox.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"});
+            this.devicesCombobox.Location = new System.Drawing.Point(60, 38);
+            this.devicesCombobox.Name = "devicesCombobox";
+            this.devicesCombobox.Size = new System.Drawing.Size(67, 21);
+            this.devicesCombobox.TabIndex = 1;
+            // 
+            // devicesLabel
+            // 
+            this.devicesLabel.AutoSize = true;
+            this.devicesLabel.Location = new System.Drawing.Point(6, 41);
+            this.devicesLabel.Name = "devicesLabel";
+            this.devicesLabel.Size = new System.Drawing.Size(48, 13);
+            this.devicesLabel.TabIndex = 0;
+            this.devicesLabel.Text = "Arduinos";
             // 
             // statusBar
             // 
@@ -729,37 +772,47 @@ namespace iDash
             // iRacingToolStripMenuItem1
             // 
             this.iRacingToolStripMenuItem1.Name = "iRacingToolStripMenuItem1";
-            this.iRacingToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.iRacingToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.iRacingToolStripMenuItem1.Text = "iRacing";
             this.iRacingToolStripMenuItem1.Click += new System.EventHandler(this.iRacingToolStripMenuItem1_Click);
             // 
             // raceRoomToolStripMenuItem1
             // 
             this.raceRoomToolStripMenuItem1.Name = "raceRoomToolStripMenuItem1";
-            this.raceRoomToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.raceRoomToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.raceRoomToolStripMenuItem1.Text = "RaceRoom";
             this.raceRoomToolStripMenuItem1.Click += new System.EventHandler(this.raceRoomToolStripMenuItem1_Click);
             // 
             // assettoToolStripMenuItem1
             // 
             this.assettoToolStripMenuItem1.Name = "assettoToolStripMenuItem1";
-            this.assettoToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.assettoToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.assettoToolStripMenuItem1.Text = "Assetto Corsa";
             this.assettoToolStripMenuItem1.Click += new System.EventHandler(this.assettoToolStripMenuItem1_Click);
             // 
             // amsToolStripMenuItem1
             // 
             this.amsToolStripMenuItem1.Name = "amsToolStripMenuItem1";
-            this.amsToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.amsToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.amsToolStripMenuItem1.Text = "Automobilista";
             this.amsToolStripMenuItem1.Click += new System.EventHandler(this.rFactorToolStripMenuItem1_Click);
             // 
             // rFactor2ToolStripMenuItem1
             // 
             this.rFactor2ToolStripMenuItem1.Name = "rFactor2ToolStripMenuItem1";
-            this.rFactor2ToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.rFactor2ToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
             this.rFactor2ToolStripMenuItem1.Text = "RFactor2";
             this.rFactor2ToolStripMenuItem1.Click += new System.EventHandler(this.rFactor2ToolStripMenuItem1_Click);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Enabled = false;
+            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Location = new System.Drawing.Point(9, 7);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(287, 26);
+            this.textBox1.TabIndex = 2;
+            this.textBox1.Text = "Arduino(n) will connect to VJoy(n)";
             // 
             // MainForm
             // 
@@ -785,6 +838,8 @@ namespace iDash
             this.buttons.PerformLayout();
             this.debugTab.ResumeLayout(false);
             this.debugTab.PerformLayout();
+            this.configurationTab.ResumeLayout(false);
+            this.configurationTab.PerformLayout();
             this.mainmenu.ResumeLayout(false);
             this.mainmenu.PerformLayout();
             this.ResumeLayout(false);
@@ -860,6 +915,10 @@ namespace iDash
         private System.Windows.Forms.ToolStripMenuItem rFactor2ToolStripMenuItem1;
         private System.Windows.Forms.CheckBox isTestMode;
         private System.Windows.Forms.Label bPressed;
+        private System.Windows.Forms.TabPage configurationTab;
+        private System.Windows.Forms.ComboBox devicesCombobox;
+        private System.Windows.Forms.Label devicesLabel;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

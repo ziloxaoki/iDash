@@ -27,6 +27,8 @@ namespace iDash
         public const char SIGN_EQUALS = '=';
         public const char SIGN_AMPERSAND = '&';
 
+        public const int MAX_ARDUINOS_SUPPORTED = 6;
+
         public static readonly byte[] rpmPattern = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
         public static readonly byte[] blackRGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
         public static readonly byte[] whiteRGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 1, 1, 1, 1, 1, 1, 1, 1, 1 };

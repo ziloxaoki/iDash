@@ -21,9 +21,9 @@ namespace iDash
         private const int WAIT_THREADS_TO_CLOSE = 3500;
         public const string UPDATE_BUTTON_VOLTAGE = "UPDATE_BUTTON_VOLTAGE";
 
-        private SerialManager sm;
-        private ButtonHandler bh;
-        private VJoyFeeder vf;
+        private List<SerialManager> sm = new List<SerialManager>();
+        private List<ButtonHandler> bh = new List<ButtonHandler>();
+        private List<VJoyFeeder> vf = new List<VJoyFeeder>();
         private IRacingConnector irc;
         private RaceRoomConnector rrc;
         private AssettoCorsaConnector acc;
@@ -58,48 +58,59 @@ namespace iDash
         public delegate void HandleButtonActions(List<State> states);
         public HandleButtonActions handleButtonActions;
         public static bool formFinishedLoading;
+        public static int devicesAvailable = 1;
 
 
         public MainForm()
         {
             Logger.LogMessageToFile("Initializing IDash.", true);            
             try {
-                this.appendToStatusBar = new AppendToStatusBarDelegate(UpdateStatusBar);
-                this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
                 //Action Handlers have a pointer to Form, so they can only be initialized after the form.
                 InitializeComponent();                
-
-                this.Shown += new System.EventHandler(FormLoadComplete);
-
-                handleButtonActions = new HandleButtonActions(handleButtons);
-
-                Logger.LogMessageToFile("Initializing serial manager.", true);
-                sm = new SerialManager();
-                sm.StatusMessageSubscribers += UpdateStatusBar;
-                sm.DebugMessageSubscribers += UpdateDebugData;
-
-                Logger.LogMessageToFile("Initializing button handler.", true);
-                bh = new ButtonHandler(sm);
-                bh.buttonStateHandler += ButtonStateReceived;
-                //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
-                Thread.Sleep(1000);
-
-                Logger.LogMessageToFile("Initializing Vjoy.", true);
-                vf = new VJoyFeeder(bh);
-                vf.StatusMessageSubscribers += UpdateStatusBar;
-
-                this.iRacingToolStripMenuItem1.PerformClick();
-
-                sm.Init();
-                vf.InitializeJoystick();
-                
-                AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory + "\n");
-                this.debugModes.DataSource = Enum.GetValues(typeof(iDash.DebugMode)); //fix for designer. Cannot declare it in MainForm.Designer
             }
             catch (Exception e)
             {
                 Logger.LogExceptionToFile(e);
             }
+        }
+
+        private void initDevices()
+        {
+            this.appendToStatusBar = new AppendToStatusBarDelegate(UpdateStatusBar);
+            this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
+
+            this.Shown += new System.EventHandler(FormLoadComplete);
+
+            handleButtonActions = new HandleButtonActions(handleButtons);
+
+            for (int x = 0; x <= this.devicesCombobox.SelectedIndex; x++)
+            {
+                Logger.LogMessageToFile("Initializing serial manager.", true);
+                SerialManager serialManager = new SerialManager((uint)x + 1);
+                serialManager.StatusMessageSubscribers += UpdateStatusBar;
+                serialManager.DebugMessageSubscribers += UpdateDebugData;
+                sm.Add(serialManager);
+
+                Logger.LogMessageToFile("Initializing button handler.", true);
+                ButtonHandler buttonHandler = new ButtonHandler(serialManager, (uint)x + 1);
+                buttonHandler.buttonStateHandler += ButtonStateReceived;
+                bh.Add(buttonHandler);
+                //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
+                Thread.Sleep(1000);
+
+                Logger.LogMessageToFile("Initializing Vjoy.", true);
+                VJoyFeeder vJoyFeeder  = new VJoyFeeder(buttonHandler);
+                vJoyFeeder.StatusMessageSubscribers += UpdateStatusBar;
+                vf.Add(vJoyFeeder);
+
+                this.iRacingToolStripMenuItem1.PerformClick();
+
+                serialManager.Init();
+                vJoyFeeder.InitializeJoystick();
+            }
+
+            AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory + "\n");
+            this.debugModes.DataSource = Enum.GetValues(typeof(iDash.DebugMode)); //fix for designer. Cannot declare it in MainForm.Designer
         }
 
 
@@ -216,6 +227,17 @@ namespace iDash
 
             //Default to first simulator
             loadViewProperties(0);
+
+            if (Properties.Settings.Default.CONFIGURATION == 0)
+            {
+                this.devicesCombobox.SelectedIndex = 0;
+            }
+            else
+            {
+                this.devicesCombobox.SelectedIndex = Properties.Settings.Default.CONFIGURATION;
+            }
+
+            devicesAvailable = this.devicesCombobox.SelectedIndex + 1;
         }
 
 
@@ -256,6 +278,8 @@ namespace iDash
                 }
             }
 
+            Properties.Settings.Default.CONFIGURATION = int.Parse(this.devicesCombobox.Text) - 1;
+
             Properties.Settings.Default.Save();
         }
 
@@ -268,15 +292,26 @@ namespace iDash
             if (cmdHeader.Text.Length > 0)
                 header = (byte)Convert.ToInt16(cmdHeader.Text);
             Command command = new Command(header, data, true);
-            sm.sendCommand(command, true);     //transmit data
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.sendCommand(command, true);     //transmit data
+            }
         }
 
         protected async override void OnFormClosing(FormClosingEventArgs e)
         {
             stopThreads = true;
-            sm.StatusMessageSubscribers -= UpdateStatusBar;
-            vf.StatusMessageSubscribers -= UpdateStatusBar;
-            sm.DebugMessageSubscribers -= UpdateDebugData;
+
+            foreach(SerialManager serialManager in sm) {
+                serialManager.StatusMessageSubscribers -= UpdateStatusBar;
+                serialManager.DebugMessageSubscribers -= UpdateDebugData;
+            }
+
+            foreach (VJoyFeeder vJoyFeeder in vf)
+            {
+                vJoyFeeder.StatusMessageSubscribers -= UpdateStatusBar;
+            }
+
             if (irc != null)
                 irc.StatusMessageSubscribers -= UpdateStatusBar;
             if (rrc != null)
@@ -342,18 +377,22 @@ namespace iDash
             //0 = none, 1 = default, 2 = verbose
             byte[] state = { (byte)debugModes.SelectedIndex };
             //update formd debug mode reference
-            sm.formDebugMode = (DebugMode)debugModes.SelectedIndex;
 
-            Command command = new Command(Command.CMD_SET_DEBUG_MODE, state);
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.formDebugMode = (DebugMode)debugModes.SelectedIndex;
 
-            //make sure Arduino and IDash debug state are in sync
-            while (state[0] != (int)sm.arduinoDebugMode)
-            {                
-                sm.sendCommand(command, false);     //transmit data
-                await Task.Delay(WAIT_ARDUINO_SET_DEBUG_MODE);
-                //update state if value in combobox changed
-                state[0] = (byte)debugModes.SelectedIndex;
-                sm.formDebugMode = (DebugMode)debugModes.SelectedIndex;
+                Command command = new Command(Command.CMD_SET_DEBUG_MODE, state);
+
+                //make sure Arduino and IDash debug state are in sync
+                while (state[0] != (int)serialManager.arduinoDebugMode)
+                {
+                    serialManager.sendCommand(command, false);     //transmit data
+                    await Task.Delay(WAIT_ARDUINO_SET_DEBUG_MODE);
+                    //update state if value in combobox changed
+                    state[0] = (byte)debugModes.SelectedIndex;
+                    serialManager.formDebugMode = (DebugMode)debugModes.SelectedIndex;
+                }
             }
 
             bPressed.Text = "Buttons voltage...";
@@ -800,6 +839,8 @@ namespace iDash
             foreach (string s in ActionHandler.ACTIONS) {
                 buttonActions.Items.Add(s);
             }
+
+            initDevices();
         }
 
         private async void keystroke_Click(object sender, EventArgs e)
@@ -884,7 +925,11 @@ namespace iDash
 
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sm.isSimulatorDisconnected = false;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.isSimulatorDisconnected = false;
+            }
+            
             stopAllSimThreads();
             //keep iRacing threads alive
             stopIRacingThreads = false;
@@ -907,7 +952,10 @@ namespace iDash
 
         private void raceroomToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sm.isSimulatorDisconnected = false;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.isSimulatorDisconnected = false;
+            }
             stopAllSimThreads();
             //keep RaceRoom threads alive
             stopRaceRoomThreads = false;
@@ -930,7 +978,10 @@ namespace iDash
 
         private void assettoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sm.isSimulatorDisconnected = false;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.isSimulatorDisconnected = false;
+            }
             stopAllSimThreads();        
             //keep Assetto threads alive
             stopAssettoThreads = false;
@@ -953,7 +1004,10 @@ namespace iDash
 
         private void rFactorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sm.isSimulatorDisconnected = false;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.isSimulatorDisconnected = false;
+            }
             stopAllSimThreads();            
             //keep rFactor threads alive
             stopRFactorThreads = false;
@@ -976,7 +1030,10 @@ namespace iDash
 
         private void rFactor2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sm.isSimulatorDisconnected = false;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.isSimulatorDisconnected = false;
+            }
             stopAllSimThreads();
             //keep rFactor2 threads alive
             stopRFactor2Threads = false;
@@ -999,7 +1056,10 @@ namespace iDash
 
         private void noneToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sm.isSimulatorDisconnected = true;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.isSimulatorDisconnected = true;
+            }
             stopAllSimThreads();
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
@@ -1085,12 +1145,18 @@ namespace iDash
 
         private void IsDisabledSerial_CheckedChanged(object sender, EventArgs e)
         {
-            sm.isDisabledSerial = isDisabledSerial.Checked;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.isDisabledSerial = isDisabledSerial.Checked;
+            }
         }
 
         private void AsHex_CheckedChanged(object sender, EventArgs e)
         {
-            sm.asHex = asHex.Checked;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.asHex = asHex.Checked;
+            }
         }
 
         private void FormLoadComplete(object sender, EventArgs e)
@@ -1100,7 +1166,10 @@ namespace iDash
 
         private void isTestMode_CheckedChanged(object sender, EventArgs e)
         {
-            sm.isTestMode = isTestMode.Checked;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.isTestMode = isTestMode.Checked;
+            }
         }
     }    
 }

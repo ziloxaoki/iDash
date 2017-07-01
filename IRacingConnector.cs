@@ -22,7 +22,7 @@ namespace iDash
 
         private bool disposed = false;
 
-        public IRacingConnector(SerialManager sm) : base(sm)
+        public IRacingConnector(List<SerialManager> sm) : base(sm)
         {
             this.sm = sm;
 
@@ -61,17 +61,24 @@ namespace iDash
                     isConnected = true;
 
                     sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                    if (sm.arduinoHas7Seg == Constants.DASH)
+
+                    foreach (SerialManager serialManager in sm)
                     {
-                        send7SegmentMsg();
+                        if (serialManager.deviceContains7Segments())
+                        {
+                            send7SegmentMsg();
+                        }
                     }
                 }
                 else
                 {
                     isConnected = false;
-                    if (sm.arduinoHas7Seg == Constants.DASH)
+                    foreach (SerialManager serialManager in sm)
                     {
-                        sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        if (serialManager.deviceContains7Segments())
+                        {
+                            serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        }
                     }
                 }
 

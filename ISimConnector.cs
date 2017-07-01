@@ -11,12 +11,12 @@ namespace iDash
         public delegate void StatusMessageHandler(string m);
         public StatusMessageHandler StatusMessageSubscribers;
 
-        protected SerialManager sm;
+        protected List<SerialManager> sm;
 
         private const int LED_NUM_TOTAL = 16;
         public const float FIRST_RPM = 0.7f;
 
-        public ISimConnector(SerialManager sm)
+        public ISimConnector(List<SerialManager> sm)
         {
             this.sm = sm;
         }
@@ -82,7 +82,10 @@ namespace iDash
                 
                 //Array.Copy(pattern, 0, rpmLed, 0, pattern.Length);
                 rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
-                sm.sendCommand(rgbShift, false);
+                foreach (SerialManager serialManager in sm)
+                {
+                    serialManager.sendCommand(rgbShift, false);
+                }
             }
         }
         
@@ -151,7 +154,11 @@ namespace iDash
                 {
                     byte[] b = Utils.getBytes(msg.ToString());
                     Command c = new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
-                    sm.sendCommand(c, false);
+
+                    foreach (SerialManager serialManager in sm)
+                    {
+                        serialManager.sendCommand(c, false);
+                    }
                 }
             }
         }

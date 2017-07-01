@@ -28,6 +28,7 @@ namespace iDash
         public VJoyFeeder(ButtonHandler bh)
         {
             bh.buttonStateHandler += ButtonStateReceived;
+            jID = bh.getVJoyID();
         }        
 
         public void InitializeJoystick()

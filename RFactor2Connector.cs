@@ -41,7 +41,7 @@ namespace iDash
         protected rF2VehScoringInfo carData;
         protected rF2Wheel wheel;
 
-        public RFactor2Connector(SerialManager sm) : base(sm)
+        public RFactor2Connector(List<SerialManager> sm) : base(sm)
         {
             this.sm = sm;
 
@@ -96,9 +96,13 @@ namespace iDash
                             flag = currrF2State.mSpeedLimiter > 0 ? (int)Constants.FLAG_TYPE.SPEED_LIMITER : flag;
 
                             sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                            if (sm.arduinoHas7Seg == Constants.DASH)
-                            {                                
-                                send7SegmentMsg();
+
+                            foreach (SerialManager serialManager in sm)
+                            {
+                                if (serialManager.deviceContains7Segments())
+                                {
+                                    send7SegmentMsg();
+                                }
                             }
                         }
                     }
@@ -115,9 +119,13 @@ namespace iDash
                     checkRFactor2Running();
                     isConnected = false;
                     disableNotification = false;
-                    if (sm.arduinoHas7Seg == Constants.DASH)
+
+                    foreach (SerialManager serialManager in sm)
                     {
-                        sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        if (serialManager.deviceContains7Segments())
+                        {
+                            serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        }
                     }
                 }
                 

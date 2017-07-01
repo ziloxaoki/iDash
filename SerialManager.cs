@@ -20,7 +20,7 @@ namespace iDash
         private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
         private const int WAIT_FOR_ARDUINO_DATA = ARDUINO_TIMED_OUT/5;
-        public int arduinoHas7Seg = 0;
+        private int arduinoHas7Seg = 0;
 
         //arduino command length
         private int commandLength;        
@@ -56,6 +56,12 @@ namespace iDash
         private string[] portNames;
         private int[,] voltages = new int[8,3];
         private int MIN_VOLTAGE = 100;
+        private uint id = 0;
+
+        public SerialManager(uint id)
+        {
+            this.id = id;
+        }
 
         public void Init()
         {
@@ -87,7 +93,7 @@ namespace iDash
 
             this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLed), false);
 
-            if (arduinoHas7Seg == Constants.DASH)
+            if (deviceContains7Segments())
             {
                 this.sendCommand(Utils.getDisconnectedMsgCmd(), false);
             }
@@ -122,7 +128,7 @@ namespace iDash
                         }
                         else if (lastArduinoResponse > 0 && portNames.Length == 1)
                         {
-                            NotifyStatusMessage("Arduino at port " + port + " disconnected.");
+                            NotifyStatusMessage("Arduino(" + id + ")at port " + port + " disconnected.");
                             lastArduinoResponse = 0;
                         }
 
@@ -130,7 +136,7 @@ namespace iDash
 
                         if (!notificationSent.Contains(port))
                         {
-                            NotifyStatusMessage("Searching for Arduino at " + port + "...");                            
+                            NotifyStatusMessage("Searching for Arduino(" + id + ") at " + port + "...");                            
                         }
 
                         if (MainForm.formFinishedLoading)
@@ -165,8 +171,8 @@ namespace iDash
 
                         if (isArduinoAlive())
                         {
-                            NotifyStatusMessage("Arduino found at port " + port + "...");
-                            Logger.LogMessageToFile("Arduino connected to port " + port, true);
+                            NotifyStatusMessage("Arduino(" + id + ") found at port " + port + "...");
+                            Logger.LogMessageToFile("Arduino(" + id + ") connected to port " + port, true);
                             //if arduino found always try to reconnect to the same port
                             portNames = new string[] {port};
                             break;
@@ -386,6 +392,11 @@ namespace iDash
             {
                 Logger.LogDataToFile(logData.ToString());
             }
+        }
+
+        public bool deviceContains7Segments()
+        {
+            return arduinoHas7Seg == Constants.DASH;
         }
                 
         //event handler triggered by serial port

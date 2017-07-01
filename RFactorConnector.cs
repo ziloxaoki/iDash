@@ -20,7 +20,7 @@ namespace iDash
 
         private bool disposed = false;
 
-        public RFactorConnector(SerialManager sm) : base(sm)
+        public RFactorConnector(List<SerialManager> sm) : base(sm)
         {
             this.sm = sm;
 
@@ -58,9 +58,13 @@ namespace iDash
                                 int flag = wrapper.data.vehicle[0].inPits > 0 ? (int)Constants.FLAG_TYPE.IN_PIT_FLAG : 0;
 
                                 sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                                if (sm.arduinoHas7Seg == Constants.DASH)
+
+                                foreach (SerialManager serialManager in sm)
                                 {
-                                    send7SegmentMsg();
+                                    if (serialManager.deviceContains7Segments())
+                                    {
+                                        send7SegmentMsg();
+                                    }
                                 }
 
                                 if (!isConnected)
@@ -94,7 +98,10 @@ namespace iDash
 
                 if(!isConnected)
                 {
-                    sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                    foreach (SerialManager serialManager in sm)
+                    {
+                        serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                    }
                 }
 
                 await Task.Delay(Constants.SharedMemoryReadRate);

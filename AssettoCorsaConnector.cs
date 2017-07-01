@@ -21,7 +21,7 @@ namespace iDash
         private Graphics gr;
         private Physics ph;
 
-        public AssettoCorsaConnector(SerialManager sm) : base(sm)
+        public AssettoCorsaConnector(List<SerialManager> sm) : base(sm)
         {
             this.sm = sm;
             ac = new AssettoCorsa();
@@ -60,9 +60,13 @@ namespace iDash
                     isConnected = true;
 
                     sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                    if (sm.arduinoHas7Seg == Constants.DASH)
+
+                    foreach (SerialManager serialManager in sm)
                     {
-                        send7SegmentMsg();
+                        if (serialManager.deviceContains7Segments())
+                        {
+                            send7SegmentMsg();
+                        }
                     }
                 }
                 else
@@ -74,9 +78,13 @@ namespace iDash
                     }
 
                     isConnected = false;
-                    if (sm.arduinoHas7Seg == Constants.DASH)
+
+                    foreach (SerialManager serialManager in sm)
                     {
-                        sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        if (serialManager.deviceContains7Segments())
+                        {
+                            serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        }
                     }
                 }
 

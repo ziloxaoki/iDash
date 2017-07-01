@@ -27,7 +27,7 @@ namespace iDash
 
         private bool disposed = false;
 
-        public RaceRoomConnector(SerialManager sm) : base(sm)
+        public RaceRoomConnector(List<SerialManager> sm) : base(sm)
         {
             this.sm = sm;
 
@@ -64,9 +64,12 @@ namespace iDash
                                 buffer = new Byte[Marshal.SizeOf(typeof(Shared))];
                         }
 
-                        if (sm.arduinoHas7Seg == Constants.DASH)
+                        foreach (SerialManager serialManager in sm)
                         {
-                            sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                            if (serialManager.deviceContains7Segments())
+                            {
+                                serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                            }
                         }
                     }
                     else
@@ -102,16 +105,23 @@ namespace iDash
                                 }
 
                                 sendRPMShiftMsg(currentRpm, firstRpm, lastRpm, flag);
-                                if (sm.arduinoHas7Seg == Constants.DASH)
+
+                                foreach (SerialManager serialManager in sm)
                                 {
-                                    send7SegmentMsg();
+                                    if (serialManager.deviceContains7Segments())
+                                    {
+                                        send7SegmentMsg();
+                                    }
                                 }
                             }
                             else
                             {
-                                if (sm.arduinoHas7Seg == Constants.DASH)
+                                foreach (SerialManager serialManager in sm)
                                 {
-                                    sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                                    if (serialManager.deviceContains7Segments())
+                                    {
+                                        serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                                    }
                                 }
                             }
                         }
@@ -119,7 +129,10 @@ namespace iDash
                 }
                 else
                 {
-                    sm.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                    foreach (SerialManager serialManager in sm)
+                    {
+                        serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                    }
                     if(isConnected)
                     {
                         string s = DateTime.Now.ToString("hh:mm:ss") + ": RaceRoom closed.";
