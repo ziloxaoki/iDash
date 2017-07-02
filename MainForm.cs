@@ -35,12 +35,6 @@ namespace iDash
         private Dictionary<String, int> buttonStateMap = new Dictionary<String, int>();
         private ArrayList bActions = new ArrayList();
 
-        public static bool stopThreads = false;
-        public static bool stopIRacingThreads = false;
-        public static bool stopRaceRoomThreads = false;
-        public static bool stopAssettoThreads = false;
-        public static bool stopRFactorThreads = false;
-        public static bool stopRFactor2Threads = false;
         private static List<string> _7Segment = new List<string>();
         private static string strFormat = "";
         private static readonly Object listLock = new Object();
@@ -66,7 +60,8 @@ namespace iDash
             Logger.LogMessageToFile("Initializing IDash.", true);            
             try {
                 //Action Handlers have a pointer to Form, so they can only be initialized after the form.
-                InitializeComponent();                
+                InitializeComponent();
+                this.Shown += new System.EventHandler(FormLoadComplete);
             }
             catch (Exception e)
             {
@@ -77,21 +72,21 @@ namespace iDash
         private void initDevices()
         {
             this.appendToStatusBar = new AppendToStatusBarDelegate(UpdateStatusBar);
-            this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);
-
-            this.Shown += new System.EventHandler(FormLoadComplete);
+            this.appendToDebugDialog = new AppendToDebugDialogDelegate(AppendToDebugDialog);            
 
             handleButtonActions = new HandleButtonActions(handleButtons);
 
             for (int x = 0; x <= this.devicesCombobox.SelectedIndex; x++)
             {
-                Logger.LogMessageToFile("Initializing serial manager.", true);
+                Logger.LogMessageToFile("Initializing Serial Manager.", true);
+                AppendToStatusBar("\n\nInitializing Serial Manager.\n");
                 SerialManager serialManager = new SerialManager((uint)x + 1);
                 serialManager.StatusMessageSubscribers += UpdateStatusBar;
                 serialManager.DebugMessageSubscribers += UpdateDebugData;
                 sm.Add(serialManager);
 
-                Logger.LogMessageToFile("Initializing button handler.", true);
+                Logger.LogMessageToFile("Initializing Button Handler.", true);
+                AppendToStatusBar("Initializing Button Handler.\n");
                 ButtonHandler buttonHandler = new ButtonHandler(serialManager, (uint)x + 1);
                 buttonHandler.buttonStateHandler += ButtonStateReceived;
                 bh.Add(buttonHandler);
@@ -99,6 +94,7 @@ namespace iDash
                 Thread.Sleep(1000);
 
                 Logger.LogMessageToFile("Initializing Vjoy.", true);
+                AppendToStatusBar("Initializing Vjoy.\n");
                 VJoyFeeder vJoyFeeder  = new VJoyFeeder(buttonHandler);
                 vJoyFeeder.StatusMessageSubscribers += UpdateStatusBar;
                 vf.Add(vJoyFeeder);
@@ -113,30 +109,6 @@ namespace iDash
             this.debugModes.DataSource = Enum.GetValues(typeof(iDash.DebugMode)); //fix for designer. Cannot declare it in MainForm.Designer
         }
 
-
-        /*private int getSelectedSimulator()
-        {
-            for (int x = 0; x < simulatorToolStripMenuItem.DropDownItems.Count - 1; x++)
-            {
-                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)simulatorToolStripMenuItem.DropDownItems[x];
-                if (dropDownItem.Checked)
-                    return x;
-            }
-
-            return -1;
-        }
-
-        private int getSelectedConfiguration()
-        {
-            for (int x = 0; x < settingsToolStripMenuItem.DropDownItems.Count; x++)
-            {
-                ToolStripMenuItem dropDownItem = (ToolStripMenuItem)settingsToolStripMenuItem.DropDownItems[x];
-                if (dropDownItem.Checked)
-                    return x;
-            }
-
-            return -1;
-        }*/
 
         //parse the view dialog so 7 segment display nows which properties to show
         private void parseViews()
@@ -298,11 +270,11 @@ namespace iDash
             }
         }
 
-        protected async override void OnFormClosing(FormClosingEventArgs e)
-        {
-            stopThreads = true;
 
-            foreach(SerialManager serialManager in sm) {
+        private void unRegisterAllSubscribers()
+        {
+            foreach (SerialManager serialManager in sm)
+            {
                 serialManager.StatusMessageSubscribers -= UpdateStatusBar;
                 serialManager.DebugMessageSubscribers -= UpdateDebugData;
             }
@@ -316,6 +288,47 @@ namespace iDash
                 irc.StatusMessageSubscribers -= UpdateStatusBar;
             if (rrc != null)
                 rrc.StatusMessageSubscribers -= UpdateStatusBar;
+            if (ams != null)
+                ams.StatusMessageSubscribers -= UpdateStatusBar;
+            if (acc != null)
+                acc.StatusMessageSubscribers -= UpdateStatusBar;
+            if (rf2 != null)
+                rf2.StatusMessageSubscribers -= UpdateStatusBar;
+        }
+
+        private void stopAllThreads()
+        {
+            unRegisterAllSubscribers();
+            stopAllSimThreads();
+
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.stopThread();
+            }
+
+            foreach (VJoyFeeder vJoyfeeder in vf)
+            {
+                vJoyfeeder.Dispose();
+            }
+
+            sm.Clear();
+            bh.Clear();
+            vf.Clear();
+        }
+
+
+        private async void resetAllThreads()
+        {
+            stopAllThreads();
+
+            await Task.Delay(WAIT_THREADS_TO_CLOSE);
+
+            initDevices();
+        }
+
+        protected async override void OnFormClosing(FormClosingEventArgs e)
+        {
+            stopAllThreads();
 
             saveAppSettings();
 
@@ -870,11 +883,6 @@ namespace iDash
 
         private void resetConnectionUI()
         {
-            irc = null;
-            rrc = null;
-            acc = null;
-            ams = null;
-            rf2 = null;
             ToolStripMenuItem menu = (ToolStripMenuItem)mainmenu.Items[0];
             foreach (ToolStripMenuItem mItem in menu.DropDownItems)
             {
@@ -911,28 +919,38 @@ namespace iDash
         {
             //update connection menu state
             resetConnectionUI();
+
             //keep iRacing threads alive
-            stopIRacingThreads = true;
+            if (irc != null)
+                irc.stopThread();
             //stop RaceRoom threads
-            stopRaceRoomThreads = true;
+            if (rrc != null)
+                rrc.stopThread();
             //stop Assetto threads
-            stopAssettoThreads = true;
+            if (acc != null)
+                acc.stopThread();
             //stop rFactor threads
-            stopRFactorThreads = true;
+            if (ams != null)
+                ams.stopThread();
             //stop rFactor2 threads
-            stopRFactor2Threads = true;
+            if (rf2 != null)
+                rf2.stopThread();
+
+            irc = null;
+            rrc = null;
+            acc = null;
+            ams = null;
+            rf2 = null;
         }
 
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             foreach (SerialManager serialManager in sm)
             {
-                serialManager.isSimulatorDisconnected = false;
+                serialManager.isSimulatorDisconnected(false);
             }
             
             stopAllSimThreads();
-            //keep iRacing threads alive
-            stopIRacingThreads = false;
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked; 
                        
@@ -954,11 +972,10 @@ namespace iDash
         {
             foreach (SerialManager serialManager in sm)
             {
-                serialManager.isSimulatorDisconnected = false;
+                serialManager.isSimulatorDisconnected(false);
             }
+
             stopAllSimThreads();
-            //keep RaceRoom threads alive
-            stopRaceRoomThreads = false;
           
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
 
@@ -980,11 +997,10 @@ namespace iDash
         {
             foreach (SerialManager serialManager in sm)
             {
-                serialManager.isSimulatorDisconnected = false;
+                serialManager.isSimulatorDisconnected(false);
             }
+
             stopAllSimThreads();        
-            //keep Assetto threads alive
-            stopAssettoThreads = false;
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
 
@@ -1006,11 +1022,10 @@ namespace iDash
         {
             foreach (SerialManager serialManager in sm)
             {
-                serialManager.isSimulatorDisconnected = false;
+                serialManager.isSimulatorDisconnected(false);
             }
+
             stopAllSimThreads();            
-            //keep rFactor threads alive
-            stopRFactorThreads = false;
             
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
 
@@ -1032,11 +1047,10 @@ namespace iDash
         {
             foreach (SerialManager serialManager in sm)
             {
-                serialManager.isSimulatorDisconnected = false;
+                serialManager.isSimulatorDisconnected(false);
             }
+
             stopAllSimThreads();
-            //keep rFactor2 threads alive
-            stopRFactor2Threads = false;
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
 
@@ -1058,7 +1072,7 @@ namespace iDash
         {
             foreach (SerialManager serialManager in sm)
             {
-                serialManager.isSimulatorDisconnected = true;
+                serialManager.isSimulatorDisconnected(true);
             }
             stopAllSimThreads();
 
@@ -1170,6 +1184,11 @@ namespace iDash
             {
                 serialManager.isTestMode = isTestMode.Checked;
             }
+        }
+
+        private void devicesCombobox_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            resetAllThreads();
         }
     }    
 }

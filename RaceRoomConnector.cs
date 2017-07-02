@@ -46,7 +46,7 @@ namespace iDash
 
             NotifyStatusMessage("Waiting for RRRE.exe...");
 
-            while (!MainForm.stopThreads && !MainForm.stopRaceRoomThreads)
+            while (!closeThread)
             {
                 msg.Clear();
 

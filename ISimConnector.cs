@@ -15,10 +15,16 @@ namespace iDash
 
         private const int LED_NUM_TOTAL = 16;
         public const float FIRST_RPM = 0.7f;
+        protected bool closeThread = false;
 
         public ISimConnector(List<SerialManager> sm)
         {
             this.sm = sm;
+        }
+
+        public void stopThread()
+        {
+            this.closeThread = true;
         }
 
         protected void sendRPMShiftMsg(float currentRpm, float firstRpm, float lastRpm, int flag)

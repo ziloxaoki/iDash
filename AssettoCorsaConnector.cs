@@ -46,7 +46,7 @@ namespace iDash
 
             bool isConnected = false;       
 
-            while (!MainForm.stopThreads && !MainForm.stopAssettoThreads)
+            while (!closeThread)
             {
                 if (gr.Status != AC_STATUS.AC_OFF)
                 {

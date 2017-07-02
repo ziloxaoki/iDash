@@ -34,7 +34,7 @@ namespace iDash
             Object rawGameData;
             NotifyStatusMessage("Waiting for RFactor...");
 
-            while (!MainForm.stopThreads && !MainForm.stopRFactorThreads)
+            while (!closeThread)
             {                
                 if (isGameRunning)
                 {                    

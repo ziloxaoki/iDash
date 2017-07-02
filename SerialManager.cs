@@ -26,7 +26,7 @@ namespace iDash
         private int commandLength;        
         private byte[] serialCommand = new byte[BUFFER_SIZE];
         private SerialPort serialPort = new SerialPort(); //create of serial port
-        private static long lastArduinoResponse = -1;        
+        private long lastArduinoResponse = -1;        
         private object readLock = new object();
         private object sendLock = new object();
 
@@ -37,7 +37,7 @@ namespace iDash
         //disable messages when in Default debugging mode. This is set by the mainform. (ignore incoming data)
         public bool isTestMode = false;
         public bool isDisabledSerial = false;
-        public bool isSimulatorDisconnected = true;
+        private bool isSimDisconnected = true;
         //indicates how often a debug message need to be logged in the debug dialog
         private long lastMessageLogged = 0; 
         //show debug commands in hex or int (show as hexadecimal)
@@ -57,6 +57,7 @@ namespace iDash
         private int[,] voltages = new int[8,3];
         private int MIN_VOLTAGE = 100;
         private uint id = 0;
+        private bool closeThread = false;
 
         public SerialManager(uint id)
         {
@@ -99,11 +100,16 @@ namespace iDash
             }
         }    
 
+        public void isSimulatorDisconnected(bool isSimDisconnected)
+        {
+            this.isSimDisconnected = isSimDisconnected;
+        }
+
         private async void tryToConnect()
         {
             HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            while (!MainForm.stopThreads)
+            while (!closeThread)
             {
                 //check if new usb was connected
                 if(lastArduinoResponse == -1)
@@ -111,7 +117,7 @@ namespace iDash
 
                 if (isArduinoAlive())
                 {
-                    if (isSimulatorDisconnected)
+                    if (isSimDisconnected)
                     {
                         sendDefaultMsg();
                     }
@@ -181,6 +187,15 @@ namespace iDash
                 }
             }
 
+        }
+
+        public void stopThread()
+        {
+            if (serialPort != null && serialPort.IsOpen)
+            {
+                serialPort.Close();
+            }
+            this.closeThread = true;            
         }
 
         private void sendSynAck()

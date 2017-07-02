@@ -99,7 +99,6 @@ namespace iDash
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.amsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -646,7 +645,6 @@ namespace iDash
             // 
             // configurationTab
             // 
-            this.configurationTab.Controls.Add(this.textBox1);
             this.configurationTab.Controls.Add(this.devicesCombobox);
             this.configurationTab.Controls.Add(this.devicesLabel);
             this.configurationTab.Location = new System.Drawing.Point(4, 22);
@@ -667,15 +665,16 @@ namespace iDash
             "4",
             "5",
             "6"});
-            this.devicesCombobox.Location = new System.Drawing.Point(60, 38);
+            this.devicesCombobox.Location = new System.Drawing.Point(60, 9);
             this.devicesCombobox.Name = "devicesCombobox";
             this.devicesCombobox.Size = new System.Drawing.Size(67, 21);
             this.devicesCombobox.TabIndex = 1;
+            this.devicesCombobox.SelectionChangeCommitted += new System.EventHandler(this.devicesCombobox_SelectionChangeCommitted);
             // 
             // devicesLabel
             // 
             this.devicesLabel.AutoSize = true;
-            this.devicesLabel.Location = new System.Drawing.Point(6, 41);
+            this.devicesLabel.Location = new System.Drawing.Point(6, 12);
             this.devicesLabel.Name = "devicesLabel";
             this.devicesLabel.Size = new System.Drawing.Size(48, 13);
             this.devicesLabel.TabIndex = 0;
@@ -804,16 +803,6 @@ namespace iDash
             this.rFactor2ToolStripMenuItem1.Text = "RFactor2";
             this.rFactor2ToolStripMenuItem1.Click += new System.EventHandler(this.rFactor2ToolStripMenuItem1_Click);
             // 
-            // textBox1
-            // 
-            this.textBox1.Enabled = false;
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(9, 7);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(287, 26);
-            this.textBox1.TabIndex = 2;
-            this.textBox1.Text = "Arduino(n) will connect to VJoy(n)";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -918,7 +907,6 @@ namespace iDash
         private System.Windows.Forms.TabPage configurationTab;
         private System.Windows.Forms.ComboBox devicesCombobox;
         private System.Windows.Forms.Label devicesLabel;
-        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

@@ -54,7 +54,7 @@ namespace iDash
 
             NotifyStatusMessage("Waiting for RFactor2...");
 
-            while (!MainForm.stopThreads && !MainForm.stopRFactor2Threads)
+            while (!closeThread)
             {
                 msg.Clear();
                 if (isGameRunning)

@@ -11,7 +11,7 @@ namespace iDash
         POSITIVE
     };
 
-    public class VJoyFeeder
+    public class VJoyFeeder : IDisposable
     {
         // Declaring one joystick (Device id 1) and a position structure. 
         private static uint CENTER = 16384;
@@ -95,9 +95,9 @@ namespace iDash
                 NotifyStatusMessage(String.Format("Version of Driver Matches DLL Version ({0:X})", DllVer));
             else
                 NotifyStatusMessage(String.Format("Version of Driver ({0:X}) does NOT match DLL Version ({1:X})", DrvVer, DllVer));
-            
+                                   
             // Acquire the target
-            if ((status == VjdStat.VJD_STAT_OWN) || ((status == VjdStat.VJD_STAT_FREE) && (!joystick.AcquireVJD(jID))))
+            if ((status == VjdStat.VJD_STAT_OWN) || (status == VjdStat.VJD_STAT_FREE) && (!joystick.AcquireVJD(jID)))
             {
                 NotifyStatusMessage(String.Format("Failed to acquire vJoy device number {0}.", jID));
                 return;
@@ -184,6 +184,12 @@ namespace iDash
                     joystick.SetBtn(states[(int)i] == State.KeyDown || states[(int)i] == State.KeyHold, jID, i + 1 - AXIS_OFFSET);
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            joystick.RelinquishVJD(jID);
+            joystick = null;            
         }
 
     }

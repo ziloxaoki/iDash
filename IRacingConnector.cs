@@ -46,7 +46,7 @@ namespace iDash
 
             NotifyStatusMessage("Waiting for IRacing...");
 
-            while (!MainForm.stopThreads && !MainForm.stopIRacingThreads)
+            while (!closeThread)
             {
                 msg.Clear();
               
