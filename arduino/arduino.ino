@@ -1,5 +1,5 @@
 #define INCLUDE_LED
-#define TYPE 1 //0 = Dash, 1 = Button Box
+#define WHEEL
 
 
 #include <avr/pgmspace.h>
@@ -41,9 +41,19 @@
 // TM1637 7 Segment modules -----------------------------------------------------------------------------
 //
 // -------------------------------------------------------------------------------------------------------
+
+#ifdef WHEEL
 //id cannot start with Arduino
 String id = "Wheel";
 //String id = "Button Box"
+int TYPE = 0; //0 = Dash, 1 = Button Box
+#endif
+
+#ifdef BUTTON_BOX
+//id cannot start with Arduino
+String id = "Button Box"
+int TYPE = 1; //0 = Dash, 1 = Button Box
+#endif
 
 #ifdef INCLUDE_LED
 // Number of Connected TM1637 modules
