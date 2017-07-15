@@ -86,7 +86,6 @@ namespace iDash
             for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++)
             {
                 ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
-                Label deviceLabel = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
 
                 if (vjoyCombo.SelectedIndex > 0)
                 {
@@ -408,14 +407,16 @@ namespace iDash
                 case UPDATE_ARDUINO_ID:
                     Label label = null;
                     Label notUsed = null;
+                    ComboBox vjoyCombo = null;
                     for (int x = TOTAL_NUM_OF_ARDUINOS; x > 0 ; x--) {
                         label = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+                        vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
                         if (label.Text.Equals(split[1]))
                         {
                             label.ForeColor = Color.Green;
                             return;
                         }
-                        if(label.Text.StartsWith(ARDUINO_ID_PREFIX))
+                        if(label.Text.StartsWith(ARDUINO_ID_PREFIX) && vjoyCombo.SelectedIndex > 0)
                         {
                             notUsed = label;
                         }
@@ -1264,7 +1265,19 @@ namespace iDash
 
         private void button5_Click(object sender, EventArgs e)
         {
-            resetAllThreads();
+            for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++)
+            {
+                ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
+                Label deviceLabel = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+
+                if(!deviceLabel.Text.StartsWith(ARDUINO_ID_PREFIX) && vjoyCombo.SelectedIndex == 0)
+                {
+                    deviceLabel.Text = ARDUINO_ID_PREFIX + " " + x;
+                    deviceLabel.ForeColor = Color.Black;
+                }
+            }
+
+                resetAllThreads();
         }
     }    
 }
