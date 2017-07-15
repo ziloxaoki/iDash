@@ -82,8 +82,18 @@ namespace iDash
             this.clearData = new System.Windows.Forms.Button();
             this.debugData = new System.Windows.Forms.RichTextBox();
             this.configurationTab = new System.Windows.Forms.TabPage();
-            this.devicesCombobox = new System.Windows.Forms.ComboBox();
-            this.devicesLabel = new System.Windows.Forms.Label();
+            this.vjoyCombo6 = new System.Windows.Forms.ComboBox();
+            this.deviceLabel6 = new System.Windows.Forms.Label();
+            this.vjoyCombo5 = new System.Windows.Forms.ComboBox();
+            this.deviceLabel5 = new System.Windows.Forms.Label();
+            this.vjoyCombo4 = new System.Windows.Forms.ComboBox();
+            this.deviceLabel4 = new System.Windows.Forms.Label();
+            this.vjoyCombo3 = new System.Windows.Forms.ComboBox();
+            this.deviceLabel3 = new System.Windows.Forms.Label();
+            this.vjoyCombo2 = new System.Windows.Forms.ComboBox();
+            this.deviceLabel2 = new System.Windows.Forms.Label();
+            this.vjoyCombo1 = new System.Windows.Forms.ComboBox();
+            this.deviceLabel1 = new System.Windows.Forms.Label();
             this.statusBar = new System.Windows.Forms.RichTextBox();
             this.mainmenu = new System.Windows.Forms.MenuStrip();
             this.simulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -99,6 +109,7 @@ namespace iDash
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.amsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.button5 = new System.Windows.Forms.Button();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -645,8 +656,19 @@ namespace iDash
             // 
             // configurationTab
             // 
-            this.configurationTab.Controls.Add(this.devicesCombobox);
-            this.configurationTab.Controls.Add(this.devicesLabel);
+            this.configurationTab.Controls.Add(this.button5);
+            this.configurationTab.Controls.Add(this.vjoyCombo6);
+            this.configurationTab.Controls.Add(this.deviceLabel6);
+            this.configurationTab.Controls.Add(this.vjoyCombo5);
+            this.configurationTab.Controls.Add(this.deviceLabel5);
+            this.configurationTab.Controls.Add(this.vjoyCombo4);
+            this.configurationTab.Controls.Add(this.deviceLabel4);
+            this.configurationTab.Controls.Add(this.vjoyCombo3);
+            this.configurationTab.Controls.Add(this.deviceLabel3);
+            this.configurationTab.Controls.Add(this.vjoyCombo2);
+            this.configurationTab.Controls.Add(this.deviceLabel2);
+            this.configurationTab.Controls.Add(this.vjoyCombo1);
+            this.configurationTab.Controls.Add(this.deviceLabel1);
             this.configurationTab.Location = new System.Drawing.Point(4, 22);
             this.configurationTab.Name = "configurationTab";
             this.configurationTab.Padding = new System.Windows.Forms.Padding(3);
@@ -655,30 +677,185 @@ namespace iDash
             this.configurationTab.Text = "Configuration";
             this.configurationTab.UseVisualStyleBackColor = true;
             // 
-            // devicesCombobox
+            // vjoyCombo6
             // 
-            this.devicesCombobox.FormattingEnabled = true;
-            this.devicesCombobox.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6"});
-            this.devicesCombobox.Location = new System.Drawing.Point(60, 9);
-            this.devicesCombobox.Name = "devicesCombobox";
-            this.devicesCombobox.Size = new System.Drawing.Size(67, 21);
-            this.devicesCombobox.TabIndex = 1;
-            this.devicesCombobox.SelectionChangeCommitted += new System.EventHandler(this.devicesCombobox_SelectionChangeCommitted);
+            this.vjoyCombo6.FormattingEnabled = true;
+            this.vjoyCombo6.Items.AddRange(new object[] {
+            "disabled",
+            "enable",
+            "vjoy1",
+            "vjoy2",
+            "vjoy3",
+            "vjoy4",
+            "vjoy5",
+            "vjoy6",
+            "vjoy7",
+            "vjoy8",
+            "vjoy9",
+            "vjoy10"});
+            this.vjoyCombo6.Location = new System.Drawing.Point(73, 146);
+            this.vjoyCombo6.Name = "vjoyCombo6";
+            this.vjoyCombo6.Size = new System.Drawing.Size(67, 21);
+            this.vjoyCombo6.TabIndex = 11;
             // 
-            // devicesLabel
+            // deviceLabel6
             // 
-            this.devicesLabel.AutoSize = true;
-            this.devicesLabel.Location = new System.Drawing.Point(6, 12);
-            this.devicesLabel.Name = "devicesLabel";
-            this.devicesLabel.Size = new System.Drawing.Size(48, 13);
-            this.devicesLabel.TabIndex = 0;
-            this.devicesLabel.Text = "Arduinos";
+            this.deviceLabel6.AutoSize = true;
+            this.deviceLabel6.Location = new System.Drawing.Point(6, 149);
+            this.deviceLabel6.Name = "deviceLabel6";
+            this.deviceLabel6.Size = new System.Drawing.Size(52, 13);
+            this.deviceLabel6.TabIndex = 10;
+            this.deviceLabel6.Text = "Arduino 6";
+            // 
+            // vjoyCombo5
+            // 
+            this.vjoyCombo5.FormattingEnabled = true;
+            this.vjoyCombo5.Items.AddRange(new object[] {
+            "disabled",
+            "enable",
+            "vjoy1",
+            "vjoy2",
+            "vjoy3",
+            "vjoy4",
+            "vjoy5",
+            "vjoy6",
+            "vjoy7",
+            "vjoy8",
+            "vjoy9",
+            "vjoy10"});
+            this.vjoyCombo5.Location = new System.Drawing.Point(73, 119);
+            this.vjoyCombo5.Name = "vjoyCombo5";
+            this.vjoyCombo5.Size = new System.Drawing.Size(67, 21);
+            this.vjoyCombo5.TabIndex = 9;
+            // 
+            // deviceLabel5
+            // 
+            this.deviceLabel5.AutoSize = true;
+            this.deviceLabel5.Location = new System.Drawing.Point(6, 122);
+            this.deviceLabel5.Name = "deviceLabel5";
+            this.deviceLabel5.Size = new System.Drawing.Size(52, 13);
+            this.deviceLabel5.TabIndex = 8;
+            this.deviceLabel5.Text = "Arduino 5";
+            // 
+            // vjoyCombo4
+            // 
+            this.vjoyCombo4.FormattingEnabled = true;
+            this.vjoyCombo4.Items.AddRange(new object[] {
+            "disabled",
+            "enable",
+            "vjoy1",
+            "vjoy2",
+            "vjoy3",
+            "vjoy4",
+            "vjoy5",
+            "vjoy6",
+            "vjoy7",
+            "vjoy8",
+            "vjoy9",
+            "vjoy10"});
+            this.vjoyCombo4.Location = new System.Drawing.Point(73, 92);
+            this.vjoyCombo4.Name = "vjoyCombo4";
+            this.vjoyCombo4.Size = new System.Drawing.Size(67, 21);
+            this.vjoyCombo4.TabIndex = 7;
+            // 
+            // deviceLabel4
+            // 
+            this.deviceLabel4.AutoSize = true;
+            this.deviceLabel4.Location = new System.Drawing.Point(6, 95);
+            this.deviceLabel4.Name = "deviceLabel4";
+            this.deviceLabel4.Size = new System.Drawing.Size(52, 13);
+            this.deviceLabel4.TabIndex = 6;
+            this.deviceLabel4.Text = "Arduino 4";
+            // 
+            // vjoyCombo3
+            // 
+            this.vjoyCombo3.FormattingEnabled = true;
+            this.vjoyCombo3.Items.AddRange(new object[] {
+            "disabled",
+            "enable",
+            "vjoy1",
+            "vjoy2",
+            "vjoy3",
+            "vjoy4",
+            "vjoy5",
+            "vjoy6",
+            "vjoy7",
+            "vjoy8",
+            "vjoy9",
+            "vjoy10"});
+            this.vjoyCombo3.Location = new System.Drawing.Point(73, 65);
+            this.vjoyCombo3.Name = "vjoyCombo3";
+            this.vjoyCombo3.Size = new System.Drawing.Size(67, 21);
+            this.vjoyCombo3.TabIndex = 5;
+            // 
+            // deviceLabel3
+            // 
+            this.deviceLabel3.AutoSize = true;
+            this.deviceLabel3.Location = new System.Drawing.Point(6, 68);
+            this.deviceLabel3.Name = "deviceLabel3";
+            this.deviceLabel3.Size = new System.Drawing.Size(52, 13);
+            this.deviceLabel3.TabIndex = 4;
+            this.deviceLabel3.Text = "Arduino 3";
+            // 
+            // vjoyCombo2
+            // 
+            this.vjoyCombo2.FormattingEnabled = true;
+            this.vjoyCombo2.Items.AddRange(new object[] {
+            "disabled",
+            "enable",
+            "vjoy1",
+            "vjoy2",
+            "vjoy3",
+            "vjoy4",
+            "vjoy5",
+            "vjoy6",
+            "vjoy7",
+            "vjoy8",
+            "vjoy9",
+            "vjoy10"});
+            this.vjoyCombo2.Location = new System.Drawing.Point(73, 38);
+            this.vjoyCombo2.Name = "vjoyCombo2";
+            this.vjoyCombo2.Size = new System.Drawing.Size(67, 21);
+            this.vjoyCombo2.TabIndex = 3;
+            // 
+            // deviceLabel2
+            // 
+            this.deviceLabel2.AutoSize = true;
+            this.deviceLabel2.Location = new System.Drawing.Point(6, 41);
+            this.deviceLabel2.Name = "deviceLabel2";
+            this.deviceLabel2.Size = new System.Drawing.Size(52, 13);
+            this.deviceLabel2.TabIndex = 2;
+            this.deviceLabel2.Text = "Arduino 2";
+            // 
+            // vjoyCombo1
+            // 
+            this.vjoyCombo1.FormattingEnabled = true;
+            this.vjoyCombo1.Items.AddRange(new object[] {
+            "disabled",
+            "enable",
+            "vjoy1",
+            "vjoy2",
+            "vjoy3",
+            "vjoy4",
+            "vjoy5",
+            "vjoy6",
+            "vjoy7",
+            "vjoy8",
+            "vjoy9",
+            "vjoy10"});
+            this.vjoyCombo1.Location = new System.Drawing.Point(73, 11);
+            this.vjoyCombo1.Name = "vjoyCombo1";
+            this.vjoyCombo1.Size = new System.Drawing.Size(67, 21);
+            this.vjoyCombo1.TabIndex = 1;
+            // 
+            // deviceLabel1
+            // 
+            this.deviceLabel1.AutoSize = true;
+            this.deviceLabel1.Location = new System.Drawing.Point(6, 14);
+            this.deviceLabel1.Name = "deviceLabel1";
+            this.deviceLabel1.Size = new System.Drawing.Size(52, 13);
+            this.deviceLabel1.TabIndex = 0;
+            this.deviceLabel1.Text = "Arduino 1";
             // 
             // statusBar
             // 
@@ -803,6 +980,16 @@ namespace iDash
             this.rFactor2ToolStripMenuItem1.Text = "RFactor2";
             this.rFactor2ToolStripMenuItem1.Click += new System.EventHandler(this.rFactor2ToolStripMenuItem1_Click);
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(26, 184);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 23);
+            this.button5.TabIndex = 12;
+            this.button5.Text = "Apply";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -905,8 +1092,19 @@ namespace iDash
         private System.Windows.Forms.CheckBox isTestMode;
         private System.Windows.Forms.Label bPressed;
         private System.Windows.Forms.TabPage configurationTab;
-        private System.Windows.Forms.ComboBox devicesCombobox;
-        private System.Windows.Forms.Label devicesLabel;
+        private System.Windows.Forms.ComboBox vjoyCombo1;
+        private System.Windows.Forms.Label deviceLabel1;
+        private System.Windows.Forms.ComboBox vjoyCombo6;
+        private System.Windows.Forms.Label deviceLabel6;
+        private System.Windows.Forms.ComboBox vjoyCombo5;
+        private System.Windows.Forms.Label deviceLabel5;
+        private System.Windows.Forms.ComboBox vjoyCombo4;
+        private System.Windows.Forms.Label deviceLabel4;
+        private System.Windows.Forms.ComboBox vjoyCombo3;
+        private System.Windows.Forms.Label deviceLabel3;
+        private System.Windows.Forms.ComboBox vjoyCombo2;
+        private System.Windows.Forms.Label deviceLabel2;
+        private System.Windows.Forms.Button button5;
     }
 }
 

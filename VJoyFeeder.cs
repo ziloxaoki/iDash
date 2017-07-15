@@ -25,10 +25,10 @@ namespace iDash
         public StatusMessageHandler StatusMessageSubscribers;        
 
 
-        public VJoyFeeder(ButtonHandler bh)
+        public VJoyFeeder(ButtonHandler bh, uint vjoyId)
         {
             bh.buttonStateHandler += ButtonStateReceived;
-            jID = bh.getVJoyID();
+            jID = vjoyId;
         }        
 
         public void InitializeJoystick()

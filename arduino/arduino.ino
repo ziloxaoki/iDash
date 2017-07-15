@@ -1,5 +1,6 @@
 #define INCLUDE_LED
-#define TYPE 0; //0 = Dash, 1 = Button Box
+#define TYPE 0 //0 = Dash, 1 = Button Box
+
 
 #include <avr/pgmspace.h>
 #include <EEPROM.h>
@@ -40,6 +41,9 @@
 // TM1637 7 Segment modules -----------------------------------------------------------------------------
 //
 // -------------------------------------------------------------------------------------------------------
+//id cannot start with Arduino
+const String id = "Wheel";
+//const String id = "Button Box";
 
 #ifdef INCLUDE_LED
 // Number of Connected TM1637 modules
@@ -669,6 +673,14 @@ void sendDebugModeState(byte header, byte state) {
   sendDataToSerial(offset, response);
 }
 
+int appendArduinoId(int offset, byte *buffer) {
+  for (int x = 0; x < id.length(); x++) {
+    buffer[offset++] = id[x];   
+  }
+
+  return offset;
+}
+
 void sendHandshacking() {
   byte response[4];
   int offset = 0;
@@ -677,6 +689,7 @@ void sendHandshacking() {
   response[offset++] = CMD_INIT;
   response[offset++] = CMD_SYN;
   response[offset++] = TYPE;
+  offset = appendArduinoId(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
   

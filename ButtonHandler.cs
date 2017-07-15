@@ -59,14 +59,8 @@ namespace iDash
         public ButtonStateHandler buttonStateHandler;
         private uint vJoyID = 1;
 
-        public ButtonHandler(SerialManager sm, uint vJoyID) : base(sm) {
+        public ButtonHandler(SerialManager sm) : base(sm) {
             sm.CommandReceivedSubscribers += new SerialManager.CommandReceivedHandler(executeCommand);
-            this.vJoyID = vJoyID;
-        }
-
-        public uint getVJoyID()
-        {
-            return vJoyID;
         }
 
         private void updateKeyState(byte[] bStates)

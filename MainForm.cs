@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
@@ -19,7 +20,8 @@ namespace iDash
         private const int WAIT_ARDUINO_SET_DEBUG_MODE = 100;
         private const int WAIT_UI_FREQUENCY = 1000;
         private const int WAIT_THREADS_TO_CLOSE = 3500;
-        public const string UPDATE_BUTTON_VOLTAGE = "UPDATE_BUTTON_VOLTAGE";
+        public const string UPDATE_BUTTON_VOLTAGE = "!-UPDATE_BUTTON_VOLTAGE";
+        public const string UPDATE_ARDUINO_ID = "!-UPDATE_ARDUINO_ID";
 
         private List<SerialManager> sm = new List<SerialManager>();
         private List<ButtonHandler> bh = new List<ButtonHandler>();
@@ -52,7 +54,12 @@ namespace iDash
         public delegate void HandleButtonActions(List<State> states);
         public HandleButtonActions handleButtonActions;
         public static bool formFinishedLoading;
-        public static int devicesAvailable = 1;
+
+        private const int TOTAL_NUM_OF_ARDUINOS = 6;
+        private const string ARDUINO_ID_PREFIX = "Arduino";
+        private const string VJOY_COMBO_CONTROL_NAME_PREFIX = "vjoyCombo";
+        private const string VJOY_COMBO_VALUE_PREFIX = "vjoy";
+        private const string ARDUINO_LABEL_CONTROL_NAME_PREFIX = "deviceLabel";
 
 
         public MainForm()
@@ -76,33 +83,43 @@ namespace iDash
 
             handleButtonActions = new HandleButtonActions(handleButtons);
 
-            for (int x = 0; x <= this.devicesCombobox.SelectedIndex; x++)
+            for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++)
             {
-                Logger.LogMessageToFile("Initializing Serial Manager.", true);
-                AppendToStatusBar("\n\nInitializing Serial Manager.\n");
-                SerialManager serialManager = new SerialManager((uint)x + 1);
-                serialManager.StatusMessageSubscribers += UpdateStatusBar;
-                serialManager.DebugMessageSubscribers += UpdateDebugData;
-                sm.Add(serialManager);
+                ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
+                Label deviceLabel = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
 
-                Logger.LogMessageToFile("Initializing Button Handler.", true);
-                AppendToStatusBar("Initializing Button Handler.\n");
-                ButtonHandler buttonHandler = new ButtonHandler(serialManager, (uint)x + 1);
-                buttonHandler.buttonStateHandler += ButtonStateReceived;
-                bh.Add(buttonHandler);
-                //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
-                Thread.Sleep(1000);
+                if (vjoyCombo.SelectedIndex > 0)
+                {
+                    Logger.LogMessageToFile("Initializing Serial Manager.", true);
+                    AppendToStatusBar("\n\nInitializing Serial Manager.\n");
+                    SerialManager serialManager = new SerialManager();
+                    serialManager.StatusMessageSubscribers += UpdateStatusBar;
+                    serialManager.DebugMessageSubscribers += UpdateDebugData;
+                    sm.Add(serialManager);
+                    serialManager.Init();
 
-                Logger.LogMessageToFile("Initializing Vjoy.", true);
-                AppendToStatusBar("Initializing Vjoy.\n");
-                VJoyFeeder vJoyFeeder  = new VJoyFeeder(buttonHandler);
-                vJoyFeeder.StatusMessageSubscribers += UpdateStatusBar;
-                vf.Add(vJoyFeeder);
+                    if (vjoyCombo.SelectedIndex > 1)
+                    {
+                        Logger.LogMessageToFile("Initializing Button Handler.", true);
+                        AppendToStatusBar("Initializing Button Handler.\n");
+                        ButtonHandler buttonHandler = new ButtonHandler(serialManager);
+                        buttonHandler.buttonStateHandler += ButtonStateReceived;
+                        bh.Add(buttonHandler);
+                        //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
+                        Thread.Sleep(1000);
 
-                this.iRacingToolStripMenuItem1.PerformClick();
+                        uint vjoyId = (uint)vjoyCombo.SelectedIndex - 1;
 
-                serialManager.Init();
-                vJoyFeeder.InitializeJoystick();
+                        Logger.LogMessageToFile("Initializing Vjoy.", true);
+                        AppendToStatusBar("Initializing Vjoy.\n");
+                        VJoyFeeder vJoyFeeder = new VJoyFeeder(buttonHandler, vjoyId);
+                        vJoyFeeder.StatusMessageSubscribers += UpdateStatusBar;
+                        vf.Add(vJoyFeeder);
+                        vJoyFeeder.InitializeJoystick();
+                    }
+
+                    this.iRacingToolStripMenuItem1.PerformClick();                                       
+                }
             }
 
             AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory + "\n");
@@ -197,19 +214,30 @@ namespace iDash
                 }
             }
 
-            //Default to first simulator
+            //Set first game as default
             loadViewProperties(0);
 
-            if (Properties.Settings.Default.CONFIGURATION == 0)
+            string[] aux = Properties.Settings.Default.VJOY_IDS.Split(',');
+
+            for (int x = 1; x <= aux.Length; x++)
             {
-                this.devicesCombobox.SelectedIndex = 0;
-            }
-            else
-            {
-                this.devicesCombobox.SelectedIndex = Properties.Settings.Default.CONFIGURATION;
+                if (Int32.Parse(aux[x - 1]) > -1)
+                {                    
+                    var combo = (ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
+                    combo.SelectedIndex = Int32.Parse(aux[x - 1]);
+                }
             }
 
-            devicesAvailable = this.devicesCombobox.SelectedIndex + 1;
+            aux = Properties.Settings.Default.ARDUINO_IDS.Split(',');
+
+            for (int x = 1; x <= aux.Length; x++)
+            {
+                if (!aux[x - 1].StartsWith(ARDUINO_ID_PREFIX))
+                {
+                    var label = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+                    label.Text = aux[x - 1];
+                }
+            }
         }
 
 
@@ -250,7 +278,25 @@ namespace iDash
                 }
             }
 
-            Properties.Settings.Default.CONFIGURATION = int.Parse(this.devicesCombobox.Text) - 1;
+            string[] vjoyIds = new string[] { "0", "0", "0", "0", "0", "0" };
+
+            for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++)
+            {
+                var combo = (ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
+                vjoyIds[x - 1] = combo.SelectedIndex.ToString().Trim();                                   
+            }            
+
+            Properties.Settings.Default.VJOY_IDS = String.Join(",", vjoyIds);
+
+            string[] arduinoIds = new string[] { "Arduino 1", "Arduino 2", "Arduino 3", "Arduino 4", "Arduino 5", "Arduino 6" };
+            for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++)
+            {
+                var label = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+                arduinoIds[x - 1] = label.Text.Trim();
+            }
+
+            Properties.Settings.Default.ARDUINO_IDS = String.Join(",", arduinoIds);
+
 
             Properties.Settings.Default.Save();
         }
@@ -350,12 +396,42 @@ namespace iDash
             else this.AppendToStatusBar(s);
         }
 
+        private void processExternalCommand(String s)
+        {
+            string[] split = s.Split(':');
+
+            switch (split[0])
+            {
+                case UPDATE_BUTTON_VOLTAGE:                    
+                    bPressed.Text = split[1];
+                    break;
+                case UPDATE_ARDUINO_ID:
+                    Label label = null;
+                    Label notUsed = null;
+                    for (int x = TOTAL_NUM_OF_ARDUINOS; x > 0 ; x--) {
+                        label = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+                        if (label.Text.Equals(split[1]))
+                        {
+                            label.ForeColor = Color.Green;
+                            return;
+                        }
+                        if(label.Text.StartsWith(ARDUINO_ID_PREFIX))
+                        {
+                            notUsed = label;
+                        }
+                    }
+
+                    notUsed.Text = split[1];
+                    notUsed.ForeColor = Color.Green;
+                    break;
+            }
+        }
+
         public void AppendToDebugDialog(String s)
         {
-            if (s.StartsWith(UPDATE_BUTTON_VOLTAGE))
+            if (s.StartsWith("!-"))
             {
-                string[] split = s.Split(':');
-                bPressed.Text = split[1];
+                processExternalCommand(s);
             }
             else
             {
@@ -1186,7 +1262,7 @@ namespace iDash
             }
         }
 
-        private void devicesCombobox_SelectionChangeCommitted(object sender, EventArgs e)
+        private void button5_Click(object sender, EventArgs e)
         {
             resetAllThreads();
         }

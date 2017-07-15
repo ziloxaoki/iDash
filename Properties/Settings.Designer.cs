@@ -49,13 +49,25 @@ namespace iDash.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int CONFIGURATION {
+        [global::System.Configuration.DefaultSettingValueAttribute("1,0,0,0,0,0")]
+        public string VJOY_IDS {
             get {
-                return ((int)(this["CONFIGURATION"]));
+                return ((string)(this["VJOY_IDS"]));
             }
             set {
-                this["CONFIGURATION"] = value;
+                this["VJOY_IDS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Arduino 1,Arduino 2,Arduino 3,Arduino 4,Arduino 5,Arduino 6")]
+        public string ARDUINO_IDS {
+            get {
+                return ((string)(this["ARDUINO_IDS"]));
+            }
+            set {
+                this["ARDUINO_IDS"] = value;
             }
         }
     }

@@ -56,13 +56,8 @@ namespace iDash
         private string[] portNames;
         private int[,] voltages = new int[8,3];
         private int MIN_VOLTAGE = 100;
-        private uint id = 0;
+        private string id = "";
         private bool closeThread = false;
-
-        public SerialManager(uint id)
-        {
-            this.id = id;
-        }
 
         public void Init()
         {
@@ -243,6 +238,14 @@ namespace iDash
             return 0;
         }    
 
+        private string retrieveArduinoId(Command command)
+        {
+            char[] c = Encoding.UTF8.GetString(command.getData()).ToCharArray();
+            string result = new string(Utils.getSubArray(c, 2, c.Length - 3));            
+
+            return result;
+        }
+
         private string processCommand(Command command)
         {
             string type = "invalid";
@@ -254,6 +257,8 @@ namespace iDash
                     //ACK message sent by Arduino
                     case Command.CMD_SYN:
                         arduinoHas7Seg = command.getData()[1];
+                        id = retrieveArduinoId(command);
+                        NotifyDebugMessage(String.Format(MainForm.UPDATE_ARDUINO_ID + ":{0}", id));
                         break;
                     //Arduino response to the set debug mode command
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:
