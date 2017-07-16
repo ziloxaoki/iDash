@@ -152,13 +152,6 @@ namespace iDash
                         catch(Exception e)
                         {
                             Logger.LogExceptionToFile(e);
-                            /*if (!notificationSent.Contains(port))
-                            {
-                                MessageBox.Show(String.Format("Port {0} already in use", port),
-                                    "Warning",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Warning);
-                            }*/
                             await Task.Delay(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
 
                             continue;                          
