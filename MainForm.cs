@@ -22,6 +22,7 @@ namespace iDash
         private const int WAIT_THREADS_TO_CLOSE = 3500;
         public const string UPDATE_BUTTON_VOLTAGE = "!-UPDATE_BUTTON_VOLTAGE";
         public const string UPDATE_ARDUINO_ID = "!-UPDATE_ARDUINO_ID";
+        public const string UPDATE_ARDUINO_DISCONNECTED = "!-UPDATE_ARDUINO_DISCONNECTED";
 
         private List<SerialManager> sm = new List<SerialManager>();
         private List<ButtonHandler> bh = new List<ButtonHandler>();
@@ -424,6 +425,17 @@ namespace iDash
 
                     notUsed.Text = split[1];
                     notUsed.ForeColor = Color.Green;
+                    break;
+                case UPDATE_ARDUINO_DISCONNECTED:
+                    for (int x = TOTAL_NUM_OF_ARDUINOS; x > 0; x--)
+                    {
+                        label = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+                        if (label.Text.Equals(split[1]))
+                        {
+                            label.ForeColor = Color.Black;
+                            return;
+                        }
+                    }
                     break;
             }
         }

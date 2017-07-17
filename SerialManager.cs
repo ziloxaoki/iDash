@@ -129,6 +129,7 @@ namespace iDash
                         }
                         else if (lastArduinoResponse > 0 && portNames.Length == 1)
                         {
+                            NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_DISCONNECTED + ":{0}", id));
                             NotifyStatusMessage("Arduino(" + id + ")at port " + port + " disconnected.");
                             lastArduinoResponse = 0;
                         }
@@ -156,15 +157,14 @@ namespace iDash
 
                             continue;                          
                         }
-                       
-                        //check if connected
-                        sendSynAck();
+                      
 
                         //wait for arduino ACK message
                         await Task.Delay(WAIT_SERIAL_CONNECT);
 
                         if (isArduinoAlive())
                         {
+                            sendSynAck();
                             NotifyStatusMessage("Arduino(" + id + ") found at port " + port + "...");
                             Logger.LogMessageToFile("Arduino(" + id + ") connected to port " + port, true);
                             //if arduino found always try to reconnect to the same port
@@ -251,7 +251,7 @@ namespace iDash
                     case Command.CMD_SYN:
                         arduinoHas7Seg = command.getData()[1];
                         id = retrieveArduinoId(command);
-                        NotifyDebugMessage(String.Format(MainForm.UPDATE_ARDUINO_ID + ":{0}", id));
+                        NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_ID + ":{0}", id));
                         break;
                     //Arduino response to the set debug mode command
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:
@@ -274,7 +274,7 @@ namespace iDash
                         {
                             sb.Append(String.Format("pin {0}={1}-{2}  ", voltages[x, 0], voltages[x, 1], voltages[x, 2]));
                         }
-                        NotifyDebugMessage(String.Format(MainForm.UPDATE_BUTTON_VOLTAGE + ":{0}",sb.ToString()));
+                        NotifyMessage(String.Format(MainForm.UPDATE_BUTTON_VOLTAGE + ":{0}",sb.ToString()));
                         break;
                     //Arduino response when crc command failed
                     case Command.CMD_INVALID:
@@ -285,7 +285,7 @@ namespace iDash
                 if (formDebugMode == DebugMode.Default) {
                     if (isDisabledSerial) {
                         if (command.getRawData()[0] == Command.CMD_INIT_DEBUG) {
-                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", 
+                            NotifyMessage(String.Format("Command processed:{0} - ({1})\n", 
                                 Utils.byteArrayToString(command.getRawData(), false), 
                                 type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
@@ -295,7 +295,7 @@ namespace iDash
                     {
                         if ((c != Command.CMD_BUTTON_STATUS && c != Command.CMD_SYN) || Utils.hasTimedOut(lastMessageLogged, 1000))
                         {
-                            NotifyDebugMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
+                            NotifyMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
                         }
                     }
@@ -451,7 +451,7 @@ namespace iDash
         }
 
         //notify subscribers (debug field) that a message has to be logged
-        public void NotifyDebugMessage(string args)
+        public void NotifyMessage(string args)
         {
             DebugMessageHandler handler = DebugMessageSubscribers;
 
