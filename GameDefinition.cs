@@ -7,18 +7,18 @@ namespace iDash
 {
     public enum GameEnum
     {
-        RACE_ROOM, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, RF2, ASSETTO_64BIT, ASSETTO_32BIT
+        RACE_ROOM, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, RF2, ASSETTO_64BIT, ASSETTO_32BIT, IRACING_64BIT
     }
     public class GameDefinition
     {
-        /*public static GameDefinition pCars64Bit = new GameDefinition(GameEnum.PCARS_64BIT, Configuration.getUIString("pcars_64_bit"), "pCARS64",
-            "CrewChiefV4.PCars.PCarsSpotterv2", "pcars64_launch_exe", "pcars64_launch_params", "launch_pcars");
-        public static GameDefinition pCars32Bit = new GameDefinition(GameEnum.PCARS_32BIT, Configuration.getUIString("pcars_32_bit"), "pCARS",
-            "CrewChiefV4.PCars.PCarsSpotterv2", "pcars32_launch_exe", "pcars32_launch_params", "launch_pcars");
-        public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, Configuration.getUIString("race_room"), "RRRE", "CrewChiefV4.RaceRoom.R3ESpotterv2",
+        public static GameDefinition pCars64Bit = new GameDefinition(GameEnum.PCARS_64BIT, "PCars 64 bits", "pCARS64",
+            "pcars64_launch_exe", "pcars64_launch_params", "launch_pcars");
+        public static GameDefinition pCars32Bit = new GameDefinition(GameEnum.PCARS_32BIT, "Pcars 32 bits", "pCARS",
+            "pcars32_launch_exe", "pcars32_launch_params", "launch_pcars");
+        public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, "Raceroom", "RRRE",
             "r3e_launch_exe", "r3e_launch_params", "launch_raceroom");
-        public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, Configuration.getUIString("pcars_udp"), null, "CrewChiefV4.PCars.PCarsSpotterv2",
-            null, null, null);*/
+        public static GameDefinition iracing = new GameDefinition(GameEnum.IRACING_64BIT, "IRacing 64 bits", "iRacingSim64DX11",
+            "iracing_launch_exe", "iracing_launch_params", "launch_iracing");
         public static GameDefinition rFactor1 = new GameDefinition(GameEnum.RF1, "RFactor", "rFactor",
             "rf1_launch_exe", "rf1_launch_params", "launch_rfactor1");
         public static GameDefinition gameStockCar = new GameDefinition(GameEnum.RF1, "Game Stock Car", "GSC",
@@ -31,10 +31,10 @@ namespace iDash
             "ftruck_launch_exe", "ftruck_launch_params", "launch_ftruck");
         public static GameDefinition rfactor2 = new GameDefinition(GameEnum.RF2, "RFactor 2", "RFACTOR2",
             "rfactor2_exe", "rfactor2_params", "rfactor2");
-        /*public static GameDefinition assetto64Bit = new GameDefinition(GameEnum.ASSETTO_64BIT, Configuration.getUIString("assetto_64_bit"), "acs", "CrewChiefV4.assetto.ACSSpotter",
+        public static GameDefinition assetto64Bit = new GameDefinition(GameEnum.ASSETTO_64BIT, "Assetto 64 bits", "acs",
             "acs_launch_exe", "acs_launch_params", "launch_acs");
-        public static GameDefinition assetto32Bit = new GameDefinition(GameEnum.ASSETTO_32BIT, Configuration.getUIString("assetto_32_bit"), "acs_x86", "CrewChiefV4.assetto.ACSSpotter",
-            "acs_launch_exe", "acs_launch_params", "launch_acs");*/
+        public static GameDefinition assetto32Bit = new GameDefinition(GameEnum.ASSETTO_32BIT, "assetto_32_bit", "acs_x86",
+            "acs_launch_exe", "acs_launch_params", "launch_acs");
 
 
 
@@ -43,7 +43,8 @@ namespace iDash
         {
             List<GameDefinition> definitions = new List<GameDefinition>();
             definitions.Add(automobilista); definitions.Add(gameStockCar); definitions.Add(marcas);
-            definitions.Add(ftruck); definitions.Add(rFactor1);
+            definitions.Add(ftruck); definitions.Add(rFactor1); definitions.Add(assetto32Bit); definitions.Add(assetto64Bit);
+            definitions.Add(raceRoom); definitions.Add(rfactor2); definitions.Add(iracing);
             return definitions;
         }
 

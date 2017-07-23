@@ -124,6 +124,8 @@ namespace iDash
 
             AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory + "\n");
             this.debugModes.DataSource = Enum.GetValues(typeof(iDash.DebugMode)); //fix for designer. Cannot declare it in MainForm.Designer
+            //search for Game
+            autoConnectToSimulator();
         }
 
 
@@ -1168,6 +1170,7 @@ namespace iDash
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             statusBar.AppendText("Simulator disconnected.\n");
             selectedSimulator = Constants.None;
+            autoConnectToSimulator();
         }
 
         private void iRacingToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -1290,6 +1293,44 @@ namespace iDash
             }
 
                 resetAllThreads();
+        }
+
+        private async void autoConnectToSimulator()
+        {
+            List<GameDefinition> gameDefinitionList = GameDefinition.getAllGameDefinitions();
+
+            while (irc == null && rrc == null && acc == null && ams == null && rf2 == null)
+            {
+                foreach (GameDefinition gd in gameDefinitionList) {
+                    Process[] pname = Process.GetProcessesByName(gd.processName);
+                    if (pname.Length > 0)
+                    {
+                        switch(gd.gameEnum)
+                        {
+                            case GameEnum.ASSETTO_32BIT:
+                            case GameEnum.ASSETTO_64BIT:
+                                assettoToolStripMenuItem.PerformClick();
+                                break;
+
+                            case GameEnum.IRACING_64BIT:
+                                iRacingToolStripMenuItem.PerformClick();
+                                break;
+                            case GameEnum.RACE_ROOM:
+                                raceroomToolStripMenuItem.PerformClick();
+                                break;
+                            case GameEnum.RF1:
+                                amsToolStripMenuItem.PerformClick();
+                                break;
+                            case GameEnum.RF2:
+                                rFactor2ToolStripMenuItem.PerformClick();
+                                break;
+                        }
+                    }                        
+                }
+
+                //wait 1sec
+                await Task.Delay(1000);
+            }
         }
     }    
 }

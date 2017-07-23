@@ -130,7 +130,7 @@ namespace iDash
             if (!String.IsNullOrEmpty(result))
                 return result;
 
-            return "00.00.00.00";
+            return "";
         }
 
         //needs to wait until MainForm 7Segment is loaded

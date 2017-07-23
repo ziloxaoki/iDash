@@ -182,8 +182,8 @@ int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT_PULLUP},  //A7 Left paddle - INPUT_PU
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
-int BUTTON_LIMITS[8][4][2] = {{{575, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
-                              {{575, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
+int BUTTON_LIMITS[8][4][2] = {{{580, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
+                              {{580, 900}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
                               {{450, 530}, {550, 620}, {625, 690}, {695, 745}},   //A5 Extra 1 - INPUT
                               {{450, 530}, {550, 620}, {625, 690}, {695, 745}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
