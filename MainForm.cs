@@ -1299,7 +1299,7 @@ namespace iDash
         {
             List<GameDefinition> gameDefinitionList = GameDefinition.getAllGameDefinitions();
 
-            while (irc == null && rrc == null && acc == null && ams == null && rf2 == null)
+            while (irc == null && rrc == null && acc == null && ams == null && rf2 == null && !IsDisposed)
             {
                 foreach (GameDefinition gd in gameDefinitionList) {
                     Process[] pname = Process.GetProcessesByName(gd.processName);
