@@ -293,7 +293,7 @@ namespace iDash
                     }
                     else
                     {
-                        if ((c != Command.CMD_BUTTON_STATUS && c != Command.CMD_SYN) || Utils.hasTimedOut(lastMessageLogged, 1000))
+                        if ((c != Command.CMD_BUTTON_STATUS && c != Command.CMD_SYN && c != Command.CMD_DEBUG_BUTTON) || Utils.hasTimedOut(lastMessageLogged, 1000))
                         {
                             NotifyMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
