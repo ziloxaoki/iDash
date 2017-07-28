@@ -247,13 +247,13 @@ byte MAX7221_ByteReorder(byte x)
 
 void resetTM1637_MAX7221() {
   byte v[] = {' ',' ',0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111};
-  sendToTM1637_MAX7221(v);
+  sendToTM1637_MAX7221(v, 22);
 }
 
-void sendToTM1637_MAX7221(byte *buffer) {
+void sendToTM1637_MAX7221(byte *buffer, int commandLength) {
   //first char(0) is the command start and second char is the command header 
   uint8_t k = 2;  
-
+  
   // TM1637
   for (uint8_t i = 0; i < TM1637_ENABLEDMODULES ; i++) {
     TM1637_screens[i]->setSegments(buffer,2,4,0);
@@ -262,13 +262,15 @@ void sendToTM1637_MAX7221(byte *buffer) {
   
   // MAX7221
   for (uint8_t i = 0; i < MAX7221_ENABLEDMODULES; i++) {     
-    for (uint8_t j = 0; j < 8; j++) {
-      //48 used as white space because 0 is used as end of msg
-      if(buffer[k] == 48) {
-        MAX7221.setRow(i, 7 - j, 0);
-        k++;
-      } else {
-        MAX7221.setRow(i, 7 - j, MAX7221_ByteReorder(buffer[k++]));
+    for (uint8_t j = 0; j < 8 && k < commandLength; j++) {
+      if(buffer[k] > 0) {
+        //48 used as white space because 0 is used as end of msg
+        if(buffer[k] == 48) {
+          MAX7221.setRow(i, 7 - j, 0);
+          k++;
+        } else {
+          MAX7221.setRow(i, 7 - j, MAX7221_ByteReorder(buffer[k++]));
+        }
       }
     }
   }
@@ -293,42 +295,45 @@ void updateLedBuffer(byte *buffer) {
   isBlinking = buffer[(WS2812B_RGBLEDCOUNT * 3) + k] == 1;  
     
   for (uint8_t j = 0; j < WS2812B_RGBLEDCOUNT; j++) {
-    ledBuffer[l++] = buffer[k++];    
-    ledBuffer[l++] = buffer[k++];
-    ledBuffer[l++] = buffer[k++];
+    if(buffer[k] < 256 && buffer[k + 1] < 256 && buffer[k + 2] < 256) {
+      ledBuffer[l++] = buffer[k++];    
+      ledBuffer[l++] = buffer[k++];
+      ledBuffer[l++] = buffer[k++];
+    }
   }  
 }
 
 void sendToWS2812B() {
   uint8_t k = 0;
-
-  if(isBlinking) {
-    if(millis() - lastBlinkTime > 100) {
-      isLedBlack = !isLedBlack;
-      lastBlinkTime = millis();
-    }
-  }
-  
-  for (uint8_t j = 0; j < WS2812B_RGBLEDCOUNT; j++) {
-
-    uint8_t r = 0;
-    uint8_t g = 0;
-    uint8_t b = 0;
-
-    if(!isBlinking || isLedBlack) {
-      r = ledBuffer[k++];    
-      g = ledBuffer[k++];
-      b = ledBuffer[k++];
-    } 
-    
-    if (WS2812B_RIGHTTOLEFT == 1) {
-      WS2812B_strip.setPixelColor(WS2812B_RGBLEDCOUNT - j - 1, r, g, b);
-    } else {
-      WS2812B_strip.setPixelColor(j, r, g, b);
-    }
-  }  
   
   if (WS2812B_RGBLEDCOUNT > 0) {
+
+    if(isBlinking) {
+      if(millis() - lastBlinkTime > 100) {
+        isLedBlack = !isLedBlack;
+        lastBlinkTime = millis();
+      }
+    }
+    
+    for (uint8_t j = 0; j < WS2812B_RGBLEDCOUNT; j++) {
+  
+      uint8_t r = 0;
+      uint8_t g = 0;
+      uint8_t b = 0;
+  
+      if(!isBlinking || isLedBlack) {
+        r = ledBuffer[k++];    
+        g = ledBuffer[k++];
+        b = ledBuffer[k++];
+      } 
+      
+      if (WS2812B_RIGHTTOLEFT == 1) {
+        WS2812B_strip.setPixelColor(WS2812B_RGBLEDCOUNT - j - 1, r, g, b);
+      } else {
+        WS2812B_strip.setPixelColor(j, r, g, b);
+      }
+    }  
+  
     WS2812B_strip.show();
   }  
 }
@@ -592,7 +597,7 @@ void processCommand(byte *buffer, int commandLength) {
       
 #ifdef INCLUDE_LED  
     case CMD_7_SEGS :    
-      sendToTM1637_MAX7221(buffer);      
+      sendToTM1637_MAX7221(buffer, commandLength);      
       break;
 #endif
 
@@ -638,9 +643,18 @@ int readline(int readch, byte *buffer, int len)
   return -1;
 }
 
+void initBuffer(byte *buffer, int size) {
+  for(int x = 0; x < size; x++) {
+    buffer[x] = 0;
+  }
+
+  return buffer;
+}
 
 void processData() {  
-  static byte buffer[100];
+  static byte buffer[100]; 
+  initBuffer(buffer, 100);
+  
   int commandLength = 0;
 
   long startReading = millis();
