@@ -70,5 +70,17 @@ namespace iDash.Properties {
                 this["ARDUINO_IDS"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,0,0,0,0,0")]
+        public string COMPORT_IDS {
+            get {
+                return ((string)(this["COMPORT_IDS"]));
+            }
+            set {
+                this["COMPORT_IDS"] = value;
+            }
+        }
     }
 }

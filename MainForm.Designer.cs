@@ -82,6 +82,7 @@ namespace iDash
             this.clearData = new System.Windows.Forms.Button();
             this.debugData = new System.Windows.Forms.RichTextBox();
             this.configurationTab = new System.Windows.Forms.TabPage();
+            this.button5 = new System.Windows.Forms.Button();
             this.vjoyCombo6 = new System.Windows.Forms.ComboBox();
             this.deviceLabel6 = new System.Windows.Forms.Label();
             this.vjoyCombo5 = new System.Windows.Forms.ComboBox();
@@ -109,7 +110,12 @@ namespace iDash
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.amsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.button5 = new System.Windows.Forms.Button();
+            this.serialPortCombo1 = new System.Windows.Forms.ComboBox();
+            this.serialPortCombo2 = new System.Windows.Forms.ComboBox();
+            this.serialPortCombo3 = new System.Windows.Forms.ComboBox();
+            this.serialPortCombo4 = new System.Windows.Forms.ComboBox();
+            this.serialPortCombo5 = new System.Windows.Forms.ComboBox();
+            this.serialPortCombo6 = new System.Windows.Forms.ComboBox();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -656,6 +662,12 @@ namespace iDash
             // 
             // configurationTab
             // 
+            this.configurationTab.Controls.Add(this.serialPortCombo6);
+            this.configurationTab.Controls.Add(this.serialPortCombo5);
+            this.configurationTab.Controls.Add(this.serialPortCombo4);
+            this.configurationTab.Controls.Add(this.serialPortCombo3);
+            this.configurationTab.Controls.Add(this.serialPortCombo2);
+            this.configurationTab.Controls.Add(this.serialPortCombo1);
             this.configurationTab.Controls.Add(this.button5);
             this.configurationTab.Controls.Add(this.vjoyCombo6);
             this.configurationTab.Controls.Add(this.deviceLabel6);
@@ -676,6 +688,16 @@ namespace iDash
             this.configurationTab.TabIndex = 2;
             this.configurationTab.Text = "Configuration";
             this.configurationTab.UseVisualStyleBackColor = true;
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(26, 184);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 23);
+            this.button5.TabIndex = 12;
+            this.button5.Text = "Apply";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // vjoyCombo6
             // 
@@ -980,15 +1002,185 @@ namespace iDash
             this.rFactor2ToolStripMenuItem1.Text = "RFactor2";
             this.rFactor2ToolStripMenuItem1.Click += new System.EventHandler(this.rFactor2ToolStripMenuItem1_Click);
             // 
-            // button5
+            // serialPortCombo1
             // 
-            this.button5.Location = new System.Drawing.Point(26, 184);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(75, 23);
-            this.button5.TabIndex = 12;
-            this.button5.Text = "Apply";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
+            this.serialPortCombo1.FormattingEnabled = true;
+            this.serialPortCombo1.Items.AddRange(new object[] {
+            "disabled",
+            "COM1",
+            "COM2",
+            "COM3",
+            "COM4",
+            "COM5",
+            "COM6",
+            "COM7",
+            "COM8",
+            "COM9",
+            "COM10",
+            "COM11",
+            "COM12",
+            "COM13",
+            "COM14",
+            "COM15",
+            "COM16",
+            "COM17",
+            "COM18",
+            "COM19",
+            "COM20"});
+            this.serialPortCombo1.Location = new System.Drawing.Point(156, 11);
+            this.serialPortCombo1.Name = "serialPortCombo1";
+            this.serialPortCombo1.Size = new System.Drawing.Size(76, 21);
+            this.serialPortCombo1.TabIndex = 13;
+            // 
+            // serialPortCombo2
+            // 
+            this.serialPortCombo2.FormattingEnabled = true;
+            this.serialPortCombo2.Items.AddRange(new object[] {
+            "disabled",
+            "COM1",
+            "COM2",
+            "COM3",
+            "COM4",
+            "COM5",
+            "COM6",
+            "COM7",
+            "COM8",
+            "COM9",
+            "COM10",
+            "COM11",
+            "COM12",
+            "COM13",
+            "COM14",
+            "COM15",
+            "COM16",
+            "COM17",
+            "COM18",
+            "COM19",
+            "COM20"});
+            this.serialPortCombo2.Location = new System.Drawing.Point(156, 38);
+            this.serialPortCombo2.Name = "serialPortCombo2";
+            this.serialPortCombo2.Size = new System.Drawing.Size(76, 21);
+            this.serialPortCombo2.TabIndex = 14;
+            // 
+            // serialPortCombo3
+            // 
+            this.serialPortCombo3.FormattingEnabled = true;
+            this.serialPortCombo3.Items.AddRange(new object[] {
+            "disabled",
+            "COM1",
+            "COM2",
+            "COM3",
+            "COM4",
+            "COM5",
+            "COM6",
+            "COM7",
+            "COM8",
+            "COM9",
+            "COM10",
+            "COM11",
+            "COM12",
+            "COM13",
+            "COM14",
+            "COM15",
+            "COM16",
+            "COM17",
+            "COM18",
+            "COM19",
+            "COM20"});
+            this.serialPortCombo3.Location = new System.Drawing.Point(156, 65);
+            this.serialPortCombo3.Name = "serialPortCombo3";
+            this.serialPortCombo3.Size = new System.Drawing.Size(76, 21);
+            this.serialPortCombo3.TabIndex = 15;
+            // 
+            // serialPortCombo4
+            // 
+            this.serialPortCombo4.FormattingEnabled = true;
+            this.serialPortCombo4.Items.AddRange(new object[] {
+            "disabled",
+            "COM1",
+            "COM2",
+            "COM3",
+            "COM4",
+            "COM5",
+            "COM6",
+            "COM7",
+            "COM8",
+            "COM9",
+            "COM10",
+            "COM11",
+            "COM12",
+            "COM13",
+            "COM14",
+            "COM15",
+            "COM16",
+            "COM17",
+            "COM18",
+            "COM19",
+            "COM20"});
+            this.serialPortCombo4.Location = new System.Drawing.Point(156, 92);
+            this.serialPortCombo4.Name = "serialPortCombo4";
+            this.serialPortCombo4.Size = new System.Drawing.Size(76, 21);
+            this.serialPortCombo4.TabIndex = 16;
+            // 
+            // serialPortCombo5
+            // 
+            this.serialPortCombo5.FormattingEnabled = true;
+            this.serialPortCombo5.Items.AddRange(new object[] {
+            "disabled",
+            "COM1",
+            "COM2",
+            "COM3",
+            "COM4",
+            "COM5",
+            "COM6",
+            "COM7",
+            "COM8",
+            "COM9",
+            "COM10",
+            "COM11",
+            "COM12",
+            "COM13",
+            "COM14",
+            "COM15",
+            "COM16",
+            "COM17",
+            "COM18",
+            "COM19",
+            "COM20"});
+            this.serialPortCombo5.Location = new System.Drawing.Point(156, 119);
+            this.serialPortCombo5.Name = "serialPortCombo5";
+            this.serialPortCombo5.Size = new System.Drawing.Size(76, 21);
+            this.serialPortCombo5.TabIndex = 17;
+            // 
+            // serialPortCombo6
+            // 
+            this.serialPortCombo6.FormattingEnabled = true;
+            this.serialPortCombo6.Items.AddRange(new object[] {
+            "disabled",
+            "COM1",
+            "COM2",
+            "COM3",
+            "COM4",
+            "COM5",
+            "COM6",
+            "COM7",
+            "COM8",
+            "COM9",
+            "COM10",
+            "COM11",
+            "COM12",
+            "COM13",
+            "COM14",
+            "COM15",
+            "COM16",
+            "COM17",
+            "COM18",
+            "COM19",
+            "COM20"});
+            this.serialPortCombo6.Location = new System.Drawing.Point(156, 146);
+            this.serialPortCombo6.Name = "serialPortCombo6";
+            this.serialPortCombo6.Size = new System.Drawing.Size(76, 21);
+            this.serialPortCombo6.TabIndex = 18;
             // 
             // MainForm
             // 
@@ -1105,6 +1297,12 @@ namespace iDash
         private System.Windows.Forms.ComboBox vjoyCombo2;
         private System.Windows.Forms.Label deviceLabel2;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.ComboBox serialPortCombo6;
+        private System.Windows.Forms.ComboBox serialPortCombo5;
+        private System.Windows.Forms.ComboBox serialPortCombo4;
+        private System.Windows.Forms.ComboBox serialPortCombo3;
+        private System.Windows.Forms.ComboBox serialPortCombo2;
+        private System.Windows.Forms.ComboBox serialPortCombo1;
     }
 }
 

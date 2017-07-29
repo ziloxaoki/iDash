@@ -13,13 +13,13 @@ namespace iDash
 
         int bs = 0;
 
-        private const int BUFFER_SIZE = 40;
+        private const int BUFFER_SIZE = 100;
         private const int WAIT_TO_RECONNECT = 500;        
         //arduino will wait 5 secs for a SYN ACK        
         private const int ARDUINO_TIMED_OUT = 500;
         private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
-        private const int WAIT_FOR_ARDUINO_DATA = ARDUINO_TIMED_OUT/5;
+        private const int WAIT_FOR_ARDUINO_DATA = 10;
         private int arduinoHas7Seg = 0;
 
         //arduino command length
@@ -53,26 +53,33 @@ namespace iDash
 
         private bool disposed = false;
 
-        private string[] portNames;
+        private string portName;
         private int[,] voltages = new int[8,3];
         private int MIN_VOLTAGE = 100;
         private string id = "";
         private bool closeThread = false;
 
-        public void Init()
+
+        public void Init(string comPort)
         {
             serialPort.Parity = Parity.None;     //selected parity 
             serialPort.StopBits = StopBits.One;  //selected stopbits
             serialPort.DataBits = 8;             //selected data bits
             serialPort.BaudRate = 38400;         //selected baudrate            
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                         
-            
+            portName = comPort;
+
             this.tryToConnect();
         }
 
         private bool isArduinoAlive()
         {
             return !Utils.hasTimedOut(lastArduinoResponse, ARDUINO_TIMED_OUT);
+        }
+
+        public string getId()
+        {
+            return id;
         }
 
         private void sendDefaultMsg()
@@ -107,8 +114,8 @@ namespace iDash
             while (!closeThread)
             {
                 //check if new usb was connected
-                if(lastArduinoResponse == -1)
-                    portNames = SerialPort.GetPortNames();
+                //if(lastArduinoResponse == -1)
+                //    portNames = SerialPort.GetPortNames();
 
                 if (isArduinoAlive())
                 {
@@ -121,56 +128,50 @@ namespace iDash
                 }
                 else
                 {
-                    foreach (string port in portNames)
+                    if (serialPort.IsOpen)  //if port is  open 
                     {
-                        if (serialPort.IsOpen)  //if port is  open 
-                        {
-                            serialPort.Close();  //close port
-                        }
-                        else if (lastArduinoResponse > 0 && portNames.Length == 1)
-                        {
-                            NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_DISCONNECTED + ":{0}", id));
-                            NotifyStatusMessage("Arduino(" + id + ")at port " + port + " disconnected.");
-                            lastArduinoResponse = 0;
-                        }
+                        serialPort.Close();  //close port
+                    }
+                    else if (!isArduinoAlive() && !notificationSent.Contains(portName))
+                    {
+                        NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_DISCONNECTED + ":{0}", id));
+                        NotifyStatusMessage("Arduino(" + id + ")at port " + portName + " disconnected.");
+                        lastArduinoResponse = 0;
+                    }
 
-                        serialPort.PortName = port;    //selected name of port
+                    serialPort.PortName = portName;    //selected name of port
 
-                        if (!notificationSent.Contains(port))
-                        {
-                            NotifyStatusMessage("Searching for Arduino(" + id + ") at " + port + "...");                            
-                        }
+                    if (!notificationSent.Contains(portName))
+                    {
+                        NotifyStatusMessage("Searching for Arduino at " + portName + "...");                            
+                    }
 
-                        if (MainForm.formFinishedLoading)
-                        {
-                            notificationSent.Add(port);
-                        }
+                    if (MainForm.formFinishedLoading)
+                    {
+                        notificationSent.Add(portName);
+                    }
 
-                        try
-                        {
-                            serialPort.Open();        //open serial port                
-                        }
-                        catch(Exception e)
-                        {
-                            Logger.LogExceptionToFile(e);
-                            await Task.Delay(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
+                    try
+                    {
+                        serialPort.Open();        //open serial port                
+                    }
+                    catch(Exception e)
+                    {
+                        Logger.LogExceptionToFile(e);
+                        await Task.Delay(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
 
-                            continue;                          
-                        }
+                        continue;                          
+                    }
                       
 
-                        //wait for arduino ACK message
-                        await Task.Delay(WAIT_SERIAL_CONNECT);
+                    //wait for arduino ACK message
+                    await Task.Delay(WAIT_SERIAL_CONNECT);                        
 
-                        if (isArduinoAlive())
-                        {
-                            sendSynAck();
-                            NotifyStatusMessage("Arduino(" + id + ") found at port " + port + "...");
-                            Logger.LogMessageToFile("Arduino(" + id + ") connected to port " + port, true);
-                            //if arduino found always try to reconnect to the same port
-                            portNames = new string[] {port};
-                            break;
-                        }
+                    if (isArduinoAlive())
+                    {
+                        sendSynAck();
+                        NotifyStatusMessage("Arduino(" + id + ") found at port " + portName + "...");
+                        Logger.LogMessageToFile("Arduino(" + id + ") connected to port " + portName, true);
                     }
                 }
             }

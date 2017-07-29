@@ -14,5 +14,8 @@
     <Setting Name="ARDUINO_IDS" Type="System.String" Scope="User">
       <Value Profile="(Default)">Arduino 1,Arduino 2,Arduino 3,Arduino 4,Arduino 5,Arduino 6</Value>
     </Setting>
+    <Setting Name="COMPORT_IDS" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0,0,0,0,0,0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

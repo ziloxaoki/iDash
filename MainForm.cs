@@ -59,6 +59,7 @@ namespace iDash
         private const int TOTAL_NUM_OF_ARDUINOS = 6;
         private const string ARDUINO_ID_PREFIX = "Arduino";
         private const string VJOY_COMBO_CONTROL_NAME_PREFIX = "vjoyCombo";
+        private const string COMPORT_COMBO_CONTROL_NAME_PREFIX = "serialPortCombo";
         private const string VJOY_COMBO_VALUE_PREFIX = "vjoy";
         private const string ARDUINO_LABEL_CONTROL_NAME_PREFIX = "deviceLabel";
 
@@ -86,17 +87,18 @@ namespace iDash
 
             for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++)
             {
-                ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
+                ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);                
 
                 if (vjoyCombo.SelectedIndex > 0)
                 {
+                    ComboBox comPortCombo = ((ComboBox)Controls.Find(COMPORT_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
                     Logger.LogMessageToFile("Initializing Serial Manager.", true);
                     AppendToStatusBar("\n\nInitializing Serial Manager.\n");
                     SerialManager serialManager = new SerialManager();
                     serialManager.StatusMessageSubscribers += UpdateStatusBar;
                     serialManager.DebugMessageSubscribers += UpdateDebugData;
                     sm.Add(serialManager);
-                    serialManager.Init();
+                    serialManager.Init((String)comPortCombo.SelectedItem.ToString());
 
                     if (vjoyCombo.SelectedIndex > 1)
                     {
@@ -106,7 +108,7 @@ namespace iDash
                         buttonHandler.buttonStateHandler += ButtonStateReceived;
                         bh.Add(buttonHandler);
                         //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
-                        Thread.Sleep(1000);
+                        //Thread.Sleep(1000);
 
                         uint vjoyId = (uint)vjoyCombo.SelectedIndex - 1;
 
@@ -221,24 +223,49 @@ namespace iDash
 
             string[] aux = Properties.Settings.Default.VJOY_IDS.Split(',');
 
-            for (int x = 1; x <= aux.Length; x++)
-            {
-                if (Int32.Parse(aux[x - 1]) > -1)
-                {                    
+            try {
+                for (int x = 1; x <= aux.Length; x++)
+                {
                     var combo = (ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
-                    combo.SelectedIndex = Int32.Parse(aux[x - 1]);
+                    if (Int32.Parse(aux[x - 1]) > -1)
+                    {                        
+                        combo.SelectedIndex = Int32.Parse(aux[x - 1]);
+                    }
+                    else
+                    {
+                        combo.SelectedIndex = 0;
+                    }
+                }
+
+                aux = Properties.Settings.Default.ARDUINO_IDS.Split(',');
+
+                for (int x = 1; x <= aux.Length; x++)
+                {
+                    if (!aux[x - 1].StartsWith(ARDUINO_ID_PREFIX))
+                    {
+                        var label = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+                        label.Text = aux[x - 1];
+                    }
+                }
+
+                aux = Properties.Settings.Default.COMPORT_IDS.Split(',');
+
+                for (int x = 1; x <= aux.Length; x++)
+                {
+                    var combo = (ComboBox)Controls.Find(COMPORT_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
+                    if (Int32.Parse(aux[x - 1]) > -1)
+                    {                        
+                        combo.SelectedIndex = Int32.Parse(aux[x - 1]);
+                    }
+                    else
+                    {
+                        combo.SelectedIndex = 0;
+                    }
                 }
             }
-
-            aux = Properties.Settings.Default.ARDUINO_IDS.Split(',');
-
-            for (int x = 1; x <= aux.Length; x++)
+            catch (Exception e)
             {
-                if (!aux[x - 1].StartsWith(ARDUINO_ID_PREFIX))
-                {
-                    var label = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
-                    label.Text = aux[x - 1];
-                }
+                Logger.LogExceptionToFile(e);
             }
         }
 
@@ -299,6 +326,14 @@ namespace iDash
 
             Properties.Settings.Default.ARDUINO_IDS = String.Join(",", arduinoIds);
 
+            string[] comPortIds = new string[] { "0", "0", "0", "0", "0", "0" };
+            for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++)
+            {
+                var combo = (ComboBox)Controls.Find(COMPORT_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
+                comPortIds[x - 1] = combo.SelectedIndex.ToString().Trim();
+            }
+
+            Properties.Settings.Default.COMPORT_IDS = String.Join(",", comPortIds);
 
             Properties.Settings.Default.Save();
         }

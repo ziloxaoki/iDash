@@ -603,7 +603,6 @@ void processCommand(byte *buffer, int commandLength) {
 
     case CMD_RGB_SHIFT :
       updateLedBuffer(buffer);      
-      break;
   }  
 
   if(debugMode > 0) {
