@@ -57,7 +57,6 @@ namespace iDash
         //----------------------------------------- Events
         public delegate void ButtonStateHandler(List<State> states);
         public ButtonStateHandler buttonStateHandler;
-        private uint vJoyID = 1;
 
         public ButtonHandler(SerialManager sm) : base(sm) {
             sm.CommandReceivedSubscribers += new SerialManager.CommandReceivedHandler(executeCommand);

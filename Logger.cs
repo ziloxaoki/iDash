@@ -54,7 +54,7 @@ namespace iDash
 
         public static void LogExceptionToFile(Exception e)
         {
-            LogMessageToFile(e.Source + ": " + e.Message + "\n", true);
+            LogMessageToFile(e.ToString() + "\n", true);
         }
     }
 }

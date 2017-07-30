@@ -145,34 +145,33 @@ namespace iDash
 
         private void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
-            //gets max car rpm
-            //YamlQuery yq = e.SessionInfo["DriverInfo"]["DriverCarSLBlinkRPM"];
-            /*YamlQuery yq = e.SessionInfo["DriverInfo"]["DriverCarSLFirstRPM"];
-            if (yq != null)
+            try
             {
-                firstRpm = float.Parse(yq.Value, CultureInfo.InvariantCulture.NumberFormat);
-                //Logger.LogMessageToFile("Shift:" + maxRpm + "\n");
-            }*/
-            YamlQuery yLastRPM = e.SessionInfo["DriverInfo"]["DriverCarSLLastRPM"];
-            YamlQuery yShiftRPM = e.SessionInfo["DriverInfo"]["DriverCarSLShiftRPM"];
-            //YamlQuery yIsOnPit = e.SessionInfo["DriverInfo"]["OnPitRoad"];             
+                YamlQuery yLastRPM = e.SessionInfo["DriverInfo"]["DriverCarSLLastRPM"];
+                YamlQuery yShiftRPM = e.SessionInfo["DriverInfo"]["DriverCarSLShiftRPM"];
+                //YamlQuery yIsOnPit = e.SessionInfo["DriverInfo"]["OnPitRoad"];             
 
-            if (yShiftRPM != null)
-            {
-                lastRpm = float.Parse(yShiftRPM.Value, CultureInfo.InvariantCulture.NumberFormat);                
-                //Logger.LogMessageToFile("Shift:" + maxRpm + "\n");
-            }
-            else
-            {
-                if (yLastRPM != null)
+                if (yShiftRPM != null)
                 {
-                    //calibrate shift gear light rpm
-                    lastRpm = float.Parse(yLastRPM.Value, CultureInfo.InvariantCulture.NumberFormat) * 0.97f;
+                    lastRpm = float.Parse(yShiftRPM.Value, CultureInfo.InvariantCulture.NumberFormat);
                     //Logger.LogMessageToFile("Shift:" + maxRpm + "\n");
                 }
-            }
+                else
+                {
+                    if (yLastRPM != null)
+                    {
+                        //calibrate shift gear light rpm
+                        lastRpm = float.Parse(yLastRPM.Value, CultureInfo.InvariantCulture.NumberFormat) * 0.97f;
+                        //Logger.LogMessageToFile("Shift:" + maxRpm + "\n");
+                    }
+                }
 
-            firstRpm = FIRST_RPM * lastRpm;                                 
+                firstRpm = FIRST_RPM * lastRpm;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogExceptionToFile(ex);
+            }
         }
 
         private void OnTelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
@@ -180,22 +179,28 @@ namespace iDash
             currentRpm = e.TelemetryInfo.RPM.Value;
             this.telemetryInfo = e;
 
-            switch (wrapper.GetTelemetryValue<int>("SessionFlags").Value)
+            try
             {
-                case 32:
-                    flag = (int)Constants.FLAG_TYPE.BLUE_FLAG;
-                    break;
-                case 8:
-                    flag = (int)Constants.FLAG_TYPE.YELLOW_FLAG;
-                    break;
-                default:
-                    flag = (int)Constants.FLAG_TYPE.NO_FLAG;
-                    break;
-            }
+                switch (wrapper.GetTelemetryValue<int>("SessionFlags").Value)
+                {
+                    case 32:
+                        flag = (int)Constants.FLAG_TYPE.BLUE_FLAG;
+                        break;
+                    case 8:
+                        flag = (int)Constants.FLAG_TYPE.YELLOW_FLAG;
+                        break;
+                    default:
+                        flag = (int)Constants.FLAG_TYPE.NO_FLAG;
+                        break;
+                }
 
-            flag = ((int)wrapper.GetTelemetryValue<int>("EngineWarnings").Value & 0x10) == 0x10 ? (int)Constants.FLAG_TYPE.SPEED_LIMITER : flag;
-            
-            //Logger.LogMessageToFile("rpm:" + rpm + "\n");
+                flag = ((int)wrapper.GetTelemetryValue<int>("EngineWarnings").Value & 0x10) == 0x10 ? (int)Constants.FLAG_TYPE.SPEED_LIMITER : flag;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogExceptionToFile(ex);
+            }
         }
 
         public override void Dispose()
