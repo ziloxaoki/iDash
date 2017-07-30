@@ -60,6 +60,7 @@ namespace iDash
         private const string ARDUINO_ID_PREFIX = "Arduino";
         private const string VJOY_COMBO_CONTROL_NAME_PREFIX = "vjoyCombo";
         private const string COMPORT_COMBO_CONTROL_NAME_PREFIX = "serialPortCombo";
+        private const string CONNECTION_STATUS_COMBO_CONTROL_NAME_PREFIX = "portStatusBox";
         private const string VJOY_COMBO_VALUE_PREFIX = "vjoy";
         private const string ARDUINO_LABEL_CONTROL_NAME_PREFIX = "deviceLabel";
 
@@ -86,21 +87,21 @@ namespace iDash
             handleButtonActions = new HandleButtonActions(handleButtons);
 
             for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++)
-            {
-                ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);                
+            {  
+                ComboBox portCombo = ((ComboBox)Controls.Find(COMPORT_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
 
-                if (vjoyCombo.SelectedIndex > 0)
+                if (portCombo.SelectedIndex > 0)
                 {
-                    ComboBox comPortCombo = ((ComboBox)Controls.Find(COMPORT_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
                     Logger.LogMessageToFile("Initializing Serial Manager.", true);
                     AppendToStatusBar("\n\nInitializing Serial Manager.\n");
                     SerialManager serialManager = new SerialManager();
                     serialManager.StatusMessageSubscribers += UpdateStatusBar;
                     serialManager.DebugMessageSubscribers += UpdateDebugData;
                     sm.Add(serialManager);
-                    serialManager.Init((String)comPortCombo.SelectedItem.ToString());
+                    serialManager.Init((String)portCombo.SelectedItem.ToString());
 
-                    if (vjoyCombo.SelectedIndex > 1)
+                    ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
+                    if (vjoyCombo.SelectedIndex > 0)
                     {
                         Logger.LogMessageToFile("Initializing Button Handler.", true);
                         AppendToStatusBar("Initializing Button Handler.\n");
@@ -110,7 +111,7 @@ namespace iDash
                         //wait 1 second until ButtonHandler initializes, otherwise VJoyFeeder may crash.
                         //Thread.Sleep(1000);
 
-                        uint vjoyId = (uint)vjoyCombo.SelectedIndex - 1;
+                        uint vjoyId = (uint)vjoyCombo.SelectedIndex;
 
                         Logger.LogMessageToFile("Initializing Vjoy.", true);
                         AppendToStatusBar("Initializing Vjoy.\n");
@@ -226,14 +227,15 @@ namespace iDash
             try {
                 for (int x = 1; x <= aux.Length; x++)
                 {
-                    var combo = (ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
-                    if (Int32.Parse(aux[x - 1]) > -1)
-                    {                        
-                        combo.SelectedIndex = Int32.Parse(aux[x - 1]);
+                    var vjoyCombo = (ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0];                    
+
+                    if (Int32.Parse(aux[x - 1]) >= 0)
+                    {
+                        vjoyCombo.SelectedIndex = Int32.Parse(aux[x - 1]);
                     }
                     else
                     {
-                        combo.SelectedIndex = 0;
+                        vjoyCombo.SelectedIndex = 0;
                     }
                 }
 
@@ -252,14 +254,18 @@ namespace iDash
 
                 for (int x = 1; x <= aux.Length; x++)
                 {
-                    var combo = (ComboBox)Controls.Find(COMPORT_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
-                    if (Int32.Parse(aux[x - 1]) > -1)
-                    {                        
-                        combo.SelectedIndex = Int32.Parse(aux[x - 1]);
+                    var portCombo = (ComboBox)Controls.Find(COMPORT_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
+                    var pictBox = (PictureBox)Controls.Find(CONNECTION_STATUS_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
+
+                    if (Int32.Parse(aux[x - 1]) > 0)
+                    {
+                        portCombo.SelectedIndex = Int32.Parse(aux[x - 1]);                        
+                        pictBox.Visible = true;
                     }
                     else
                     {
-                        combo.SelectedIndex = 0;
+                        portCombo.SelectedIndex = 0;
+                        pictBox.Visible = false;
                     }
                 }
             }
@@ -436,40 +442,45 @@ namespace iDash
         private void processExternalCommand(String s)
         {
             string[] split = s.Split(':');
+            Label arduinoId = null;
+            ComboBox portCombo = null;
+            PictureBox pictBox = null;
 
             switch (split[0])
             {
                 case UPDATE_BUTTON_VOLTAGE:                    
                     bPressed.Text = split[1];
                     break;
-                case UPDATE_ARDUINO_ID:
-                    Label label = null;
-                    Label notUsed = null;
-                    ComboBox vjoyCombo = null;
-                    for (int x = TOTAL_NUM_OF_ARDUINOS; x > 0 ; x--) {
-                        label = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
-                        vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
-                        if (label.Text.Equals(split[1]))
+                case UPDATE_ARDUINO_ID:                                        
+                    string[] props = split[1].Split(',');
+
+                    for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++) {                                                
+                        portCombo = ((ComboBox)Controls.Find(COMPORT_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
+                         
+                        if (portCombo.Text.Equals(props[1], StringComparison.InvariantCultureIgnoreCase))
                         {
-                            label.ForeColor = Color.Green;
-                            return;
-                        }
-                        if(label.Text.StartsWith(ARDUINO_ID_PREFIX) && vjoyCombo.SelectedIndex > 0)
-                        {
-                            notUsed = label;
+                            pictBox = (PictureBox)Controls.Find(CONNECTION_STATUS_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
+                            arduinoId = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+                            arduinoId.Text = props[0];
+                            arduinoId.ForeColor = Color.Green;
+                            pictBox.Image = Properties.Resources.connected;
+                            pictBox.Visible = true;
+                            break;
                         }
                     }
-
-                    notUsed.Text = split[1];
-                    notUsed.ForeColor = Color.Green;
                     break;
                 case UPDATE_ARDUINO_DISCONNECTED:
                     for (int x = TOTAL_NUM_OF_ARDUINOS; x > 0; x--)
-                    {
-                        label = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
-                        if (label.Text.Equals(split[1]))
+                    {                        
+                        portCombo = ((ComboBox)Controls.Find(COMPORT_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);   
+                                             
+                        if (portCombo.Text.Equals(split[1], StringComparison.InvariantCultureIgnoreCase))
                         {
-                            label.ForeColor = Color.Black;
+                            arduinoId = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+                            pictBox = (PictureBox)Controls.Find(CONNECTION_STATUS_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
+                            arduinoId.ForeColor = Color.Red;
+                            pictBox.Visible = true;
+                            pictBox.Image = Properties.Resources.disconnected;
                             return;
                         }
                     }
@@ -1317,17 +1328,15 @@ namespace iDash
         {
             for (int x = 1; x <= TOTAL_NUM_OF_ARDUINOS; x++)
             {
-                ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
                 Label deviceLabel = (Label)Controls.Find(ARDUINO_LABEL_CONTROL_NAME_PREFIX + x, true)[0];
+                var pictBox = (PictureBox)Controls.Find(CONNECTION_STATUS_COMBO_CONTROL_NAME_PREFIX + x, true)[0];
 
-                if(!deviceLabel.Text.StartsWith(ARDUINO_ID_PREFIX) && vjoyCombo.SelectedIndex == 0)
-                {
-                    deviceLabel.Text = ARDUINO_ID_PREFIX + " " + x;
-                    deviceLabel.ForeColor = Color.Black;
-                }
+                deviceLabel.Text = ARDUINO_ID_PREFIX + " " + x;
+                deviceLabel.ForeColor = Color.Black;
+                pictBox.Visible = false;
             }
 
-                resetAllThreads();
+            resetAllThreads();
         }
 
         private async void autoConnectToSimulator()

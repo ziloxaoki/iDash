@@ -134,7 +134,7 @@ namespace iDash
                     }
                     else if (!isArduinoAlive() && !notificationSent.Contains(portName))
                     {
-                        NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_DISCONNECTED + ":{0}", id));
+                        NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_DISCONNECTED + ":{0}", portName));
                         NotifyStatusMessage("Arduino(" + id + ")at port " + portName + " disconnected.");
                         lastArduinoResponse = 0;
                     }
@@ -169,6 +169,7 @@ namespace iDash
 
                     if (isArduinoAlive())
                     {
+                        notificationSent.Remove(portName);
                         sendSynAck();
                         NotifyStatusMessage("Arduino(" + id + ") found at port " + portName + "...");
                         Logger.LogMessageToFile("Arduino(" + id + ") connected to port " + portName, true);
@@ -252,7 +253,7 @@ namespace iDash
                     case Command.CMD_SYN:
                         arduinoHas7Seg = command.getData()[1];
                         id = retrieveArduinoId(command);
-                        NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_ID + ":{0}", id));
+                        NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_ID + ":{0},{1}", id, portName));
                         break;
                     //Arduino response to the set debug mode command
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:

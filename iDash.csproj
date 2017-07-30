@@ -150,6 +150,8 @@
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
     <Content Include="icon.ico" />
+    <None Include="Resources\disconnected.png" />
+    <None Include="Resources\connected.png" />
     <None Include="Resources\bin.png" />
     <None Include="Resources\images.png" />
     <None Include="Resources\PrintEntireDocument.png" />
