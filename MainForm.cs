@@ -113,7 +113,7 @@ namespace iDash
 
                         uint vjoyId = (uint)vjoyCombo.SelectedIndex;
 
-                        Logger.LogMessageToFile("Initializing Vjoy.", true);
+                        Logger.LogMessageToFile(String.Format("Initializing vJoy{0}.", vjoyId), true);
                         AppendToStatusBar("Initializing Vjoy.\n");
                         VJoyFeeder vJoyFeeder = new VJoyFeeder(buttonHandler, vjoyId);
                         vJoyFeeder.StatusMessageSubscribers += UpdateStatusBar;

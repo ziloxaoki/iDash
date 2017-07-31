@@ -62,10 +62,11 @@ namespace iDash
 
         public void Init(string comPort)
         {
-            serialPort.Parity = Parity.None;     //selected parity 
-            serialPort.StopBits = StopBits.One;  //selected stopbits
-            serialPort.DataBits = 8;             //selected data bits
-            serialPort.BaudRate = 38400;         //selected baudrate            
+            serialPort.Parity = Parity.None;     
+            serialPort.StopBits = StopBits.One;  
+            serialPort.DataBits = 8;             
+            serialPort.BaudRate = 38400;         
+            serialPort.DtrEnable = false;  
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                         
             portName = comPort;
 
@@ -113,10 +114,6 @@ namespace iDash
 
             while (!closeThread)
             {
-                //check if new usb was connected
-                //if(lastArduinoResponse == -1)
-                //    portNames = SerialPort.GetPortNames();
-
                 if (isArduinoAlive())
                 {
                     if (isSimDisconnected)
