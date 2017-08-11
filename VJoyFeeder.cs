@@ -31,7 +31,7 @@ namespace iDash
             jID = vjoyId;
         }        
 
-        public void InitializeJoystick()
+        public void initializeJoystick()
         {
             if (joystick == null)
                 joystick = new vJoy();           

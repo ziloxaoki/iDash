@@ -20,6 +20,7 @@ namespace iDash
         private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
         private const int WAIT_FOR_ARDUINO_DATA = 10;
+        private const int HANDSHAKING_INTERVAL = 5000;
         private int arduinoHas7Seg = 0;
 
         //arduino command length
@@ -39,7 +40,8 @@ namespace iDash
         public bool isDisabledSerial = false;
         private bool isSimDisconnected = true;
         //indicates how often a debug message need to be logged in the debug dialog
-        private long lastMessageLogged = 0; 
+        private long lastMessageLogged = 0;
+        private long lastHandshaking = 0;
         //show debug commands in hex or int (show as hexadecimal)
         public bool asHex = false;
 
@@ -59,16 +61,19 @@ namespace iDash
         private string id = "";
         private bool closeThread = false;
 
+        public SerialManager(string comPort)
+        {
+            portName = comPort;
+        }
 
-        public void Init(string comPort)
+        public void init()
         {
             serialPort.Parity = Parity.None;     
             serialPort.StopBits = StopBits.One;  
             serialPort.DataBits = 8;             
             serialPort.BaudRate = 38400;         
-            serialPort.DtrEnable = false;  
-            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                         
-            portName = comPort;
+            //serialPort.DtrEnable = false;  
+            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                                     
 
             this.tryToConnect();
         }
@@ -93,12 +98,11 @@ namespace iDash
             {
                 Array.Copy(Constants.rpmPattern, 0, rpmLed, 0, Constants.rpmPattern.Length);
                 rpmLed[rpmLed.Length - 1] = Constants.LED_BLINK;
-            }
-
-            this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLed), false);
+            }            
 
             if (deviceContains7Segments())
             {
+                this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLed), false);
                 this.sendCommand(Utils.getDisconnectedMsgCmd(), false);
             }
         }    
@@ -121,6 +125,12 @@ namespace iDash
                         sendDefaultMsg();
                     }
 
+                    if (Utils.getCurrentTimeMillis() - lastHandshaking > HANDSHAKING_INTERVAL)
+                    {
+                        sendSynAck();
+                        lastHandshaking = Utils.getCurrentTimeMillis();
+                    }
+
                     await Task.Delay(WAIT_FOR_ARDUINO_DATA);                    
                 }
                 else
@@ -132,7 +142,7 @@ namespace iDash
                     else if (!isArduinoAlive() && !notificationSent.Contains(portName))
                     {
                         NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_DISCONNECTED + ":{0}", portName));
-                        NotifyStatusMessage("Arduino(" + id + ")at port " + portName + " disconnected.");
+                        NotifyStatusMessage("Arduino(" + id + ") at port " + portName + " disconnected.");
                         lastArduinoResponse = 0;
                     }
 
@@ -330,10 +340,11 @@ namespace iDash
                 }
                 catch (Exception e)
                 {                    
-                    Logger.LogExceptionToFile(e);
+                    Logger.LogExceptionToFile(e, Utils.byteArrayToString(command.getRawData(), false));
 
                     if(lastArduinoResponse > 0)
-                        NotifyStatusMessage("Error sending command to Arduino."); //if there are not is any COM port in PC show message
+                        NotifyStatusMessage(string.Format("[{0:G}]: Error sending command to Arduino({1} - {2}).", System.DateTime.Now, id, 
+                            Utils.byteArrayToString(command.getRawData(), false))); //if there are not is any COM port in PC show message
                 }
             }
         }

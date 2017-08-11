@@ -56,5 +56,10 @@ namespace iDash
         {
             LogMessageToFile(e.ToString() + "\n", true);
         }
+
+        public static void LogExceptionToFile(Exception e, string msg)
+        {
+            LogMessageToFile(string.Format("{0}\n{1}\n",msg,e.ToString()), true);
+        }
     }
 }

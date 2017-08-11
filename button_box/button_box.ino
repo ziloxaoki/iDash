@@ -4,9 +4,6 @@
 #include "Arduino.h"
 #include <avr/pgmspace.h>
 
-
-
-
 const byte CMD_INIT = 200; //94d 5Eh
 const byte CMD_INIT_DEBUG = 201; //95d 5Fh
 const byte CMD_END = (byte)'~'; //126d 7Eh
@@ -25,7 +22,7 @@ const byte INVALID_COMMAND_HEADER = 0xEF;
 const uint8_t pinNumbers[] = {0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,1,0,3,2,1,0,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,7,2,1,0,7,6,5,4,3,2,1,0,3,2,1,0};
 
 //analogic pins are mapped from 0 to 15 (comminication pins 14 and 15 cannot be used)
-#define portOfPin(P)\
+/*#define portOfPin(P)\
   ((P)>=0&&(P)<8)?&PORTF:((P)>=8&&(P)<16)?&PORTK:((P)>=22&&(P)<30)?&PORTA:((P)>=30&&(P)<38)?&PORTC:((P)>=38)?&PORTD:((P)>=39&&(P)<42)?&PORTG:((P)>=42&&(P)<50)?&PORTL:((P)>=50&&(P)<54)?&PORTB:((P)>=16&&(P)<18)?&PORTH:&PORTD
 #define ddrOfPin(P)\
   ((P)>=0&&(P)<8)?&DDRF:((P)>=8&&(P)<16)?&DDRK:((P)>=22&&(P)<30)?&DDRA:((P)>=30&&(P)<38)?&DDRC:((P)>=38)?&DDRD:((P)>=39&&(P)<42)?&DDRG:((P)>=42&&(P)<50)?&DDRL:((P)>=50&&(P)<54)?&DDRB:((P)>=16&&(P)<18)?&DDRH:&DDRD
@@ -41,12 +38,7 @@ const uint8_t pinNumbers[] = {0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,1,0,3,2,1,0,0,1,2,
 #define digitalHigh(P) *(portOfPin(P))|=pinMask(P)
 #define isHigh(P)((*(pinOfPin(P))& pinMask(P))>0)
 #define isLow(P)((*(pinOfPin(P))& pinMask(P))==0)
-#define digitalState(P)((uint8_t)isHigh(P))
-
-
-
-
-
+#define digitalState(P)((uint8_t)isHigh(P))*/
 
 
 long lastTimeReceivedByte = 0;
@@ -55,7 +47,6 @@ int debugMode = 0;
 bool isInterruptDisabled[] = {false,false,false,false};
 const int encoderPinA[] = {21,20,19,18};
 const int encoderPinB[] = {25,24,27,26};
-
 
 
 //id cannot start with Arduino
@@ -287,7 +278,7 @@ void processData() {
         }
       }
     }    
-    if(millis() - startReading > 10) {
+    if(millis() - startReading > 100) {
       break;
     }
   }
@@ -359,19 +350,19 @@ int sendRotaryState(int offset, byte *response) {
 
 int sendButtonState(int offset, byte *response) {  
   for (int i = 0; i < ENABLED_BUTTONS_COUNT; i++) {      
-    response[offset++] = digitalState(BUTTON_PINS[i]) == HIGH ? 0 : 1;
+    response[offset++] = digitalRead(BUTTON_PINS[i]) == HIGH ? 0 : 1;
   }   
   
   return offset;
 }
 
-int sendMatrixState(int offset, byte *response) {  
+int sendMatrixState(int offset, byte *response) {   
   for (int i = 0; i < ENABLED_MATRIX_COLUMNS; i++) {
     digitalWrite(columnPins[i], LOW);
     for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
       response[offset++] = (digitalRead(rowPins[x]) == LOW) ? 1 : 0;
-    }
-    digitalWrite(columnPins[i], HIGH);
+    }   
+    digitalWrite(columnPins[i], HIGH);   
   }   
   
   return offset;
@@ -419,6 +410,7 @@ void setup()
   // MATRIX
   for (int x = 0; x < ENABLED_MATRIX_COLUMNS; x++) {
     pinMode(columnPins[x], OUTPUT);           // set pin to input    
+    digitalWrite(columnPins[x], HIGH);        // initiate high
     //pinAsOutput(columnPins[x]);    
   }
 

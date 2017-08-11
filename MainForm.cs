@@ -94,11 +94,11 @@ namespace iDash
                 {
                     Logger.LogMessageToFile("Initializing Serial Manager.", true);
                     AppendToStatusBar("\n\nInitializing Serial Manager.\n");
-                    SerialManager serialManager = new SerialManager();
+                    SerialManager serialManager = new SerialManager((String)portCombo.Text);
                     serialManager.StatusMessageSubscribers += UpdateStatusBar;
                     serialManager.DebugMessageSubscribers += UpdateDebugData;
                     sm.Add(serialManager);
-                    serialManager.Init((String)portCombo.SelectedItem.ToString());
+                    serialManager.init();
 
                     ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
                     if (vjoyCombo.SelectedIndex > 0)
@@ -118,7 +118,7 @@ namespace iDash
                         VJoyFeeder vJoyFeeder = new VJoyFeeder(buttonHandler, vjoyId);
                         vJoyFeeder.StatusMessageSubscribers += UpdateStatusBar;
                         vf.Add(vJoyFeeder);
-                        vJoyFeeder.InitializeJoystick();
+                        vJoyFeeder.initializeJoystick();
                     }
 
                     this.iRacingToolStripMenuItem1.PerformClick();                                       
