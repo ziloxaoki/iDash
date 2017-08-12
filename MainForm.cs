@@ -33,8 +33,8 @@ namespace iDash
         private RFactorConnector ams;
         private RFactor2Connector rf2;
 
-        private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>(Constants.None - 1);
-        private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>(Constants.None - 1);
+        private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>(Constants.None);
+        private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>(Constants.None);
         private Dictionary<String, int> buttonStateMap = new Dictionary<String, int>();
         private ArrayList bActions = new ArrayList();
 
@@ -166,11 +166,11 @@ namespace iDash
             {
                 ArrayList objCollection = new ArrayList();
                 objCollection.AddRange(Utils.convertObjectCollectionToStringArray(views.Items));
-                TM1637ListBoxItems.Insert(selectedSimulator, objCollection);
+                TM1637ListBoxItems[selectedSimulator] = objCollection;
 
                 ArrayList objCollection2 = new ArrayList();
                 objCollection2.AddRange(Utils.convertObjectCollectionToStringArray(views2.Items));
-                ButtonsListBoxItems.Insert(selectedSimulator, objCollection2);
+                ButtonsListBoxItems[selectedSimulator] = objCollection2;
             }
         }
 
@@ -219,8 +219,8 @@ namespace iDash
                 }
             }
 
-            //Set first game as default
-            loadViewProperties(0);
+            //Set iRacing as default game
+            loadViewProperties(Constants.IRacing);
 
             string[] aux = Properties.Settings.Default.VJOY_IDS.Split(',');
 
@@ -613,7 +613,7 @@ namespace iDash
 
             object selected = lb.SelectedItem;
 
-            // Removing removable element
+            // Removing element
             lb.Items.Remove(selected);
             // Insert it in new position
             lb.Items.Insert(newIndex, selected);
@@ -1082,6 +1082,7 @@ namespace iDash
 
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
         {
+                        selectedSimulator = Constants.IRacing;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1100,13 +1101,13 @@ namespace iDash
             this.iRacingToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
-            selectedSimulator = Constants.IRacing;
 
             setButtonHandler(selectedSimulator);
         }
 
         private void raceroomToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            selectedSimulator = Constants.Raceroom;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1125,13 +1126,13 @@ namespace iDash
             this.raceRoomToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
-            selectedSimulator = Constants.Raceroom;
 
             setButtonHandler(selectedSimulator);
         }               
 
         private void assettoToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            selectedSimulator = Constants.Assetto;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1150,13 +1151,13 @@ namespace iDash
             this.assettoToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
-            selectedSimulator = Constants.Assetto;
 
             setButtonHandler(selectedSimulator);
         }
 
         private void rFactorToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            selectedSimulator = Constants.RFactor;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1175,13 +1176,13 @@ namespace iDash
             this.amsToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
-            selectedSimulator = Constants.RFactor;
 
             setButtonHandler(selectedSimulator);
         }
 
         private void rFactor2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            selectedSimulator = Constants.RFactor2;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1200,13 +1201,13 @@ namespace iDash
             this.rFactor2ToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
-            selectedSimulator = Constants.RFactor2;
 
             setButtonHandler(selectedSimulator);
         }
 
         private void noneToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            selectedSimulator = Constants.None;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(true);
@@ -1214,8 +1215,7 @@ namespace iDash
             stopAllSimThreads();
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
-            statusBar.AppendText("Simulator disconnected.\n");
-            selectedSimulator = Constants.None;
+            statusBar.AppendText("Simulator disconnected.\n");            
             autoConnectToSimulator();
         }
 
