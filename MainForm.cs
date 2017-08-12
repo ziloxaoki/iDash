@@ -94,11 +94,11 @@ namespace iDash
                 {
                     Logger.LogMessageToFile("Initializing Serial Manager.", true);
                     AppendToStatusBar("\n\nInitializing Serial Manager.\n");
-                    SerialManager serialManager = new SerialManager((String)portCombo.Text);
+                    SerialManager serialManager = new SerialManager();                    
                     serialManager.StatusMessageSubscribers += UpdateStatusBar;
                     serialManager.DebugMessageSubscribers += UpdateDebugData;
                     sm.Add(serialManager);
-                    serialManager.init();
+                    serialManager.RunWorkerAsync((String)portCombo.Text);
 
                     ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
                     if (vjoyCombo.SelectedIndex > 0)
@@ -431,14 +431,10 @@ namespace iDash
             initDevices();
         }
 
-        protected async override void OnFormClosing(FormClosingEventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs e)
         {
             stopAllThreads();
-
             saveAppSettings();
-
-            //wait all threads to close
-            await Task.Delay(WAIT_THREADS_TO_CLOSE);
         }
 
         public void AppendToStatusBar(String s)

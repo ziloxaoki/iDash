@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace iDash
 {
-    public class SerialManager : IDisposable
+    public class SerialManager : BackgroundWorker
     {
 
         int bs = 0;
@@ -61,13 +61,15 @@ namespace iDash
         private string id = "";
         private bool closeThread = false;
 
-        public SerialManager(string comPort)
+        public SerialManager()
         {
-            portName = comPort;
+            this.DoWork += this.worker_DoWork;
         }
 
-        public void init()
+        private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
+            portName = (string)e.Argument;
+
             serialPort.Parity = Parity.None;     
             serialPort.StopBits = StopBits.One;  
             serialPort.DataBits = 8;             
@@ -112,7 +114,7 @@ namespace iDash
             this.isSimDisconnected = isSimDisconnected;
         }
 
-        private async void tryToConnect()
+        private void tryToConnect()
         {
             HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -131,7 +133,7 @@ namespace iDash
                         lastHandshaking = Utils.getCurrentTimeMillis();
                     }
 
-                    await Task.Delay(WAIT_FOR_ARDUINO_DATA);                    
+                    Thread.Sleep(WAIT_FOR_ARDUINO_DATA);                    
                 }
                 else
                 {
@@ -165,14 +167,14 @@ namespace iDash
                     catch(Exception e)
                     {
                         Logger.LogExceptionToFile(e);
-                        await Task.Delay(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
+                        Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
 
                         continue;                          
                     }
-                      
+
 
                     //wait for arduino ACK message
-                    await Task.Delay(WAIT_SERIAL_CONNECT);                        
+                    Thread.Sleep(WAIT_SERIAL_CONNECT);                        
 
                     if (isArduinoAlive())
                     {
@@ -343,7 +345,7 @@ namespace iDash
                     Logger.LogExceptionToFile(e, Utils.byteArrayToString(command.getRawData(), false));
 
                     if(lastArduinoResponse > 0)
-                        NotifyStatusMessage(string.Format("[{0:G}]: Error sending command to Arduino({1} - {2}).", System.DateTime.Now, id, 
+                        NotifyStatusMessage(string.Format("Error sending command to Arduino({0} - {1}).", id, 
                             Utils.byteArrayToString(command.getRawData(), false))); //if there are not is any COM port in PC show message
                 }
             }
@@ -453,6 +455,8 @@ namespace iDash
         public void NotifyStatusMessage(string args)
         {
             StatusMessageHandler handler = StatusMessageSubscribers;
+
+            args = string.Format("[{0:G}]: " + args, System.DateTime.Now);
 
             if (handler != null)
             {
