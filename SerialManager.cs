@@ -133,7 +133,7 @@ namespace iDash
                         lastHandshaking = Utils.getCurrentTimeMillis();
                     }
 
-                    Thread.Sleep(WAIT_FOR_ARDUINO_DATA);                    
+                    //Thread.Sleep(WAIT_FOR_ARDUINO_DATA);                    
                 }
                 else
                 {
@@ -202,7 +202,7 @@ namespace iDash
             Command synack = new Command(Command.CMD_SYN_ACK, new byte[0]);
             sendCommand(synack, true);
         }    
-        
+
         private int updateVoltageLimits(int pinNumber, int voltage)
         {
             for (int x=0; x < voltages.Length; x++)
@@ -266,6 +266,7 @@ namespace iDash
                         break;
                     //Arduino response to the set debug mode command
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:
+                        voltages = new int[8, 3];
                         arduinoDebugMode = (DebugMode)command.getData()[1];                     
                         break;
                     //Arduino buttons state message

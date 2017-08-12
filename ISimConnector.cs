@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace iDash
 {
-    public abstract class ISimConnector : IDisposable
+    public abstract class ISimConnector : BackgroundWorker
     {
         public delegate void StatusMessageHandler(string m);
         public StatusMessageHandler StatusMessageSubscribers;
@@ -17,10 +18,18 @@ namespace iDash
         public const float FIRST_RPM = 0.7f;
         protected bool closeThread = false;
 
-        public ISimConnector(List<SerialManager> sm)
+        public ISimConnector()
         {
-            this.sm = sm;
+            this.DoWork += this.worker_DoWork;
         }
+
+        private void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            this.sm = (List<SerialManager>)e.Argument;
+            start();
+        }
+
+        protected abstract void start();
 
         public void stopThread()
         {

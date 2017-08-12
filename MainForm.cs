@@ -1106,7 +1106,8 @@ namespace iDash
                        
             if (irc == null)
             {
-                irc = new IRacingConnector(sm);
+                irc = new IRacingConnector();
+                irc.RunWorkerAsync(sm);
                 irc.StatusMessageSubscribers += UpdateStatusBar;
             }
 
@@ -1131,7 +1132,8 @@ namespace iDash
 
             if (rrc == null)
             {
-                rrc = new RaceRoomConnector(sm);
+                rrc = new RaceRoomConnector();
+                rrc.RunWorkerAsync(sm);
                 rrc.StatusMessageSubscribers += UpdateStatusBar;
             }
 
@@ -1156,7 +1158,8 @@ namespace iDash
 
             if (acc == null)
             {
-                acc = new AssettoCorsaConnector(sm);
+                acc = new AssettoCorsaConnector();
+                acc.RunWorkerAsync(sm);
                 acc.StatusMessageSubscribers += UpdateStatusBar;
             }
 
@@ -1181,7 +1184,8 @@ namespace iDash
 
             if (ams == null)
             {
-                ams = new RFactorConnector(sm);
+                ams = new RFactorConnector();
+                ams.RunWorkerAsync(sm);
                 ams.StatusMessageSubscribers += UpdateStatusBar;
             }
 
@@ -1206,7 +1210,8 @@ namespace iDash
 
             if (rf2 == null)
             {
-                rf2 = new RFactor2Connector(sm);
+                rf2 = new RFactor2Connector();
+                rf2.RunWorkerAsync(sm);
                 rf2.StatusMessageSubscribers += UpdateStatusBar;
             }
 

@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace iDash
 {
@@ -27,19 +28,12 @@ namespace iDash
 
         private bool disposed = false;
 
-        public RaceRoomConnector(List<SerialManager> sm) : base(sm)
-        {
-            this.sm = sm;
-
-            new Thread(new ThreadStart(start)).Start();
-        }
-
         private bool isRrreRunning()
         {
             return Process.GetProcessesByName("RRRE").Length > 0;
         }
 
-        public async void start()
+        protected override void start()
         {
             StringBuilder msg = new StringBuilder();
             bool isConnected = false;            
@@ -142,7 +136,7 @@ namespace iDash
                     }
                 }
 
-                await Task.Delay(Constants.SharedMemoryReadRate);
+                //Thread.Sleep(Constants.SharedMemoryReadRate);
             }
 
             Dispose();

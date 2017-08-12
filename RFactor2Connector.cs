@@ -41,14 +41,7 @@ namespace iDash
         protected rF2VehScoringInfo carData;
         protected rF2Wheel wheel;
 
-        public RFactor2Connector(List<SerialManager> sm) : base(sm)
-        {
-            this.sm = sm;
-
-            new Thread(new ThreadStart(start)).Start();
-        }
-
-        public async void start()
+        protected override void start()
         {
             StringBuilder msg = new StringBuilder();
 
@@ -129,7 +122,7 @@ namespace iDash
                     }
                 }
                 
-                await Task.Delay(Constants.SharedMemoryReadRate);
+                //Thread.Sleep(Constants.SharedMemoryReadRate);
             }            
 
             Dispose();

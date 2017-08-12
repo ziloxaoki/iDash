@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Globalization;
+using System.ComponentModel;
 
 namespace iDash
 {
     public class IRacingConnector : ISimConnector
     {             
         // Globally declared SdkWrapper object
-        private readonly SdkWrapper wrapper;
+        private readonly SdkWrapper wrapper = new SdkWrapper();
         private SdkWrapper.TelemetryUpdatedEventArgs telemetryInfo;
 
         private float firstRpm = 0;
@@ -20,27 +21,17 @@ namespace iDash
         private float currentRpm = 0;
         private int flag = 0;
 
-        private bool disposed = false;
+        private bool disposed = false;       
 
-        public IRacingConnector(List<SerialManager> sm) : base(sm)
+        protected override void start()
         {
-            this.sm = sm;
-
-            // Create instance
-            wrapper = new SdkWrapper();
             //wrapper.TelemetryUpdateFrequency = 60;
             // Listen to events
             wrapper.TelemetryUpdated += OnTelemetryUpdated;
             wrapper.SessionInfoUpdated += OnSessionInfoUpdated;
             // Start it if Arduino is Connected
-            wrapper.Start();            
+            wrapper.Start();
 
-            new Thread(new ThreadStart(start)).Start();
-        }              
-
-
-        private async void start()
-        {
             StringBuilder msg = new StringBuilder();
             bool isConnected = false;
 
@@ -82,7 +73,7 @@ namespace iDash
                     }
                 }
 
-                await Task.Delay(Constants.SharedMemoryReadRate);
+                //Thread.Sleep(Constants.SharedMemoryReadRate);
             }
 
             Dispose();
@@ -223,7 +214,7 @@ namespace iDash
                 // Release unmanaged resources.
                 disposed = true;
             }
-        }        
+        }
 
         ~IRacingConnector() { Dispose(false); }
     }

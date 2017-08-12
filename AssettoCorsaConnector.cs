@@ -21,9 +21,8 @@ namespace iDash
         private Graphics gr;
         private Physics ph;
 
-        public AssettoCorsaConnector(List<SerialManager> sm) : base(sm)
+        protected override void start()
         {
-            this.sm = sm;
             ac = new AssettoCorsa();
 
             ac.GraphicsInterval = 10;
@@ -33,14 +32,6 @@ namespace iDash
             ac.StaticInfoUpdated += StaticInfoUpdated;
             ac.GraphicsUpdated += GraphicsUpdated;
             ac.PhysicsUpdated += PhysicsUpdated;
-
-            ac.Start();
-
-            new Thread(new ThreadStart(start)).Start();
-        }
-
-        public async void start()
-        {
 
             NotifyStatusMessage("Waiting for Assetto Corsa...");
 
@@ -88,7 +79,7 @@ namespace iDash
                     }
                 }
 
-                await Task.Delay(Constants.SharedMemoryReadRate);
+                //Thread.Sleep(Constants.SharedMemoryReadRate);
             }            
         }
 
