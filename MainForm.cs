@@ -166,11 +166,17 @@ namespace iDash
             {
                 ArrayList objCollection = new ArrayList();
                 objCollection.AddRange(Utils.convertObjectCollectionToStringArray(views.Items));
-                TM1637ListBoxItems[selectedSimulator] = objCollection;
+                if (selectedSimulator < TM1637ListBoxItems.Count)
+                    TM1637ListBoxItems[selectedSimulator] = objCollection;
+                else
+                    TM1637ListBoxItems.Insert(selectedSimulator, objCollection);
 
                 ArrayList objCollection2 = new ArrayList();
                 objCollection2.AddRange(Utils.convertObjectCollectionToStringArray(views2.Items));
-                ButtonsListBoxItems[selectedSimulator] = objCollection2;
+                if (selectedSimulator < ButtonsListBoxItems.Count)
+                    ButtonsListBoxItems[selectedSimulator] = objCollection2;
+                else
+                    ButtonsListBoxItems.Insert(selectedSimulator, objCollection2);
             }
         }
 
@@ -185,11 +191,13 @@ namespace iDash
 
             if (simulatorIndex < TM1637ListBoxItems.Count)
             {
-                this.views.Items.AddRange(TM1637ListBoxItems[simulatorIndex].ToArray());
+                if (simulatorIndex < TM1637ListBoxItems.Count)
+                    this.views.Items.AddRange(TM1637ListBoxItems[simulatorIndex].ToArray());
             }
             if (simulatorIndex < ButtonsListBoxItems.Count)
             {
-                this.views2.Items.AddRange(ButtonsListBoxItems[simulatorIndex].ToArray());
+                if (simulatorIndex < ButtonsListBoxItems.Count)
+                    this.views2.Items.AddRange(ButtonsListBoxItems[simulatorIndex].ToArray());
             }
 
             if (views.Items.Count > 0)
