@@ -127,8 +127,12 @@ namespace iDash
 
             AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory + "\n");
             this.debugModes.DataSource = Enum.GetValues(typeof(iDash.DebugMode)); //fix for designer. Cannot declare it in MainForm.Designer
-            //search for Game
-            autoConnectToSimulator();
+
+            if (autoConnectCheckbox.Checked)
+            {
+                //search for Game
+                autoConnectToSimulator();
+            }
         }
 
 
@@ -276,6 +280,8 @@ namespace iDash
                         pictBox.Visible = false;
                     }
                 }
+
+                autoConnectCheckbox.Checked = Properties.Settings.Default.AUTOCONNECT;
             }
             catch (Exception e)
             {
@@ -348,6 +354,8 @@ namespace iDash
             }
 
             Properties.Settings.Default.COMPORT_IDS = String.Join(",", comPortIds);
+
+            Properties.Settings.Default.AUTOCONNECT = autoConnectCheckbox.Checked;
 
             Properties.Settings.Default.Save();
         }
@@ -1223,8 +1231,12 @@ namespace iDash
             stopAllSimThreads();
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
-            statusBar.AppendText("Simulator disconnected.\n");            
-            autoConnectToSimulator();
+            statusBar.AppendText("Simulator disconnected.\n");
+
+            if (autoConnectCheckbox.Checked)
+            {
+                autoConnectToSimulator();
+            }
         }
 
         private void iRacingToolStripMenuItem1_Click(object sender, EventArgs e)

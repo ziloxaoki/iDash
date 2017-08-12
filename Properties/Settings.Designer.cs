@@ -82,5 +82,17 @@ namespace iDash.Properties {
                 this["COMPORT_IDS"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AUTOCONNECT {
+            get {
+                return ((bool)(this["AUTOCONNECT"]));
+            }
+            set {
+                this["AUTOCONNECT"] = value;
+            }
+        }
     }
 }

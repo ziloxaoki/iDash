@@ -40,6 +40,15 @@ namespace iDash
             this.tm1637 = new System.Windows.Forms.TabPage();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.button11 = new System.Windows.Forms.Button();
+            this.addTemplate = new System.Windows.Forms.Button();
+            this.deleteTemplate = new System.Windows.Forms.Button();
+            this.buttonViewDown = new System.Windows.Forms.Button();
+            this.buttonViewUp = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.isSimConnected = new System.Windows.Forms.CheckBox();
             this.textFormat = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -51,6 +60,12 @@ namespace iDash
             this.label4 = new System.Windows.Forms.Label();
             this.keystrokeButton = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
+            this.deleteButtonBind = new System.Windows.Forms.Button();
+            this.buttonView2Down = new System.Windows.Forms.Button();
+            this.buttonView2Up = new System.Windows.Forms.Button();
+            this.button15 = new System.Windows.Forms.Button();
+            this.button16 = new System.Windows.Forms.Button();
+            this.addButtonBind = new System.Windows.Forms.Button();
             this.views2 = new System.Windows.Forms.ListBox();
             this.buttonActions = new System.Windows.Forms.ListBox();
             this.buttonsActive = new System.Windows.Forms.ListBox();
@@ -67,6 +82,12 @@ namespace iDash
             this.clearData = new System.Windows.Forms.Button();
             this.debugData = new System.Windows.Forms.RichTextBox();
             this.configurationTab = new System.Windows.Forms.TabPage();
+            this.portStatusBox6 = new System.Windows.Forms.PictureBox();
+            this.portStatusBox5 = new System.Windows.Forms.PictureBox();
+            this.portStatusBox4 = new System.Windows.Forms.PictureBox();
+            this.portStatusBox3 = new System.Windows.Forms.PictureBox();
+            this.portStatusBox2 = new System.Windows.Forms.PictureBox();
+            this.portStatusBox1 = new System.Windows.Forms.PictureBox();
             this.serialPortCombo6 = new System.Windows.Forms.ComboBox();
             this.serialPortCombo5 = new System.Windows.Forms.ComboBox();
             this.serialPortCombo4 = new System.Windows.Forms.ComboBox();
@@ -101,27 +122,7 @@ namespace iDash
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.amsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.button11 = new System.Windows.Forms.Button();
-            this.addTemplate = new System.Windows.Forms.Button();
-            this.deleteTemplate = new System.Windows.Forms.Button();
-            this.buttonViewDown = new System.Windows.Forms.Button();
-            this.buttonViewUp = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.deleteButtonBind = new System.Windows.Forms.Button();
-            this.buttonView2Down = new System.Windows.Forms.Button();
-            this.buttonView2Up = new System.Windows.Forms.Button();
-            this.button15 = new System.Windows.Forms.Button();
-            this.button16 = new System.Windows.Forms.Button();
-            this.addButtonBind = new System.Windows.Forms.Button();
-            this.portStatusBox6 = new System.Windows.Forms.PictureBox();
-            this.portStatusBox5 = new System.Windows.Forms.PictureBox();
-            this.portStatusBox4 = new System.Windows.Forms.PictureBox();
-            this.portStatusBox3 = new System.Windows.Forms.PictureBox();
-            this.portStatusBox2 = new System.Windows.Forms.PictureBox();
-            this.portStatusBox1 = new System.Windows.Forms.PictureBox();
+            this.autoConnectCheckbox = new System.Windows.Forms.CheckBox();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -129,13 +130,13 @@ namespace iDash
             this.buttons.SuspendLayout();
             this.debugTab.SuspendLayout();
             this.configurationTab.SuspendLayout();
-            this.mainmenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox1)).BeginInit();
+            this.mainmenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonSend
@@ -247,6 +248,96 @@ namespace iDash
             this.label6.Size = new System.Drawing.Size(113, 31);
             this.label6.TabIndex = 32;
             this.label6.Text = "TM1637";
+            // 
+            // button11
+            // 
+            this.button11.Image = global::iDash.Properties.Resources.PrintEntireDocument;
+            this.button11.Location = new System.Drawing.Point(752, 169);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(48, 41);
+            this.button11.TabIndex = 16;
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
+            // 
+            // addTemplate
+            // 
+            this.addTemplate.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
+            this.addTemplate.Location = new System.Drawing.Point(1328, 144);
+            this.addTemplate.Name = "addTemplate";
+            this.addTemplate.Size = new System.Drawing.Size(33, 48);
+            this.addTemplate.TabIndex = 13;
+            this.addTemplate.UseVisualStyleBackColor = true;
+            this.addTemplate.Click += new System.EventHandler(this.addTemplate_Click);
+            // 
+            // deleteTemplate
+            // 
+            this.deleteTemplate.Image = global::iDash.Properties.Resources.bin;
+            this.deleteTemplate.Location = new System.Drawing.Point(1489, 664);
+            this.deleteTemplate.Name = "deleteTemplate";
+            this.deleteTemplate.Size = new System.Drawing.Size(46, 48);
+            this.deleteTemplate.TabIndex = 12;
+            this.deleteTemplate.UseVisualStyleBackColor = true;
+            this.deleteTemplate.Click += new System.EventHandler(this.deleteTemplate_Click);
+            // 
+            // buttonViewDown
+            // 
+            this.buttonViewDown.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
+            this.buttonViewDown.Location = new System.Drawing.Point(1489, 459);
+            this.buttonViewDown.Name = "buttonViewDown";
+            this.buttonViewDown.Size = new System.Drawing.Size(33, 48);
+            this.buttonViewDown.TabIndex = 11;
+            this.buttonViewDown.UseVisualStyleBackColor = true;
+            this.buttonViewDown.Click += new System.EventHandler(this.viewDown_Click);
+            // 
+            // buttonViewUp
+            // 
+            this.buttonViewUp.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
+            this.buttonViewUp.Location = new System.Drawing.Point(1489, 391);
+            this.buttonViewUp.Name = "buttonViewUp";
+            this.buttonViewUp.Size = new System.Drawing.Size(33, 48);
+            this.buttonViewUp.TabIndex = 10;
+            this.buttonViewUp.UseVisualStyleBackColor = true;
+            this.buttonViewUp.Click += new System.EventHandler(this.viewUp_Click);
+            // 
+            // button4
+            // 
+            this.button4.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
+            this.button4.Location = new System.Drawing.Point(1489, 74);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(33, 48);
+            this.button4.TabIndex = 9;
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // button3
+            // 
+            this.button3.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
+            this.button3.Location = new System.Drawing.Point(1489, 6);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(33, 48);
+            this.button3.TabIndex = 8;
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // button2
+            // 
+            this.button2.Image = global::iDash.Properties.Resources._112_LeftArrowShort_Grey_32x32_72;
+            this.button2.Location = new System.Drawing.Point(752, 74);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(48, 34);
+            this.button2.TabIndex = 7;
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // button1
+            // 
+            this.button1.Image = global::iDash.Properties.Resources._112_RightArrowShort_Grey_32x32_72;
+            this.button1.Location = new System.Drawing.Point(752, 20);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(48, 34);
+            this.button1.TabIndex = 6;
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // isSimConnected
             // 
@@ -366,6 +457,66 @@ namespace iDash
             this.label5.Size = new System.Drawing.Size(107, 31);
             this.label5.TabIndex = 31;
             this.label5.Text = "Buttons";
+            // 
+            // deleteButtonBind
+            // 
+            this.deleteButtonBind.Image = global::iDash.Properties.Resources.bin;
+            this.deleteButtonBind.Location = new System.Drawing.Point(1487, 661);
+            this.deleteButtonBind.Name = "deleteButtonBind";
+            this.deleteButtonBind.Size = new System.Drawing.Size(48, 48);
+            this.deleteButtonBind.TabIndex = 28;
+            this.deleteButtonBind.UseVisualStyleBackColor = true;
+            this.deleteButtonBind.Click += new System.EventHandler(this.deleteButtonBind_Click);
+            // 
+            // buttonView2Down
+            // 
+            this.buttonView2Down.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
+            this.buttonView2Down.Location = new System.Drawing.Point(1487, 424);
+            this.buttonView2Down.Name = "buttonView2Down";
+            this.buttonView2Down.Size = new System.Drawing.Size(33, 48);
+            this.buttonView2Down.TabIndex = 27;
+            this.buttonView2Down.UseVisualStyleBackColor = true;
+            this.buttonView2Down.Click += new System.EventHandler(this.view2Down_Click);
+            // 
+            // buttonView2Up
+            // 
+            this.buttonView2Up.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
+            this.buttonView2Up.Location = new System.Drawing.Point(1487, 356);
+            this.buttonView2Up.Name = "buttonView2Up";
+            this.buttonView2Up.Size = new System.Drawing.Size(33, 48);
+            this.buttonView2Up.TabIndex = 26;
+            this.buttonView2Up.UseVisualStyleBackColor = true;
+            this.buttonView2Up.Click += new System.EventHandler(this.view2Up_Click);
+            // 
+            // button15
+            // 
+            this.button15.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
+            this.button15.Location = new System.Drawing.Point(1487, 95);
+            this.button15.Name = "button15";
+            this.button15.Size = new System.Drawing.Size(33, 48);
+            this.button15.TabIndex = 25;
+            this.button15.UseVisualStyleBackColor = true;
+            this.button15.Click += new System.EventHandler(this.button15_Click);
+            // 
+            // button16
+            // 
+            this.button16.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
+            this.button16.Location = new System.Drawing.Point(1487, 27);
+            this.button16.Name = "button16";
+            this.button16.Size = new System.Drawing.Size(33, 48);
+            this.button16.TabIndex = 24;
+            this.button16.UseVisualStyleBackColor = true;
+            this.button16.Click += new System.EventHandler(this.button16_Click);
+            // 
+            // addButtonBind
+            // 
+            this.addButtonBind.Image = global::iDash.Properties.Resources._112_RightArrowShort_Grey_32x32_72;
+            this.addButtonBind.Location = new System.Drawing.Point(744, 388);
+            this.addButtonBind.Name = "addButtonBind";
+            this.addButtonBind.Size = new System.Drawing.Size(48, 34);
+            this.addButtonBind.TabIndex = 22;
+            this.addButtonBind.UseVisualStyleBackColor = true;
+            this.addButtonBind.Click += new System.EventHandler(this.addButtonBind_Click);
             // 
             // views2
             // 
@@ -524,6 +675,7 @@ namespace iDash
             // 
             // configurationTab
             // 
+            this.configurationTab.Controls.Add(this.autoConnectCheckbox);
             this.configurationTab.Controls.Add(this.portStatusBox6);
             this.configurationTab.Controls.Add(this.portStatusBox5);
             this.configurationTab.Controls.Add(this.portStatusBox4);
@@ -556,6 +708,68 @@ namespace iDash
             this.configurationTab.TabIndex = 2;
             this.configurationTab.Text = "Configuration";
             this.configurationTab.UseVisualStyleBackColor = true;
+            // 
+            // portStatusBox6
+            // 
+            this.portStatusBox6.Image = global::iDash.Properties.Resources.disconnected;
+            this.portStatusBox6.Location = new System.Drawing.Point(238, 142);
+            this.portStatusBox6.Name = "portStatusBox6";
+            this.portStatusBox6.Size = new System.Drawing.Size(25, 25);
+            this.portStatusBox6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.portStatusBox6.TabIndex = 24;
+            this.portStatusBox6.TabStop = false;
+            // 
+            // portStatusBox5
+            // 
+            this.portStatusBox5.Image = global::iDash.Properties.Resources.disconnected;
+            this.portStatusBox5.Location = new System.Drawing.Point(238, 115);
+            this.portStatusBox5.Name = "portStatusBox5";
+            this.portStatusBox5.Size = new System.Drawing.Size(25, 25);
+            this.portStatusBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.portStatusBox5.TabIndex = 23;
+            this.portStatusBox5.TabStop = false;
+            // 
+            // portStatusBox4
+            // 
+            this.portStatusBox4.Image = global::iDash.Properties.Resources.disconnected;
+            this.portStatusBox4.Location = new System.Drawing.Point(238, 88);
+            this.portStatusBox4.Name = "portStatusBox4";
+            this.portStatusBox4.Size = new System.Drawing.Size(25, 25);
+            this.portStatusBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.portStatusBox4.TabIndex = 22;
+            this.portStatusBox4.TabStop = false;
+            // 
+            // portStatusBox3
+            // 
+            this.portStatusBox3.Image = global::iDash.Properties.Resources.disconnected;
+            this.portStatusBox3.Location = new System.Drawing.Point(238, 61);
+            this.portStatusBox3.Name = "portStatusBox3";
+            this.portStatusBox3.Size = new System.Drawing.Size(25, 25);
+            this.portStatusBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.portStatusBox3.TabIndex = 21;
+            this.portStatusBox3.TabStop = false;
+            // 
+            // portStatusBox2
+            // 
+            this.portStatusBox2.Image = global::iDash.Properties.Resources.disconnected;
+            this.portStatusBox2.Location = new System.Drawing.Point(238, 34);
+            this.portStatusBox2.Name = "portStatusBox2";
+            this.portStatusBox2.Size = new System.Drawing.Size(25, 25);
+            this.portStatusBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.portStatusBox2.TabIndex = 20;
+            this.portStatusBox2.TabStop = false;
+            // 
+            // portStatusBox1
+            // 
+            this.portStatusBox1.ErrorImage = global::iDash.Properties.Resources.disconnected;
+            this.portStatusBox1.Image = global::iDash.Properties.Resources.disconnected;
+            this.portStatusBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("portStatusBox1.InitialImage")));
+            this.portStatusBox1.Location = new System.Drawing.Point(238, 7);
+            this.portStatusBox1.Name = "portStatusBox1";
+            this.portStatusBox1.Size = new System.Drawing.Size(25, 25);
+            this.portStatusBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.portStatusBox1.TabIndex = 19;
+            this.portStatusBox1.TabStop = false;
             // 
             // serialPortCombo6
             // 
@@ -1044,217 +1258,15 @@ namespace iDash
             this.rFactor2ToolStripMenuItem1.Text = "RFactor2";
             this.rFactor2ToolStripMenuItem1.Click += new System.EventHandler(this.rFactor2ToolStripMenuItem1_Click);
             // 
-            // button11
+            // autoConnectCheckbox
             // 
-            this.button11.Image = global::iDash.Properties.Resources.PrintEntireDocument;
-            this.button11.Location = new System.Drawing.Point(752, 169);
-            this.button11.Name = "button11";
-            this.button11.Size = new System.Drawing.Size(48, 41);
-            this.button11.TabIndex = 16;
-            this.button11.UseVisualStyleBackColor = true;
-            this.button11.Click += new System.EventHandler(this.button11_Click);
-            // 
-            // addTemplate
-            // 
-            this.addTemplate.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.addTemplate.Location = new System.Drawing.Point(1328, 144);
-            this.addTemplate.Name = "addTemplate";
-            this.addTemplate.Size = new System.Drawing.Size(33, 48);
-            this.addTemplate.TabIndex = 13;
-            this.addTemplate.UseVisualStyleBackColor = true;
-            this.addTemplate.Click += new System.EventHandler(this.addTemplate_Click);
-            // 
-            // deleteTemplate
-            // 
-            this.deleteTemplate.Image = global::iDash.Properties.Resources.bin;
-            this.deleteTemplate.Location = new System.Drawing.Point(1489, 664);
-            this.deleteTemplate.Name = "deleteTemplate";
-            this.deleteTemplate.Size = new System.Drawing.Size(46, 48);
-            this.deleteTemplate.TabIndex = 12;
-            this.deleteTemplate.UseVisualStyleBackColor = true;
-            this.deleteTemplate.Click += new System.EventHandler(this.deleteTemplate_Click);
-            // 
-            // buttonViewDown
-            // 
-            this.buttonViewDown.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.buttonViewDown.Location = new System.Drawing.Point(1489, 459);
-            this.buttonViewDown.Name = "buttonViewDown";
-            this.buttonViewDown.Size = new System.Drawing.Size(33, 48);
-            this.buttonViewDown.TabIndex = 11;
-            this.buttonViewDown.UseVisualStyleBackColor = true;
-            this.buttonViewDown.Click += new System.EventHandler(this.viewDown_Click);
-            // 
-            // buttonViewUp
-            // 
-            this.buttonViewUp.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.buttonViewUp.Location = new System.Drawing.Point(1489, 391);
-            this.buttonViewUp.Name = "buttonViewUp";
-            this.buttonViewUp.Size = new System.Drawing.Size(33, 48);
-            this.buttonViewUp.TabIndex = 10;
-            this.buttonViewUp.UseVisualStyleBackColor = true;
-            this.buttonViewUp.Click += new System.EventHandler(this.viewUp_Click);
-            // 
-            // button4
-            // 
-            this.button4.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.button4.Location = new System.Drawing.Point(1489, 74);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(33, 48);
-            this.button4.TabIndex = 9;
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
-            // 
-            // button3
-            // 
-            this.button3.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.button3.Location = new System.Drawing.Point(1489, 6);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(33, 48);
-            this.button3.TabIndex = 8;
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // button2
-            // 
-            this.button2.Image = global::iDash.Properties.Resources._112_LeftArrowShort_Grey_32x32_72;
-            this.button2.Location = new System.Drawing.Point(752, 74);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(48, 34);
-            this.button2.TabIndex = 7;
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // button1
-            // 
-            this.button1.Image = global::iDash.Properties.Resources._112_RightArrowShort_Grey_32x32_72;
-            this.button1.Location = new System.Drawing.Point(752, 20);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(48, 34);
-            this.button1.TabIndex = 6;
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // deleteButtonBind
-            // 
-            this.deleteButtonBind.Image = global::iDash.Properties.Resources.bin;
-            this.deleteButtonBind.Location = new System.Drawing.Point(1487, 661);
-            this.deleteButtonBind.Name = "deleteButtonBind";
-            this.deleteButtonBind.Size = new System.Drawing.Size(48, 48);
-            this.deleteButtonBind.TabIndex = 28;
-            this.deleteButtonBind.UseVisualStyleBackColor = true;
-            this.deleteButtonBind.Click += new System.EventHandler(this.deleteButtonBind_Click);
-            // 
-            // buttonView2Down
-            // 
-            this.buttonView2Down.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.buttonView2Down.Location = new System.Drawing.Point(1487, 424);
-            this.buttonView2Down.Name = "buttonView2Down";
-            this.buttonView2Down.Size = new System.Drawing.Size(33, 48);
-            this.buttonView2Down.TabIndex = 27;
-            this.buttonView2Down.UseVisualStyleBackColor = true;
-            this.buttonView2Down.Click += new System.EventHandler(this.view2Down_Click);
-            // 
-            // buttonView2Up
-            // 
-            this.buttonView2Up.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.buttonView2Up.Location = new System.Drawing.Point(1487, 356);
-            this.buttonView2Up.Name = "buttonView2Up";
-            this.buttonView2Up.Size = new System.Drawing.Size(33, 48);
-            this.buttonView2Up.TabIndex = 26;
-            this.buttonView2Up.UseVisualStyleBackColor = true;
-            this.buttonView2Up.Click += new System.EventHandler(this.view2Up_Click);
-            // 
-            // button15
-            // 
-            this.button15.Image = global::iDash.Properties.Resources._112_DownArrowShort_Grey_32x32_72;
-            this.button15.Location = new System.Drawing.Point(1487, 95);
-            this.button15.Name = "button15";
-            this.button15.Size = new System.Drawing.Size(33, 48);
-            this.button15.TabIndex = 25;
-            this.button15.UseVisualStyleBackColor = true;
-            this.button15.Click += new System.EventHandler(this.button15_Click);
-            // 
-            // button16
-            // 
-            this.button16.Image = global::iDash.Properties.Resources._112_UpArrowShort_Grey_32x42_72;
-            this.button16.Location = new System.Drawing.Point(1487, 27);
-            this.button16.Name = "button16";
-            this.button16.Size = new System.Drawing.Size(33, 48);
-            this.button16.TabIndex = 24;
-            this.button16.UseVisualStyleBackColor = true;
-            this.button16.Click += new System.EventHandler(this.button16_Click);
-            // 
-            // addButtonBind
-            // 
-            this.addButtonBind.Image = global::iDash.Properties.Resources._112_RightArrowShort_Grey_32x32_72;
-            this.addButtonBind.Location = new System.Drawing.Point(744, 388);
-            this.addButtonBind.Name = "addButtonBind";
-            this.addButtonBind.Size = new System.Drawing.Size(48, 34);
-            this.addButtonBind.TabIndex = 22;
-            this.addButtonBind.UseVisualStyleBackColor = true;
-            this.addButtonBind.Click += new System.EventHandler(this.addButtonBind_Click);
-            // 
-            // portStatusBox6
-            // 
-            this.portStatusBox6.Image = global::iDash.Properties.Resources.disconnected;
-            this.portStatusBox6.Location = new System.Drawing.Point(238, 142);
-            this.portStatusBox6.Name = "portStatusBox6";
-            this.portStatusBox6.Size = new System.Drawing.Size(25, 25);
-            this.portStatusBox6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.portStatusBox6.TabIndex = 24;
-            this.portStatusBox6.TabStop = false;
-            // 
-            // portStatusBox5
-            // 
-            this.portStatusBox5.Image = global::iDash.Properties.Resources.disconnected;
-            this.portStatusBox5.Location = new System.Drawing.Point(238, 115);
-            this.portStatusBox5.Name = "portStatusBox5";
-            this.portStatusBox5.Size = new System.Drawing.Size(25, 25);
-            this.portStatusBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.portStatusBox5.TabIndex = 23;
-            this.portStatusBox5.TabStop = false;
-            // 
-            // portStatusBox4
-            // 
-            this.portStatusBox4.Image = global::iDash.Properties.Resources.disconnected;
-            this.portStatusBox4.Location = new System.Drawing.Point(238, 88);
-            this.portStatusBox4.Name = "portStatusBox4";
-            this.portStatusBox4.Size = new System.Drawing.Size(25, 25);
-            this.portStatusBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.portStatusBox4.TabIndex = 22;
-            this.portStatusBox4.TabStop = false;
-            // 
-            // portStatusBox3
-            // 
-            this.portStatusBox3.Image = global::iDash.Properties.Resources.disconnected;
-            this.portStatusBox3.Location = new System.Drawing.Point(238, 61);
-            this.portStatusBox3.Name = "portStatusBox3";
-            this.portStatusBox3.Size = new System.Drawing.Size(25, 25);
-            this.portStatusBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.portStatusBox3.TabIndex = 21;
-            this.portStatusBox3.TabStop = false;
-            // 
-            // portStatusBox2
-            // 
-            this.portStatusBox2.Image = global::iDash.Properties.Resources.disconnected;
-            this.portStatusBox2.Location = new System.Drawing.Point(238, 34);
-            this.portStatusBox2.Name = "portStatusBox2";
-            this.portStatusBox2.Size = new System.Drawing.Size(25, 25);
-            this.portStatusBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.portStatusBox2.TabIndex = 20;
-            this.portStatusBox2.TabStop = false;
-            // 
-            // portStatusBox1
-            // 
-            this.portStatusBox1.ErrorImage = global::iDash.Properties.Resources.disconnected;
-            this.portStatusBox1.Image = global::iDash.Properties.Resources.disconnected;
-            this.portStatusBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("portStatusBox1.InitialImage")));
-            this.portStatusBox1.Location = new System.Drawing.Point(238, 7);
-            this.portStatusBox1.Name = "portStatusBox1";
-            this.portStatusBox1.Size = new System.Drawing.Size(25, 25);
-            this.portStatusBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.portStatusBox1.TabIndex = 19;
-            this.portStatusBox1.TabStop = false;
+            this.autoConnectCheckbox.AutoSize = true;
+            this.autoConnectCheckbox.Location = new System.Drawing.Point(326, 14);
+            this.autoConnectCheckbox.Name = "autoConnectCheckbox";
+            this.autoConnectCheckbox.Size = new System.Drawing.Size(174, 17);
+            this.autoConnectCheckbox.TabIndex = 25;
+            this.autoConnectCheckbox.Text = "Connect to game automatically.";
+            this.autoConnectCheckbox.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -1282,14 +1294,14 @@ namespace iDash
             this.debugTab.PerformLayout();
             this.configurationTab.ResumeLayout(false);
             this.configurationTab.PerformLayout();
-            this.mainmenu.ResumeLayout(false);
-            this.mainmenu.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.portStatusBox1)).EndInit();
+            this.mainmenu.ResumeLayout(false);
+            this.mainmenu.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1389,6 +1401,7 @@ namespace iDash
         private System.Windows.Forms.PictureBox portStatusBox3;
         private System.Windows.Forms.PictureBox portStatusBox2;
         private System.Windows.Forms.PictureBox portStatusBox1;
+        private System.Windows.Forms.CheckBox autoConnectCheckbox;
     }
 }
 

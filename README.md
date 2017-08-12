@@ -43,6 +43,9 @@ Serialized settings:
             <setting name="COMPORT_IDS" serializeAs="String">
                 <value>4,11,0,0,0,0</value>
             </setting>
+            <setting name="AUTOCONNECT" serializeAs="String">
+                <value>True</value>
+            </setting>
         </iDash.Properties.Settings>
     </userSettings>
 </configuration>
