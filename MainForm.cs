@@ -1094,7 +1094,7 @@ namespace iDash
 
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-                        selectedSimulator = Constants.IRacing;
+            selectedSimulator = Constants.IRacing;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
