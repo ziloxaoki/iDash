@@ -82,6 +82,7 @@ namespace iDash
             this.clearData = new System.Windows.Forms.Button();
             this.debugData = new System.Windows.Forms.RichTextBox();
             this.configurationTab = new System.Windows.Forms.TabPage();
+            this.autoConnectCheckbox = new System.Windows.Forms.CheckBox();
             this.portStatusBox6 = new System.Windows.Forms.PictureBox();
             this.portStatusBox5 = new System.Windows.Forms.PictureBox();
             this.portStatusBox4 = new System.Windows.Forms.PictureBox();
@@ -122,7 +123,7 @@ namespace iDash
             this.assettoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.amsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.autoConnectCheckbox = new System.Windows.Forms.CheckBox();
+            this.clearStatusBar = new System.Windows.Forms.Button();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -709,6 +710,16 @@ namespace iDash
             this.configurationTab.Text = "Configuration";
             this.configurationTab.UseVisualStyleBackColor = true;
             // 
+            // autoConnectCheckbox
+            // 
+            this.autoConnectCheckbox.AutoSize = true;
+            this.autoConnectCheckbox.Location = new System.Drawing.Point(326, 14);
+            this.autoConnectCheckbox.Name = "autoConnectCheckbox";
+            this.autoConnectCheckbox.Size = new System.Drawing.Size(174, 17);
+            this.autoConnectCheckbox.TabIndex = 25;
+            this.autoConnectCheckbox.Text = "Connect to game automatically.";
+            this.autoConnectCheckbox.UseVisualStyleBackColor = true;
+            // 
             // portStatusBox6
             // 
             this.portStatusBox6.Image = global::iDash.Properties.Resources.disconnected;
@@ -1258,21 +1269,22 @@ namespace iDash
             this.rFactor2ToolStripMenuItem1.Text = "RFactor2";
             this.rFactor2ToolStripMenuItem1.Click += new System.EventHandler(this.rFactor2ToolStripMenuItem1_Click);
             // 
-            // autoConnectCheckbox
+            // clearStatusBar
             // 
-            this.autoConnectCheckbox.AutoSize = true;
-            this.autoConnectCheckbox.Location = new System.Drawing.Point(326, 14);
-            this.autoConnectCheckbox.Name = "autoConnectCheckbox";
-            this.autoConnectCheckbox.Size = new System.Drawing.Size(174, 17);
-            this.autoConnectCheckbox.TabIndex = 25;
-            this.autoConnectCheckbox.Text = "Connect to game automatically.";
-            this.autoConnectCheckbox.UseVisualStyleBackColor = true;
+            this.clearStatusBar.Location = new System.Drawing.Point(1460, 986);
+            this.clearStatusBar.Name = "clearStatusBar";
+            this.clearStatusBar.Size = new System.Drawing.Size(75, 23);
+            this.clearStatusBar.TabIndex = 12;
+            this.clearStatusBar.Text = "Clear";
+            this.clearStatusBar.UseVisualStyleBackColor = true;
+            this.clearStatusBar.Click += new System.EventHandler(this.clearStatusBar_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1575, 1017);
+            this.Controls.Add(this.clearStatusBar);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.mainTab);
             this.Controls.Add(this.mainmenu);
@@ -1402,6 +1414,7 @@ namespace iDash
         private System.Windows.Forms.PictureBox portStatusBox2;
         private System.Windows.Forms.PictureBox portStatusBox1;
         private System.Windows.Forms.CheckBox autoConnectCheckbox;
+        private System.Windows.Forms.Button clearStatusBar;
     }
 }
 

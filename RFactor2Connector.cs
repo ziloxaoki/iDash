@@ -47,7 +47,7 @@ namespace iDash
 
             NotifyStatusMessage("Waiting for RFactor2...");
 
-            while (!closeThread)
+            while (!CancellationPending)
             {
                 msg.Clear();
                 if (isGameRunning)
@@ -56,8 +56,8 @@ namespace iDash
                     {
                         if (!disableNotification)
                         {
-                            string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to RFactor2.";
-                            Logger.LogMessageToFile("Connected to RFactor2", true);
+                            string s = "Connected to RFactor2.";
+                            Logger.LogMessageToFile(s, true);
                             NotifyStatusMessage(s);
                             disableNotification = true;
                         }
@@ -104,7 +104,8 @@ namespace iDash
                 {
                     if(isConnected)
                     {
-                        string s = DateTime.Now.ToString("hh:mm:ss") + ": RFactor2 closed.";
+                        string s = "RFactor2 closed.";
+                        Logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                         disableNotification = true;
                     }
@@ -123,8 +124,9 @@ namespace iDash
                 }
                 
                 //Thread.Sleep(Constants.SharedMemoryReadRate);
-            }            
+            }
 
+            NotifyStatusMessage("RFactor2 thread stopped.");
             Dispose();
         }
 

@@ -37,14 +37,14 @@ namespace iDash
 
             bool isConnected = false;       
 
-            while (!closeThread)
+            while (!CancellationPending)
             {
                 if (gr.Status != AC_STATUS.AC_OFF)
                 {
                     if (!isConnected)
                     {
-                        string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to Assetto Corsa.";
-                        Logger.LogMessageToFile("Connected to Assetto Corsa" , true);
+                        string s = "Connected to Assetto Corsa.";
+                        Logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                     }
 
@@ -64,7 +64,8 @@ namespace iDash
                 {
                     if (isConnected)
                     {
-                        string s = DateTime.Now.ToString("hh:mm:ss") + ": Assetto Corsa closed.";
+                        string s = "Assetto Corsa closed.";                        
+                        Logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                     }
 
@@ -79,6 +80,7 @@ namespace iDash
                     }
                 }
 
+                NotifyStatusMessage("Assetto Corsa thread stopped.");
                 //Thread.Sleep(Constants.SharedMemoryReadRate);
             }            
         }

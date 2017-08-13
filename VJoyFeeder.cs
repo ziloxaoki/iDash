@@ -115,7 +115,7 @@ namespace iDash
 
             if (handler != null)
             {
-                handler(args + "\n");
+                handler(args);
             }
         }
 

@@ -37,7 +37,7 @@ namespace iDash
 
             NotifyStatusMessage("Waiting for IRacing...");
 
-            while (!closeThread)
+            while (!CancellationPending)
             {
                 msg.Clear();
               
@@ -45,8 +45,8 @@ namespace iDash
                 {
                     if (!isConnected)
                     {
-                        string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to iRacing.";
-                        Logger.LogMessageToFile("Connected to iRacing", true);
+                        string s = "Connected to iRacing.";
+                        Logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                     }
                     isConnected = true;
@@ -63,6 +63,9 @@ namespace iDash
                 }
                 else
                 {
+                    string s = "iRacing closed.";
+                    Logger.LogMessageToFile(s, true);
+                    NotifyStatusMessage(s);
                     isConnected = false;
                     foreach (SerialManager serialManager in sm)
                     {
@@ -73,6 +76,7 @@ namespace iDash
                     }
                 }
 
+                NotifyStatusMessage("iRacing thread stopped.");
                 //Thread.Sleep(Constants.SharedMemoryReadRate);
             }
 

@@ -93,7 +93,7 @@ namespace iDash
                 if (portCombo.SelectedIndex > 0)
                 {
                     Logger.LogMessageToFile("Initializing Serial Manager.", true);
-                    AppendToStatusBar("\n\nInitializing Serial Manager.\n");
+                    AppendToStatusBar("Initializing Serial Manager.");
                     SerialManager serialManager = new SerialManager();                    
                     serialManager.StatusMessageSubscribers += UpdateStatusBar;
                     serialManager.DebugMessageSubscribers += UpdateDebugData;
@@ -104,7 +104,7 @@ namespace iDash
                     if (vjoyCombo.SelectedIndex > 0)
                     {
                         Logger.LogMessageToFile("Initializing Button Handler.", true);
-                        AppendToStatusBar("Initializing Button Handler.\n");
+                        AppendToStatusBar("Initializing Button Handler.");
                         ButtonHandler buttonHandler = new ButtonHandler(serialManager);
                         buttonHandler.buttonStateHandler += ButtonStateReceived;
                         bh.Add(buttonHandler);
@@ -114,7 +114,7 @@ namespace iDash
                         uint vjoyId = (uint)vjoyCombo.SelectedIndex;
 
                         Logger.LogMessageToFile(String.Format("Initializing vJoy{0}.", vjoyId), true);
-                        AppendToStatusBar("Initializing Vjoy.\n");
+                        AppendToStatusBar("Initializing Vjoy.");
                         VJoyFeeder vJoyFeeder = new VJoyFeeder(buttonHandler, vjoyId);
                         vJoyFeeder.StatusMessageSubscribers += UpdateStatusBar;
                         vf.Add(vJoyFeeder);
@@ -125,7 +125,7 @@ namespace iDash
                 }
             }
 
-            AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory + "\n");
+            AppendToDebugDialog("Instalation dir: " + AppDomain.CurrentDomain.BaseDirectory);
             this.debugModes.DataSource = Enum.GetValues(typeof(iDash.DebugMode)); //fix for designer. Cannot declare it in MainForm.Designer
 
             if (autoConnectCheckbox.Checked)
@@ -403,18 +403,19 @@ namespace iDash
 
         private void stopAllThreads()
         {
-            unRegisterAllSubscribers();
-            stopAllSimThreads();
-
-            foreach (SerialManager serialManager in sm)
-            {
-                serialManager.stopThread();
-            }
-
             foreach (VJoyFeeder vJoyfeeder in vf)
             {
                 vJoyfeeder.Dispose();
             }
+
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.CancelAsync();
+            }
+
+            stopAllSimThreads();            
+
+            unRegisterAllSubscribers();            
 
             sm.Clear();
             bh.Clear();
@@ -422,12 +423,9 @@ namespace iDash
         }
 
 
-        private async void resetAllThreads()
+        private void resetAllThreads()
         {
             stopAllThreads();
-
-            await Task.Delay(WAIT_THREADS_TO_CLOSE);
-
             initDevices();
         }
 
@@ -435,13 +433,15 @@ namespace iDash
         {
             stopAllThreads();
             saveAppSettings();
+            Thread.Sleep(1500);
         }
 
         public void AppendToStatusBar(String s)
         {
             if (statusBar.Lines.Count() > 1000)
                 statusBar.Clear();
-            statusBar.AppendText(s);
+
+            statusBar.AppendText(string.Format("[{0:G}]: " + s + "\n", System.DateTime.Now));
         }
 
         public void UpdateStatusBar(string s)
@@ -508,7 +508,7 @@ namespace iDash
             }
             else
             {
-                debugData.AppendText(s);
+                debugData.AppendText(s + "\n");
             }
         }
 
@@ -534,7 +534,7 @@ namespace iDash
 
         private async void debugModes_SelectedIndexChanged(object sender, EventArgs e)
         {            
-            AppendToDebugDialog("Verbose data saved to: " + AppDomain.CurrentDomain.BaseDirectory + "log.log\n");
+            AppendToDebugDialog("Verbose data saved to: " + AppDomain.CurrentDomain.BaseDirectory + "log.log");
 
             //0 = none, 1 = default, 2 = verbose
             byte[] state = { (byte)debugModes.SelectedIndex };
@@ -1071,19 +1071,19 @@ namespace iDash
 
             //keep iRacing threads alive
             if (irc != null)
-                irc.stopThread();
+                irc.CancelAsync();
             //stop RaceRoom threads
             if (rrc != null)
-                rrc.stopThread();
+                rrc.CancelAsync();
             //stop Assetto threads
             if (acc != null)
-                acc.stopThread();
+                acc.CancelAsync();
             //stop rFactor threads
             if (ams != null)
-                ams.stopThread();
+                ams.CancelAsync();
             //stop rFactor2 threads
             if (rf2 != null)
-                rf2.stopThread();
+                rf2.CancelAsync();
 
             irc = null;
             rrc = null;
@@ -1232,7 +1232,7 @@ namespace iDash
             stopAllSimThreads();
 
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
-            statusBar.AppendText("Simulator disconnected.\n");
+            statusBar.AppendText("Simulator disconnected.");
 
             if (autoConnectCheckbox.Checked)
             {
@@ -1396,6 +1396,11 @@ namespace iDash
                 //wait 1sec
                 await Task.Delay(1000);
             }
+        }
+
+        private void clearStatusBar_Click(object sender, EventArgs e)
+        {
+            statusBar.Clear();
         }
     }    
 }

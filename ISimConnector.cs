@@ -16,7 +16,6 @@ namespace iDash
 
         private const int LED_NUM_TOTAL = 16;
         public const float FIRST_RPM = 0.7f;
-        protected bool closeThread = false;
 
         public ISimConnector()
         {
@@ -27,14 +26,11 @@ namespace iDash
         {
             this.sm = (List<SerialManager>)e.Argument;
             start();
+
+            e.Cancel = true;
         }
 
         protected abstract void start();
-
-        public void stopThread()
-        {
-            this.closeThread = true;
-        }
 
         protected void sendRPMShiftMsg(float currentRpm, float firstRpm, float lastRpm, int flag)
         {
@@ -184,8 +180,8 @@ namespace iDash
             StatusMessageHandler handler = StatusMessageSubscribers;
 
             if (handler != null)
-            {
-                handler(args + "\n");
+            {                
+                handler(string.Format("[{0:G}]: " + args + "\n", System.DateTime.Now));
             }
         }
 

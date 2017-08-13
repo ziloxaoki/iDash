@@ -40,7 +40,7 @@ namespace iDash
 
             NotifyStatusMessage("Waiting for RRRE.exe...");
 
-            while (!closeThread)
+            while (!CancellationPending)
             {
                 msg.Clear();
 
@@ -50,7 +50,8 @@ namespace iDash
                     {
                         if (!isConnected)
                         {
-                            string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to RaceRoom.";
+                            string s = "Connected to RaceRoom.";
+                            Logger.LogMessageToFile(s, true);
                             NotifyStatusMessage(s);
                             isConnected = true;
 
@@ -129,13 +130,14 @@ namespace iDash
                     }
                     if(isConnected)
                     {
-                        string s = DateTime.Now.ToString("hh:mm:ss") + ": RaceRoom closed.";
-                        Logger.LogMessageToFile("Connected to RaceRoom", true);
+                        string s = "RaceRoom closed.";
+                        Logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                         isConnected = false;
                     }
                 }
 
+                NotifyStatusMessage("RaceRoom thread stopped.");
                 //Thread.Sleep(Constants.SharedMemoryReadRate);
             }
 

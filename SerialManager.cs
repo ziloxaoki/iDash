@@ -30,6 +30,7 @@ namespace iDash
         private long lastArduinoResponse = -1;        
         private object readLock = new object();
         private object sendLock = new object();
+        private object notifyLock = new object();
 
         //debug mode set on form
         public DebugMode formDebugMode = DebugMode.None;   
@@ -59,10 +60,10 @@ namespace iDash
         private int[,] voltages = new int[8,3];
         private int MIN_VOLTAGE = 100;
         private string id = "";
-        private bool closeThread = false;
 
         public SerialManager()
         {
+            WorkerSupportsCancellation = true;
             this.DoWork += this.worker_DoWork;
         }
 
@@ -78,6 +79,15 @@ namespace iDash
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                                     
 
             this.tryToConnect();
+
+            NotifyStatusMessage("Stopping Arduino(" + id + ") thread.");
+
+            if (serialPort != null && serialPort.IsOpen)
+            {
+                serialPort.Close();
+            }
+
+            e.Cancel = true;
         }
 
         private bool isArduinoAlive()
@@ -118,7 +128,7 @@ namespace iDash
         {
             HashSet<string> notificationSent = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            while (!closeThread)
+            while (!CancellationPending)
             {
                 if (isArduinoAlive())
                 {
@@ -186,15 +196,6 @@ namespace iDash
                 }
             }
 
-        }
-
-        public void stopThread()
-        {
-            if (serialPort != null && serialPort.IsOpen)
-            {
-                serialPort.Close();
-            }
-            this.closeThread = true;            
         }
 
         private void sendSynAck()
@@ -455,13 +456,14 @@ namespace iDash
         //notify subscribers (statusbar) that a message has to be logged
         public void NotifyStatusMessage(string args)
         {
-            StatusMessageHandler handler = StatusMessageSubscribers;
-
-            args = string.Format("[{0:G}]: " + args, System.DateTime.Now);
-
-            if (handler != null)
+            lock(notifyLock)
             {
-                handler(args + "\n");
+                StatusMessageHandler handler = StatusMessageSubscribers;
+
+                if (handler != null)
+                {
+                    handler(args);
+                }
             }
         }
 

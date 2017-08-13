@@ -25,9 +25,9 @@ namespace iDash
             gameDataReader = new RF1SharedMemoryReader();
 
             Object rawGameData;
-            NotifyStatusMessage("Waiting for RFactor...");
+            NotifyStatusMessage("Waiting for Automobilista(RFactor)...");
 
-            while (!closeThread)
+            while (!CancellationPending)
             {                
                 if (isGameRunning)
                 {                    
@@ -62,8 +62,8 @@ namespace iDash
 
                                 if (!isConnected)
                                 {
-                                    string s = DateTime.Now.ToString("hh:mm:ss") + ": Connected to Automobilista.";
-                                    Logger.LogMessageToFile("Connected to Automobilista", true);
+                                    string s = "Connected to Automobilista(RFactor).";
+                                    Logger.LogMessageToFile(s, true);
                                     NotifyStatusMessage(s);
                                     isConnected = true;
                                 }
@@ -83,7 +83,8 @@ namespace iDash
 
                     if (isConnected)
                     {
-                        string s = DateTime.Now.ToString("hh:mm:ss") + ": Automobilista closed.";
+                        string s = "Automobilista(RFactor) closed.";
+                        Logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                         isConnected = false;
                     }
@@ -97,6 +98,7 @@ namespace iDash
                     }
                 }
 
+                NotifyStatusMessage("Automobilista(RFactor) thread stopped.");
                 //Thread.Sleep(Constants.SharedMemoryReadRate);
             }            
             
