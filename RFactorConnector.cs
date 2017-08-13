@@ -20,6 +20,8 @@ namespace iDash
 
         private bool disposed = false;
 
+        private Logger logger = new Logger();
+
         protected override void start()
         {
             gameDataReader = new RF1SharedMemoryReader();
@@ -63,7 +65,7 @@ namespace iDash
                                 if (!isConnected)
                                 {
                                     string s = "Connected to Automobilista(RFactor).";
-                                    Logger.LogMessageToFile(s, true);
+                                    logger.LogMessageToFile(s, true);
                                     NotifyStatusMessage(s);
                                     isConnected = true;
                                 }
@@ -71,7 +73,7 @@ namespace iDash
                         }
                         catch(Exception e)
                         {
-                            Logger.LogExceptionToFile(e);
+                            logger.LogExceptionToFile(e);
                             isGameRunning = false;
                             isConnected = false;
                         }
@@ -84,7 +86,7 @@ namespace iDash
                     if (isConnected)
                     {
                         string s = "Automobilista(RFactor) closed.";
-                        Logger.LogMessageToFile(s, true);
+                        logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                         isConnected = false;
                     }
@@ -156,7 +158,7 @@ namespace iDash
                 }
                 catch (Exception e)
                 {
-                    Logger.LogExceptionToFile(e);
+                    logger.LogExceptionToFile(e);
                 }
             }
 
@@ -199,7 +201,7 @@ namespace iDash
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (!disposed)
             {

@@ -64,10 +64,11 @@ namespace iDash
         private const string VJOY_COMBO_VALUE_PREFIX = "vjoy";
         private const string ARDUINO_LABEL_CONTROL_NAME_PREFIX = "deviceLabel";
 
+        private Logger logger = new Logger();
 
         public MainForm()
         {
-            Logger.LogMessageToFile("Initializing IDash.", true);            
+            logger.LogMessageToFile("Initializing IDash.", true);            
             try {
                 //Action Handlers have a pointer to Form, so they can only be initialized after the form.
                 InitializeComponent();
@@ -75,7 +76,7 @@ namespace iDash
             }
             catch (Exception e)
             {
-                Logger.LogExceptionToFile(e);
+                logger.LogExceptionToFile(e);
             }
         }
 
@@ -92,7 +93,7 @@ namespace iDash
 
                 if (portCombo.SelectedIndex > 0)
                 {
-                    Logger.LogMessageToFile("Initializing Serial Manager.", true);
+                    logger.LogMessageToFile("Initializing Serial Manager.", true);
                     AppendToStatusBar("Initializing Serial Manager.");
                     SerialManager serialManager = new SerialManager();                    
                     serialManager.StatusMessageSubscribers += UpdateStatusBar;
@@ -103,7 +104,7 @@ namespace iDash
                     ComboBox vjoyCombo = ((ComboBox)Controls.Find(VJOY_COMBO_CONTROL_NAME_PREFIX + x, true)[0]);
                     if (vjoyCombo.SelectedIndex > 0)
                     {
-                        Logger.LogMessageToFile("Initializing Button Handler.", true);
+                        logger.LogMessageToFile("Initializing Button Handler.", true);
                         AppendToStatusBar("Initializing Button Handler.");
                         ButtonHandler buttonHandler = new ButtonHandler(serialManager);
                         buttonHandler.buttonStateHandler += ButtonStateReceived;
@@ -113,7 +114,7 @@ namespace iDash
 
                         uint vjoyId = (uint)vjoyCombo.SelectedIndex;
 
-                        Logger.LogMessageToFile(String.Format("Initializing vJoy{0}.", vjoyId), true);
+                        logger.LogMessageToFile(String.Format("Initializing vJoy{0}.", vjoyId), true);
                         AppendToStatusBar("Initializing Vjoy.");
                         VJoyFeeder vJoyFeeder = new VJoyFeeder(buttonHandler, vjoyId);
                         vJoyFeeder.StatusMessageSubscribers += UpdateStatusBar;
@@ -285,7 +286,7 @@ namespace iDash
             }
             catch (Exception e)
             {
-                Logger.LogExceptionToFile(e);
+                logger.LogExceptionToFile(e);
             }
         }
 

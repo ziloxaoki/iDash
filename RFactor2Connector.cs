@@ -41,6 +41,8 @@ namespace iDash
         protected rF2VehScoringInfo carData;
         protected rF2Wheel wheel;
 
+        private Logger logger = new Logger();
+
         protected override void start()
         {
             StringBuilder msg = new StringBuilder();
@@ -57,7 +59,7 @@ namespace iDash
                         if (!disableNotification)
                         {
                             string s = "Connected to RFactor2.";
-                            Logger.LogMessageToFile(s, true);
+                            logger.LogMessageToFile(s, true);
                             NotifyStatusMessage(s);
                             disableNotification = true;
                         }
@@ -105,7 +107,7 @@ namespace iDash
                     if(isConnected)
                     {
                         string s = "RFactor2 closed.";
-                        Logger.LogMessageToFile(s, true);
+                        logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                         disableNotification = true;
                     }
@@ -259,7 +261,7 @@ namespace iDash
                 }
                 catch (Exception e)
                 {
-                    Logger.LogExceptionToFile(e);
+                    logger.LogExceptionToFile(e);
                 }
             }
 
@@ -318,7 +320,7 @@ namespace iDash
             this.fileAccessMutex = null;
         }        
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (!disposed)
             {

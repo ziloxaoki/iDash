@@ -61,6 +61,8 @@ namespace iDash
         private int MIN_VOLTAGE = 100;
         private string id = "";
 
+        private Logger logger = new Logger();
+
         public SerialManager()
         {
             WorkerSupportsCancellation = true;
@@ -176,7 +178,7 @@ namespace iDash
                     }
                     catch(Exception e)
                     {
-                        Logger.LogExceptionToFile(e);
+                        logger.LogExceptionToFile(e);
                         Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
 
                         continue;                          
@@ -191,7 +193,7 @@ namespace iDash
                         notificationSent.Remove(portName);
                         sendSynAck();
                         NotifyStatusMessage("Arduino(" + id + ") found at port " + portName + "...");
-                        Logger.LogMessageToFile("Arduino(" + id + ") connected to port " + portName, true);
+                        logger.LogMessageToFile("Arduino(" + id + ") connected to port " + portName, true);
                     }
                 }
             }
@@ -316,7 +318,7 @@ namespace iDash
             } 
             catch(Exception e)
             {
-                Logger.LogExceptionToFile(e);
+                logger.LogExceptionToFile(e);
             }
 
             return type;                        
@@ -343,8 +345,8 @@ namespace iDash
                     }
                 }
                 catch (Exception e)
-                {                    
-                    Logger.LogExceptionToFile(e, Utils.byteArrayToString(command.getRawData(), false));
+                {
+                    logger.LogExceptionToFile(e, Utils.byteArrayToString(command.getRawData(), false));
 
                     if(lastArduinoResponse > 0)
                         NotifyStatusMessage(string.Format("Error sending command to Arduino({0} - {1}).", id, 
@@ -408,7 +410,7 @@ namespace iDash
                                     commandLength = 0;
                                     Utils.resetArray(serialCommand);
 
-                                    Logger.LogDataToFile(" - CMD_INVALID \n");
+                                    logger.LogDataToFile(" - CMD_INVALID \n");
                                 }
                                 break;
                         }                        
@@ -417,7 +419,7 @@ namespace iDash
             }
             if (formDebugMode == DebugMode.Verbose)
             {
-                Logger.LogDataToFile(logData.ToString());
+                logger.LogDataToFile(logData.ToString());
             }
         }
 
@@ -478,13 +480,13 @@ namespace iDash
             }
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (!disposed)
             {

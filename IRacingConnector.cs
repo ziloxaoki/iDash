@@ -21,7 +21,9 @@ namespace iDash
         private float currentRpm = 0;
         private int flag = 0;
 
-        private bool disposed = false;       
+        private bool disposed = false;
+
+        private Logger logger = new Logger();     
 
         protected override void start()
         {
@@ -46,7 +48,7 @@ namespace iDash
                     if (!isConnected)
                     {
                         string s = "Connected to iRacing.";
-                        Logger.LogMessageToFile(s, true);
+                        logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                     }
                     isConnected = true;
@@ -64,7 +66,7 @@ namespace iDash
                 else
                 {
                     string s = "iRacing closed.";
-                    Logger.LogMessageToFile(s, true);
+                    logger.LogMessageToFile(s, true);
                     NotifyStatusMessage(s);
                     isConnected = false;
                     foreach (SerialManager serialManager in sm)
@@ -132,7 +134,7 @@ namespace iDash
             }
             catch(Exception e)
             {
-                Logger.LogExceptionToFile(e);
+                logger.LogExceptionToFile(e);
             }
 
             return result;
@@ -165,7 +167,7 @@ namespace iDash
             }
             catch (Exception ex)
             {
-                Logger.LogExceptionToFile(ex);
+                logger.LogExceptionToFile(ex);
             }
         }
 
@@ -194,7 +196,7 @@ namespace iDash
             }
             catch (Exception ex)
             {
-                Logger.LogExceptionToFile(ex);
+                logger.LogExceptionToFile(ex);
             }
         }
 
@@ -204,7 +206,7 @@ namespace iDash
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (!disposed)
             {

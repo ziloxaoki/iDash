@@ -21,6 +21,8 @@ namespace iDash
         private Graphics gr;
         private Physics ph;
 
+        Logger logger = new Logger();
+
         protected override void start()
         {
             ac = new AssettoCorsa();
@@ -44,7 +46,7 @@ namespace iDash
                     if (!isConnected)
                     {
                         string s = "Connected to Assetto Corsa.";
-                        Logger.LogMessageToFile(s, true);
+                        logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                     }
 
@@ -64,8 +66,8 @@ namespace iDash
                 {
                     if (isConnected)
                     {
-                        string s = "Assetto Corsa closed.";                        
-                        Logger.LogMessageToFile(s, true);
+                        string s = "Assetto Corsa closed.";
+                        logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                     }
 
@@ -142,7 +144,7 @@ namespace iDash
                 }
                 catch (Exception e)
                 {
-                    Logger.LogExceptionToFile(e);
+                    logger.LogExceptionToFile(e);
                 }
             }
 
@@ -216,7 +218,7 @@ namespace iDash
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (!disposed)
             {

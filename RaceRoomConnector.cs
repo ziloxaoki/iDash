@@ -27,6 +27,7 @@ namespace iDash
         private byte[] buffer;
 
         private bool disposed = false;
+        private Logger logger = new Logger();
 
         private bool isRrreRunning()
         {
@@ -51,7 +52,7 @@ namespace iDash
                         if (!isConnected)
                         {
                             string s = "Connected to RaceRoom.";
-                            Logger.LogMessageToFile(s, true);
+                            logger.LogMessageToFile(s, true);
                             NotifyStatusMessage(s);
                             isConnected = true;
 
@@ -131,7 +132,7 @@ namespace iDash
                     if(isConnected)
                     {
                         string s = "RaceRoom closed.";
-                        Logger.LogMessageToFile(s, true);
+                        logger.LogMessageToFile(s, true);
                         NotifyStatusMessage(s);
                         isConnected = false;
                     }
@@ -228,7 +229,7 @@ namespace iDash
                 }
                 catch (Exception e)
                 {
-                    Logger.LogExceptionToFile(e);
+                    logger.LogExceptionToFile(e);
                 }
             }
 
@@ -258,7 +259,7 @@ namespace iDash
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (!disposed)
             {

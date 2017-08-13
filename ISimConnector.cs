@@ -185,6 +185,6 @@ namespace iDash
             }
         }
 
-        public abstract void Dispose();        
+        public new abstract void Dispose();        
     }
 }
