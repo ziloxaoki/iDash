@@ -65,10 +65,14 @@ namespace iDash
                 }
                 else
                 {
-                    string s = "iRacing closed.";
-                    logger.LogMessageToFile(s, true);
-                    NotifyStatusMessage(s);
-                    isConnected = false;
+                    if (isConnected)
+                    {
+                        string s = "iRacing closed.";
+                        logger.LogMessageToFile(s, true);
+                        NotifyStatusMessage(s);
+                    }
+
+                    isConnected = false;                    
                     foreach (SerialManager serialManager in sm)
                     {
                         if (serialManager.deviceContains7Segments())
@@ -78,10 +82,11 @@ namespace iDash
                     }
                 }
 
-                NotifyStatusMessage("iRacing thread stopped.");
-                //Thread.Sleep(Constants.SharedMemoryReadRate);
+                
+                Thread.Sleep(Constants.SharedMemoryReadRate);
             }
 
+            NotifyStatusMessage("iRacing thread stopped.");
             Dispose();
         }
 

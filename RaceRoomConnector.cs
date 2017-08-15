@@ -129,6 +129,7 @@ namespace iDash
                     {
                         serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
                     }
+
                     if(isConnected)
                     {
                         string s = "RaceRoom closed.";
@@ -138,10 +139,10 @@ namespace iDash
                     }
                 }
 
-                NotifyStatusMessage("RaceRoom thread stopped.");
-                //Thread.Sleep(Constants.SharedMemoryReadRate);
+                Thread.Sleep(Constants.SharedMemoryReadRate);
             }
 
+            NotifyStatusMessage("RaceRoom thread stopped.");
             Dispose();
         }
 

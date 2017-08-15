@@ -100,10 +100,10 @@ namespace iDash
                     }
                 }
 
-                NotifyStatusMessage("Automobilista(RFactor) thread stopped.");
-                //Thread.Sleep(Constants.SharedMemoryReadRate);
-            }            
-            
+                Thread.Sleep(Constants.SharedMemoryReadRate);
+            }
+
+            NotifyStatusMessage("Automobilista(RFactor) thread stopped.");
             Dispose();
         }
 

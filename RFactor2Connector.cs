@@ -125,7 +125,7 @@ namespace iDash
                     }
                 }
                 
-                //Thread.Sleep(Constants.SharedMemoryReadRate);
+                Thread.Sleep(Constants.SharedMemoryReadRate);
             }
 
             NotifyStatusMessage("RFactor2 thread stopped.");

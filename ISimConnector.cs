@@ -20,6 +20,7 @@ namespace iDash
         public ISimConnector()
         {
             this.DoWork += this.worker_DoWork;
+            this.WorkerSupportsCancellation = true;
         }
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)

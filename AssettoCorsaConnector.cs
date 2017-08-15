@@ -81,10 +81,12 @@ namespace iDash
                         }
                     }
                 }
+                
+                Thread.Sleep(Constants.SharedMemoryReadRate);
+            }
 
-                NotifyStatusMessage("Assetto Corsa thread stopped.");
-                //Thread.Sleep(Constants.SharedMemoryReadRate);
-            }            
+            NotifyStatusMessage("Assetto Corsa thread stopped.");
+            Dispose();
         }
 
         private string getValue(string name, string type, object clazz)

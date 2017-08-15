@@ -434,7 +434,7 @@ namespace iDash
         {
             stopAllThreads();
             saveAppSettings();
-            Thread.Sleep(1500);
+            Thread.Sleep(2000);
         }
 
         public void AppendToStatusBar(String s)
