@@ -182,8 +182,8 @@ int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT},  //A7 Left paddle - INPUT_PULLUP
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
-int BUTTON_LIMITS[8][4][2] = {{{590, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
-                              {{590, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
+int BUTTON_LIMITS[8][4][2] = {{{600, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
+                              {{600, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
                               {{500, 540}, {600, 650}, {670, 700}, {715, 750}},   //A5 Extra 1 - INPUT
                               {{500, 540}, {600, 650}, {670, 700}, {715, 750}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
@@ -198,11 +198,11 @@ int AXIS_LIMITS[4][2] = {{-1, 100}, {-1, 100}, {-1, 100}, {-1, 100}};
 
 int extra_button_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int extra_button_last_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   // the previous reading from the input pin               
-long lastButtonBounce = 0;  
+long lastButtonDebounce = 0;  
 
 int axis_states[] = {0, 0, 0, 0};
 int axis_last_states[] = {0, 0, 0, 0};   // the previous reading from the input pin               
-long lastAxisBounce = 0;
+//long lastAxisBounce = 0;
 
 // -------------------- ROTARY ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -215,9 +215,9 @@ volatile int encoderPos[] = {15000, 15000};
 volatile int orientation[] = {0, 0};
 int lastRotaryPos[] = {15000, 15000};
 byte lastRotaryState[] = {0, 0};
-long lastRotaryStateChange = 0;
+//long lastRotaryStateChange = 0;
 
-volatile long lastRotaryBounce = 0;
+//volatile long lastRotaryBounce = 0;
 long lastTimeReceivedByte = 0;
 
 int debugMode = 0;
@@ -421,37 +421,37 @@ void rotEncoder1(){
   detachInterrupt(digitalPinToInterrupt(encoderPinA[0]));
   isInterruptDisabled[0] = true;
   int pinOffset = 0;
-  if(millis() - lastRotaryBounce > 10) {
+//  if(millis() - lastRotaryBounce > 10) {
     int pinB = digitalState(encoderPinB[pinOffset]);
     if(pinB == HIGH) {    
       encoderPos[pinOffset]++;  
     } else{
       encoderPos[pinOffset]--;
     }
-  }  
-  lastRotaryBounce = millis();
+//  }  
+//  lastRotaryBounce = millis();
 }
 
 void rotEncoder2(){
   detachInterrupt(digitalPinToInterrupt(encoderPinA[1]));
   isInterruptDisabled[1] = true;
   int pinOffset = 1;
-  if(millis() - lastRotaryBounce > 10) {
+  //if(millis() - lastRotaryBounce > 10) {
     int pinB = digitalState(encoderPinB[pinOffset]);
     if(pinB == HIGH) {    
       encoderPos[pinOffset]++;  
     } else{
       encoderPos[pinOffset]--;
     }
-  }  
-  lastRotaryBounce = millis();
+  //}  
+  //lastRotaryBounce = millis();
 }
 
 
 int sendRotaryState(int offset, byte *response) {  
   for(int i = 0; i < TOTAL_ROTARY; i++) {                  
 
-    if(millis() - lastRotaryStateChange > 30) {  
+//    if(millis() - lastRotaryStateChange > 30) {  
       if(encoderPos[i] != lastRotaryPos[i]) {      
         if(lastRotaryPos[i] < encoderPos[i]) {  
           //turn left
@@ -462,12 +462,12 @@ int sendRotaryState(int offset, byte *response) {
         }
         lastRotaryPos[i] = encoderPos[i];        
 
-        lastRotaryStateChange = millis();
+//        lastRotaryStateChange = millis();
       } else {
         //not pressed
         lastRotaryState[i] = 0;     
       }  
-    }
+//    }
 
     switch(lastRotaryState[i]) {
       case 0:
@@ -509,10 +509,11 @@ int sendAnalogState(int offset, byte *response) {
         //Read switch 1       
         tmpButtonState = 1; 
       }      
-      if((tmpButtonState != extra_button_last_states[btn]) && (millis() - lastButtonBounce > 100)) {
+      //if((tmpButtonState != extra_button_last_states[btn]) && (millis() - lastButtonBounce > 100)) {
+      if(tmpButtonState != extra_button_last_states[btn]) {
         extra_button_last_states[btn++] = tmpButtonState; 
         response[offset++] = tmpButtonState;
-        lastButtonBounce = millis(); 
+//        lastButtonBounce = millis(); 
       } else {
         response[offset++] = extra_button_last_states[btn++];
       }      
@@ -541,10 +542,11 @@ int sendAnalogState2(int offset, byte *response) {
       //Read switch 1       
       tmpAxisState = 1; 
     }
-    if((tmpAxisState != axis_last_states[i]) && (millis() - lastAxisBounce > 100)) {
+//    if((tmpAxisState != axis_last_states[i]) && (millis() - lastAxisBounce > 100)) {
+    if(tmpAxisState != axis_last_states[i]) {
       axis_last_states[i] = tmpAxisState; 
       response[offset++] = tmpAxisState;
-      lastAxisBounce = millis(); 
+//      lastAxisBounce = millis(); 
     } else {
       response[offset++] = axis_last_states[i];
     }        
@@ -602,7 +604,8 @@ void processCommand(byte *buffer, int commandLength) {
 #endif
 
     case CMD_RGB_SHIFT :
-      updateLedBuffer(buffer);      
+      updateLedBuffer(buffer);   
+      break;   
   }  
 
   if(debugMode > 0) {
@@ -642,38 +645,32 @@ int readline(int readch, byte *buffer, int len)
   return -1;
 }
 
-void initBuffer(byte *buffer, int size) {
-  for(int x = 0; x < size; x++) {
-    buffer[x] = 0;
-  }
-
-  return buffer;
-}
-
 void processData() {  
-  static byte buffer[100]; 
-  initBuffer(buffer, 100);
+  static byte buffer[100];
+  static int byteRead = 0;
   
   int commandLength = 0;
 
   long startReading = millis();
   while (Serial.available()) {
-    commandLength = readline(Serial.read(), buffer, 100);       
+    commandLength = readline(Serial.read(), buffer, byteRead++);       
     if (commandLength > 0) {  
       int crc = calculateCrc(commandLength, buffer); 
 
       if(crc == buffer[commandLength]) {    
-        processCommand(buffer, commandLength);     
+        processCommand(buffer, commandLength);
       } else {
         if(debugMode > 0) {          
           Serial.write(INVALID_COMMAND_HEADER);
-          sendDataToSerial(commandLength, buffer);
+          sendDataToSerial(commandLength, buffer);          
           Serial.write(CMD_END);
+          buffer[0] = 0;
         }
       }
     }    
-    if(millis() - startReading > 100) {
-      break;
+    if (byteRead == 100) {
+      buffer[0] = 0;
+      byteRead = 0;
     }
   }
   //byte t[] = {'^',CMD_7_SEGS,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91};
@@ -722,20 +719,23 @@ void sendHandshacking() {
 void sendButtonStatus(byte header) {
   byte response[100];
   int offset = 0;
-  
-  //return buttons state      
-  response[offset++] = header;
-  response[offset++] = CMD_BUTTON_STATUS;
-  //axis has to be the last bytes in the array
-  offset = sendAxisState(offset, response);
-  offset = sendButtonState(offset, response);
-  offset = sendAnalogState(offset, response);
-  offset = sendRotaryState(offset, response);  
-  offset = sendAnalogState2(offset, response);
-  response[offset++] = calculateCrc(offset - 1, response);
-  response[offset++] = CMD_END;   
-  
-  sendDataToSerial(offset, response);
+
+  if(millis() - lastButtonDebounce > 30) {
+    //return buttons state      
+    response[offset++] = header;
+    response[offset++] = CMD_BUTTON_STATUS;
+    //axis has to be the last bytes in the array
+    offset = sendAxisState(offset, response);
+    offset = sendButtonState(offset, response);
+    offset = sendAnalogState(offset, response);
+    offset = sendRotaryState(offset, response);  
+    offset = sendAnalogState2(offset, response);
+    response[offset++] = calculateCrc(offset - 1, response);
+    response[offset++] = CMD_END;   
+    
+    sendDataToSerial(offset, response);
+    lastButtonDebounce = millis();
+  }
 }
 
 void sendButtonVoltage(byte header) {
@@ -763,13 +763,13 @@ void sendButtonVoltage(byte header) {
 
 void reAttachInterrupts() {
   if (isInterruptDisabled[0] == true && digitalState(encoderPinA[0]) != LOW) {
-    lastRotaryBounce = millis();
+    //lastRotaryBounce = millis();
     attachInterrupt(digitalPinToInterrupt(encoderPinA[0]), rotEncoder1, LOW);
     isInterruptDisabled[0] = false;
   } 
 
   if (isInterruptDisabled[1] == true && digitalState(encoderPinA[1]) != LOW) {
-    lastRotaryBounce = millis();
+    //lastRotaryBounce = millis();
     attachInterrupt(digitalPinToInterrupt(encoderPinA[1]), rotEncoder2, LOW);
     isInterruptDisabled[1] = false;
   }

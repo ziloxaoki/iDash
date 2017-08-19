@@ -77,11 +77,10 @@ namespace iDash
                     {
                         if (serialManager.deviceContains7Segments())
                         {
-                            serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                            serialManager.enqueueCommand(Utils.getDisconnectedMsgCmd(), false);
                         }
                     }
                 }
-
                 
                 Thread.Sleep(Constants.SharedMemoryReadRate);
             }

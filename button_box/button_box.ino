@@ -42,7 +42,7 @@ const uint8_t pinNumbers[] = {0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,1,0,3,2,1,0,0,1,2,
 
 
 long lastTimeReceivedByte = 0;
-long lastRotaryBounce = 0;
+//long lastRotaryBounce = 0;
 int debugMode = 0;
 bool isInterruptDisabled[] = {false,false,false,false};
 const int encoderPinA[] = {21,20,19,18};
@@ -64,6 +64,7 @@ int ENABLED_MATRIX_COLUMNS = 7;
 int ENABLED_MATRIX_ROWS = 7;
 int columnPins[] = {41,40,39,38,37,36,35};
 int rowPins[] = {53,52,51,50,49,48,47};
+//long lastButtonDebounce = 0;
 
 
 const int TOTAL_ROTARY = 4;
@@ -71,66 +72,66 @@ volatile int encoderPos[] = {15000, 15000, 15000, 15000};
 volatile int orientation[] = {0, 0, 0, 0};
 int lastRotaryPos[] = {15000, 15000, 15000, 15000};
 byte lastRotaryState[] = {0, 0, 0, 0};
-long lastRotaryStateChange = 0;
+//long lastRotaryStateChange = 0;
 
 void rotEncoder1(){
   int pinOffset = 0;
   detachInterrupt(digitalPinToInterrupt(encoderPinA[pinOffset]));
   isInterruptDisabled[pinOffset] = true;  
-  if(millis() - lastRotaryBounce > 10) {
+//  if(millis() - lastRotaryBounce > 10) {
     int pinB = digitalRead(encoderPinB[pinOffset]);
     if(pinB == HIGH) {    
       encoderPos[pinOffset]++;  
     } else{
       encoderPos[pinOffset]--;
     }
-  }  
-  lastRotaryBounce = millis();
+//  }  
+//  lastRotaryBounce = millis();
 }
 
 void rotEncoder2(){
   int pinOffset = 1;
   detachInterrupt(digitalPinToInterrupt(encoderPinA[pinOffset]));
   isInterruptDisabled[pinOffset] = true;  
-  if(millis() - lastRotaryBounce > 10) {
+//  if(millis() - lastRotaryBounce > 10) {
     int pinB = digitalRead(encoderPinB[pinOffset]);
     if(pinB == HIGH) {    
       encoderPos[pinOffset]++;  
     } else{
       encoderPos[pinOffset]--;
     }
-  }  
-  lastRotaryBounce = millis();
+//  }  
+//  lastRotaryBounce = millis();
 }
 
 void rotEncoder3(){
   int pinOffset = 2;
   detachInterrupt(digitalPinToInterrupt(encoderPinA[pinOffset]));
   isInterruptDisabled[pinOffset] = true;  
-  if(millis() - lastRotaryBounce > 10) {
+//  if(millis() - lastRotaryBounce > 10) {
     int pinB = digitalRead(encoderPinB[pinOffset]);
     if(pinB == HIGH) {    
       encoderPos[pinOffset]++;  
     } else{
       encoderPos[pinOffset]--;
     }
-  }  
-  lastRotaryBounce = millis();
+//  }  
+//  lastRotaryBounce = millis();
 }
 
 void rotEncoder4(){
   int pinOffset = 3;
   detachInterrupt(digitalPinToInterrupt(encoderPinA[pinOffset]));
   isInterruptDisabled[pinOffset] = true;  
-  if(millis() - lastRotaryBounce > 10) {
+//  if(millis() - lastRotaryBounce > 10) {
     int pinB = digitalRead(encoderPinB[pinOffset]);
     if(pinB == HIGH) {    
       encoderPos[pinOffset]++;  
     } else{
       encoderPos[pinOffset]--;
     }
-  }  
-  lastRotaryBounce = millis();
+//  }  
+//  lastRotaryBounce = millis();
 }
 
 int readline(int readch, byte *buffer, int len)
@@ -258,13 +259,13 @@ void processCommand(byte *buffer, int commandLength) {
 
 void processData() {  
   static byte buffer[100]; 
-  initBuffer(buffer, 100);
+  static int byteRead = 0;
   
   int commandLength = 0;
 
   long startReading = millis();
   while (Serial.available()) {
-    commandLength = readline(Serial.read(), buffer, 100);       
+    commandLength = readline(Serial.read(), buffer, byteRead++);       
     if (commandLength > 0) {  
       int crc = calculateCrc(commandLength, buffer); 
 
@@ -275,12 +276,14 @@ void processData() {
           Serial.write(INVALID_COMMAND_HEADER);
           sendDataToSerial(commandLength, buffer);
           Serial.write(CMD_END);
+          buffer[0] = 0;
         }
       }
-    }    
-    if(millis() - startReading > 100) {
-      break;
-    }
+    }   
+    if (byteRead == 100) {
+      buffer[0] = 0;
+      byteRead = 0;
+    } 
   }
 }
 
@@ -310,7 +313,7 @@ void reAttachInterrupts() {
 int sendRotaryState(int offset, byte *response) {  
   for(int i = 0; i < TOTAL_ROTARY; i++) {                  
 
-    if(millis() - lastRotaryStateChange > 30) {  
+//    if(millis() - lastRotaryStateChange > 30) {  
       if(encoderPos[i] != lastRotaryPos[i]) {      
         if(lastRotaryPos[i] < encoderPos[i]) {  
           //turn left
@@ -321,12 +324,12 @@ int sendRotaryState(int offset, byte *response) {
         }
         lastRotaryPos[i] = encoderPos[i];        
 
-        lastRotaryStateChange = millis();
+//        lastRotaryStateChange = millis();
       } else {
         //not pressed
         lastRotaryState[i] = 0;     
       }  
-    }
+//    }
 
     switch(lastRotaryState[i]) {
       case 0:
@@ -362,7 +365,8 @@ int sendMatrixState(int offset, byte *response) {
     for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
       response[offset++] = (digitalRead(rowPins[x]) == LOW) ? 1 : 0;
     }   
-    digitalWrite(columnPins[i], HIGH);   
+    digitalWrite(columnPins[i], HIGH); 
+    delay(10);  
   }   
   
   return offset;
@@ -381,20 +385,23 @@ void sendButtonStatus(byte header) {
   initBuffer(response, 100);
   int offset = 0;
   
-  //return buttons state      
-  response[offset++] = header;
-  response[offset++] = CMD_BUTTON_STATUS;
-  //axis has to be the last bytes in the array
-  offset = sendAxisState(offset, response);
-  offset = sendButtonState(offset, response);
-  //offset = sendAnalogState(offset, response);
-  offset = sendRotaryState(offset, response);  
-  //offset = sendAnalogState2(offset, response);
-  offset = sendMatrixState(offset, response);
-  response[offset++] = calculateCrc(offset - 1, response);
-  response[offset++] = CMD_END;   
-  
-  sendDataToSerial(offset, response);  
+  //return buttons state     
+//  if(millis() - lastButtonDebounce > 30) { 
+    response[offset++] = header;
+    response[offset++] = CMD_BUTTON_STATUS;
+    //axis has to be the last bytes in the array
+    offset = sendAxisState(offset, response);
+    offset = sendButtonState(offset, response);
+    //offset = sendAnalogState(offset, response);
+    offset = sendRotaryState(offset, response);  
+    //offset = sendAnalogState2(offset, response);
+    offset = sendMatrixState(offset, response);
+    response[offset++] = calculateCrc(offset - 1, response);
+    response[offset++] = CMD_END;   
+    
+    sendDataToSerial(offset, response);  
+//    lastButtonDebounce = millis();
+//  }
 }
 
 

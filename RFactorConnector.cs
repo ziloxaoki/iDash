@@ -96,7 +96,7 @@ namespace iDash
                 {
                     foreach (SerialManager serialManager in sm)
                     {
-                        serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        serialManager.enqueueCommand(Utils.getDisconnectedMsgCmd(), false);
                     }
                 }
 

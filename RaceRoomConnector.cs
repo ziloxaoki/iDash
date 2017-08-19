@@ -64,7 +64,7 @@ namespace iDash
                         {
                             if (serialManager.deviceContains7Segments())
                             {
-                                serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                                serialManager.enqueueCommand(Utils.getDisconnectedMsgCmd(), false);
                             }
                         }
                     }
@@ -116,7 +116,7 @@ namespace iDash
                                 {
                                     if (serialManager.deviceContains7Segments())
                                     {
-                                        serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                                        serialManager.enqueueCommand(Utils.getDisconnectedMsgCmd(), false);
                                     }
                                 }
                             }
@@ -127,7 +127,7 @@ namespace iDash
                 {
                     foreach (SerialManager serialManager in sm)
                     {
-                        serialManager.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                        serialManager.enqueueCommand(Utils.getDisconnectedMsgCmd(), false);
                     }
 
                     if(isConnected)

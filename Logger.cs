@@ -14,8 +14,6 @@ namespace iDash
         private const string FILE_NAME_PREFIX = "log";
         private static int CounterOfLines;
 
-        private static DateTime date = new DateTime();
-
         public Logger()
         {
             CounterOfLines = 0;
@@ -28,19 +26,18 @@ namespace iDash
                 StreamWriter writer = new StreamWriter("log.log", true);
                 if (CounterOfLines < MAX_LINES)
                 {                    
-                    writer.WriteLine(msg);
+                    writer.Write(msg);
                     CounterOfLines++;
                     writer.Close();
                 }
                 else
-                {
+                {                    
                     writer.Close();
+                    string name = GetAppPath() + "log.log";
+                    System.IO.File.WriteAllText(@name, string.Empty);
                     CounterOfLines = 1;
-                    date = date.AddMilliseconds(1);
-                    string nameFile = FILE_NAME_PREFIX + date.Hour.ToString() + date.Minute.ToString() + date.Second.ToString() + date.Millisecond.ToString() + ".log";
-                    File.Move(FILE_NAME_PREFIX + ".log", nameFile);
-                    writer = new StreamWriter(GetAppPath() + FILE_NAME_PREFIX + ".log");
-                    writer.WriteLine(msg);
+                    writer = new StreamWriter(name);
+                    writer.Write(msg);
                     writer.Close();
                 }
             }
@@ -65,7 +62,7 @@ namespace iDash
 
             LogDataToFile(logLine);
 
-            if (isNewLine)
+            if (isNewLine && !msg.EndsWith("\n"))
             {
                 LogDataToFile("\n");
             }            

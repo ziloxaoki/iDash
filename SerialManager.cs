@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,17 +21,18 @@ namespace iDash
         private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
         private const int WAIT_FOR_ARDUINO_DATA = 10;
+        private const int WAIT_TO_SEND_COMMAND = 300;
         private const int HANDSHAKING_INTERVAL = 5000;
         private int arduinoHas7Seg = 0;
 
         //arduino command length
         private int commandLength;        
         private byte[] serialCommand = new byte[BUFFER_SIZE];
-        private SerialPort serialPort = new SerialPort(); //create of serial port
-        private long lastArduinoResponse = -1;        
+        private SerialPort serialPort = new SerialPort(); //create of serial port              
         private object readLock = new object();
         private object sendLock = new object();
         private object notifyLock = new object();
+        private List<Command> listOfCommandsSent = new List<Command>();
 
         //debug mode set on form
         public DebugMode formDebugMode = DebugMode.None;   
@@ -43,6 +45,8 @@ namespace iDash
         //indicates how often a debug message need to be logged in the debug dialog
         private long lastMessageLogged = 0;
         private long lastHandshaking = 0;
+        private long lastArduinoResponse = -1;
+        private long lastCommandSent = 0;
         //show debug commands in hex or int (show as hexadecimal)
         public bool asHex = false;
 
@@ -60,6 +64,8 @@ namespace iDash
         private int[,] voltages = new int[8,3];
         private int MIN_VOLTAGE = 100;
         private string id = "";
+        private bool stillRunning = true;
+        private Queue<Command> commandQueue = new Queue<Command>();
 
         private Logger logger = new Logger();
 
@@ -67,6 +73,11 @@ namespace iDash
         {
             WorkerSupportsCancellation = true;
             this.DoWork += this.worker_DoWork;
+        }
+
+        public bool isStillRunning()
+        {
+            return stillRunning;
         }
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
@@ -80,7 +91,7 @@ namespace iDash
             //serialPort.DtrEnable = false;  
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                                     
 
-            this.tryToConnect();
+            tryToConnect();
 
             NotifyStatusMessage("Stopping Arduino(" + id + ") thread.");
 
@@ -104,20 +115,20 @@ namespace iDash
 
         private void sendDefaultMsg()
         {
-            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Constants.LED_NO_BLINK };
+            byte[] rpmLed = Constants.BLACK_RGB;
 
             int milSec = DateTime.Now.Millisecond;
 
             if (isTestMode)
             {
-                Array.Copy(Constants.rpmPattern, 0, rpmLed, 0, Constants.rpmPattern.Length);
+                Array.Copy(Constants.RPM_PATTERN, 0, rpmLed, 0, Constants.RPM_PATTERN.Length);
                 rpmLed[rpmLed.Length - 1] = Constants.LED_BLINK;
             }            
 
             if (deviceContains7Segments())
             {
-                this.sendCommand(new Command(Command.CMD_RGB_SHIFT, rpmLed), false);
-                this.sendCommand(Utils.getDisconnectedMsgCmd(), false);
+                this.enqueueCommand(new Command(Command.CMD_RGB_SHIFT, rpmLed), false);                
+                this.enqueueCommand(Utils.getDisconnectedMsgCmd(), false);
             }
         }    
 
@@ -145,6 +156,7 @@ namespace iDash
                         lastHandshaking = Utils.getCurrentTimeMillis();
                     }
 
+                    consumeCommandQueue();
                     //Thread.Sleep(WAIT_FOR_ARDUINO_DATA);                    
                 }
                 else
@@ -184,7 +196,6 @@ namespace iDash
                         continue;                          
                     }
 
-
                     //wait for arduino ACK message
                     Thread.Sleep(WAIT_SERIAL_CONNECT);                        
 
@@ -196,14 +207,18 @@ namespace iDash
                         logger.LogMessageToFile("Arduino(" + id + ") connected to port " + portName, true);
                     }
                 }
+
+                Thread.Sleep(Constants.SharedMemoryReadRate);
             }
 
+            stillRunning = false;
+            NotifyStatusMessage(string.Format("Serial Manager {0} thread cancelled.", id));
         }
 
         private void sendSynAck()
         {
             Command synack = new Command(Command.CMD_SYN_ACK, new byte[0]);
-            sendCommand(synack, true);
+            enqueueCommand(synack, true);
         }    
 
         private int updateVoltageLimits(int pinNumber, int voltage)
@@ -225,7 +240,6 @@ namespace iDash
                         {
                             voltages[x, 2] = voltage;
                         }
-                        
                     }
                     else
                     {
@@ -295,7 +309,7 @@ namespace iDash
                     case Command.CMD_INVALID:
                         break;
                 }
-                type = command.getCommandType();
+                type = command.getByteCodeName();
 
                 if (formDebugMode == DebugMode.Default) {
                     if (isDisabledSerial) {
@@ -324,15 +338,60 @@ namespace iDash
             return type;                        
         }      
 
-        public void sendCommand(Command command, bool forcePost)
-        {
-            lock(sendLock)
-            {
-                try
-                {
-                    if (serialPort.IsOpen && (!isDisabledSerial || forcePost))
-                    {
 
+        private bool hasToSendCommand(Command command)
+        {
+            for (int i = listOfCommandsSent.Count - 1; i >= 0; i--)
+            {
+                Command c = listOfCommandsSent[i];
+                //check if command is already sent
+                if (command.getRawData()[1] == c.getRawData()[1])
+                {
+                    if (Enumerable.SequenceEqual(command.getRawData(),c.getRawData()))
+                    {
+                        if (Utils.getCurrentTimeMillis() - lastCommandSent > WAIT_TO_SEND_COMMAND && 
+                            serialPort.IsOpen && !isDisabledSerial)
+                        {
+                            lastCommandSent = Utils.getCurrentTimeMillis();
+                            return true;
+                        } 
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        listOfCommandsSent[i] = command;
+                        return true;
+                    }
+                }
+            }
+
+            listOfCommandsSent.Add(command);
+            return true;
+        }
+
+        public void enqueueCommand(Command command, bool forcePost)
+        {
+            lock(commandQueue)
+            {
+                if (hasToSendCommand(command) || forcePost)
+                {
+                    commandQueue.Enqueue(command);
+                }
+            }
+        }
+
+        private void consumeCommandQueue()
+        {
+            lock (commandQueue)
+            {
+                while (commandQueue.Count > 0)
+                {
+                    Command command = commandQueue.Dequeue();
+                    try
+                    {
                         bs += command.getLength();
                         serialPort.Write(command.getRawData(), 0, command.getLength());
 
@@ -343,14 +402,14 @@ namespace iDash
                                 command.getCommandType()));
                         }*/
                     }
-                }
-                catch (Exception e)
-                {
-                    logger.LogExceptionToFile(e, Utils.byteArrayToString(command.getRawData(), false));
+                    catch (Exception e)
+                    {
+                        logger.LogExceptionToFile(e, Utils.byteArrayToString(command.getRawData(), false));
 
-                    if(lastArduinoResponse > 0)
-                        NotifyStatusMessage(string.Format("Error sending command to Arduino({0} - {1}).", id, 
-                            Utils.byteArrayToString(command.getRawData(), false))); //if there are not is any COM port in PC show message
+                        if (lastArduinoResponse > 0)
+                            NotifyStatusMessage(string.Format("Error sending command to Arduino({0} - {1}).", id,
+                                Utils.byteArrayToString(command.getRawData(), false))); //if there are not is any COM port in PC show message
+                    }
                 }
             }
         }

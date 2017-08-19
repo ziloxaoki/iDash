@@ -12,7 +12,10 @@ namespace iDash
     public class Utils
     {
         [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern short VkKeyScan(char ch);             
+        private static extern short VkKeyScan(char ch);
+
+        private Logger logger = new Logger();
+        private long benchmarkTime = 0;      
 
         public const byte TM1637_COLON_BIT = 128;
         //public const byte TM1637_CHAR_SPACE = 0;
@@ -513,6 +516,19 @@ namespace iDash
         public static bool IsGameRunning(String processName)
         {
             return Process.GetProcessesByName(processName).Length > 0;
+        }
+
+        public void logBenchmarkTime(params int[] parameters)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (int value in parameters)
+            {
+                sb.Append(" " + value);
+            }
+
+            logger.LogMessageToFile(string.Format("benchmark - {0} {1}", sb.ToString(), Utils.getCurrentTimeMillis() - benchmarkTime), true);
+            benchmarkTime = Utils.getCurrentTimeMillis();
         }
     }    
 

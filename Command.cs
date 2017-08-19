@@ -74,48 +74,48 @@ namespace iDash
             this.rawData[commandLength - 1] = Command.CMD_END;                
         }
 
-        public string getCommandType()
+        public string getByteCodeName()
         {
-            string result = "invalid";
             switch (rawData[1])
             {
                 case CMD_SET_DEBUG_MODE:
-                    result = "CMD_SET_DEBUG_MODE";
-                    break;
+                    return "CMD_SET_DEBUG_MODE";
 
                 case CMD_RESPONSE_SET_DEBUG_MODE:
-                    result = "CMD_RESPONSE_SET_DEBUG_MODE";
-                    break;
+                    return "CMD_RESPONSE_SET_DEBUG_MODE";
 
                 case CMD_SYN:
-                    result = "CMD_SYN";
-                    break; //65d 41h
+                    return "CMD_SYN";
 
                 case CMD_7_SEGS:
-                    result = "CMD_7_SEGS";
-                    break; //66d 42h
+                    return "CMD_7_SEGS";
 
                 case CMD_SYN_ACK:
-                    result = "CMD_SYN_ACK";
-                    break; //97d 61h
+                    return "CMD_SYN_ACK";
 
                 case CMD_RGB_SHIFT:
-                    result = "CMD_RGB_SHIFT";
-                    break; //67d 43h
+                    return "CMD_RGB_SHIFT";
 
                 case CMD_BUTTON_STATUS:
-                    result = "CMD_BUTTON_STATUS";
-                    break; //68d 44h
+                    return "CMD_BUTTON_STATUS";
 
                 case CMD_DEBUG_BUTTON:
-                    result = "CMD_DEBUG_BUTTON";
-                    break;
+                    return "CMD_DEBUG_BUTTON";
 
                 case CMD_INVALID:
-                    result = "CMD_INVALID";
-                    break; //239d EFh 
+                    return "CMD_INVALID";
+
+                case CMD_INIT:
+                    return "CMD_INIT";
+
+                case CMD_INIT_DEBUG:
+                    return "CMD_INIT_DEBUG";
+
+                case CMD_END:
+                    return "CMD_END";
             }
-            return result;
+
+            return "invalid";
         }
 
         public static byte calculateCRC(byte[] data)

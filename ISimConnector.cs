@@ -16,6 +16,7 @@ namespace iDash
 
         private const int LED_NUM_TOTAL = 16;
         public const float FIRST_RPM = 0.7f;
+        private bool stillRunning = true;
 
         public ISimConnector()
         {
@@ -28,7 +29,13 @@ namespace iDash
             this.sm = (List<SerialManager>)e.Argument;
             start();
 
-            e.Cancel = true;
+            stillRunning = false;
+            e.Cancel = true;            
+        }
+
+        public bool isStillRunning()
+        {
+            return stillRunning;
         }
 
         protected abstract void start();
@@ -39,19 +46,19 @@ namespace iDash
             byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Constants.LED_NO_BLINK };
             byte[] pattern = new byte[rpmLed.Length - 1];
 
-            Array.Copy(Constants.rpmPattern, 0, pattern, 0, pattern.Length);
+            Array.Copy(Constants.RPM_PATTERN, 0, pattern, 0, pattern.Length);
             int ledOffset = 0;
 
             if ((flag & (int)Constants.FLAG_TYPE.YELLOW_FLAG) != 0) {
-                Array.Copy(Constants.yellowRGB, 0, pattern, ledOffset, pattern.Length);
+                Array.Copy(Constants.YELLOW_RGB, 0, pattern, ledOffset, pattern.Length);
                 ledOffset++;
             }
             if ((flag & (int)Constants.FLAG_TYPE.BLUE_FLAG) != 0) {
-                Array.Copy(Constants.blueRGB, 0, pattern, ledOffset, pattern.Length - (2 * ledOffset));
+                Array.Copy(Constants.BLUE_RGB, 0, pattern, ledOffset, pattern.Length - (2 * ledOffset));
                 ledOffset++;
             }
             if (((flag & (int)Constants.FLAG_TYPE.IN_PIT_FLAG) != 0) || ((flag & (int)Constants.FLAG_TYPE.SPEED_LIMITER) != 0)) {
-                Array.Copy(Constants.whiteRGB, 0, pattern, ledOffset, pattern.Length - (2 * ledOffset));
+                Array.Copy(Constants.WHITE_RGB, 0, pattern, ledOffset, pattern.Length - (2 * ledOffset));
             }
 
             float rpmPerLed = (lastRpm - firstRpm) / LED_NUM_TOTAL; //rpm range per led                
@@ -88,7 +95,7 @@ namespace iDash
                     else
                     {
                         //clear shift lights
-                        Array.Copy(Constants.blackRGB, 0, rpmLed, 0, Constants.blackRGB.Length);                        
+                        Array.Copy(Constants.BLACK_RGB, 0, rpmLed, 0, Constants.BLACK_RGB.Length);                        
                     }
                 }
                 
@@ -96,7 +103,7 @@ namespace iDash
                 rgbShift = new Command(Command.CMD_RGB_SHIFT, rpmLed);
                 foreach (SerialManager serialManager in sm)
                 {
-                    serialManager.sendCommand(rgbShift, false);
+                    serialManager.enqueueCommand(rgbShift, false);
                 }
             }
         }
@@ -169,7 +176,7 @@ namespace iDash
 
                     foreach (SerialManager serialManager in sm)
                     {
-                        serialManager.sendCommand(c, false);
+                        serialManager.enqueueCommand(c, false);
                     }
                 }
             }

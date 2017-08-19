@@ -372,7 +372,7 @@ namespace iDash
             Command command = new Command(header, data, true);
             foreach (SerialManager serialManager in sm)
             {
-                serialManager.sendCommand(command, true);     //transmit data
+                serialManager.enqueueCommand(command, true);     //transmit data
             }
         }
 
@@ -411,7 +411,10 @@ namespace iDash
 
             foreach (SerialManager serialManager in sm)
             {
-                serialManager.CancelAsync();
+                while (serialManager.isStillRunning())
+                {
+                    serialManager.CancelAsync();
+                }
             }
 
             stopAllSimThreads();            
@@ -550,7 +553,7 @@ namespace iDash
                 //make sure Arduino and IDash debug state are in sync
                 while (state[0] != (int)serialManager.arduinoDebugMode)
                 {
-                    serialManager.sendCommand(command, false);     //transmit data
+                    serialManager.enqueueCommand(command, false);     //transmit data
                     await Task.Delay(WAIT_ARDUINO_SET_DEBUG_MODE);
                     //update state if value in combobox changed
                     state[0] = (byte)debugModes.SelectedIndex;
@@ -1072,19 +1075,26 @@ namespace iDash
 
             //keep iRacing threads alive
             if (irc != null)
-                irc.CancelAsync();
+                while (irc.isStillRunning())
+                {
+                    irc.CancelAsync();
+                }
             //stop RaceRoom threads
             if (rrc != null)
-                rrc.CancelAsync();
+                while (rrc.isStillRunning())
+                    rrc.CancelAsync();
             //stop Assetto threads
             if (acc != null)
-                acc.CancelAsync();
+                while (acc.isStillRunning())
+                    acc.CancelAsync();
             //stop rFactor threads
             if (ams != null)
-                ams.CancelAsync();
+                while (ams.isStillRunning())
+                    ams.CancelAsync();
             //stop rFactor2 threads
             if (rf2 != null)
-                rf2.CancelAsync();
+                while (rf2.isStillRunning())
+                    rf2.CancelAsync();
 
             irc = null;
             rrc = null;
