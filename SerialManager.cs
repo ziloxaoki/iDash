@@ -17,7 +17,7 @@ namespace iDash
         private const int BUFFER_SIZE = 100;
         private const int WAIT_TO_RECONNECT = 500;        
         //arduino will wait 5 secs for a SYN ACK        
-        private const int ARDUINO_TIMED_OUT = 500;
+        private const int ARDUINO_TIMED_OUT = 1000;
         private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
         private const int WAIT_FOR_ARDUINO_DATA = 10;
@@ -88,7 +88,8 @@ namespace iDash
             serialPort.StopBits = StopBits.One;  
             serialPort.DataBits = 8;             
             serialPort.BaudRate = 38400;         
-            //serialPort.DtrEnable = false;  
+            serialPort.DtrEnable = false;
+            serialPort.RtsEnable = false;  
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                                     
 
             tryToConnect();
@@ -376,7 +377,7 @@ namespace iDash
         {
             lock(commandQueue)
             {
-                if (hasToSendCommand(command) || forcePost)
+                if (serialPort.IsOpen && (!isDisabledSerial || forcePost))
                 {
                     commandQueue.Enqueue(command);
                 }
@@ -493,11 +494,12 @@ namespace iDash
             if (serialPort.IsOpen)
             {
                 byte[] data = new byte[serialPort.BytesToRead];
-                serialPort.Read(data, 0, data.Length);                
+                serialPort.Read(data, 0, data.Length);
 
-                if(data.Length > 0)
-                {
-                    lastArduinoResponse = Utils.getCurrentTimeMillis();
+                lastArduinoResponse = Utils.getCurrentTimeMillis();
+
+                if (data.Length > 0)
+                {                    
                     processData(data);
                 }
             }
@@ -551,9 +553,9 @@ namespace iDash
             {
                 if (disposing)
                 {
-                    if (serialPort != null && serialPort.IsOpen)
+                    if (serialPort != null)
                     {
-                        serialPort.Close();
+                        serialPort.Dispose();
                     }
                 }
                 // Release unmanaged resources.

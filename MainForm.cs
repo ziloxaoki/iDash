@@ -415,6 +415,8 @@ namespace iDash
                 {
                     serialManager.CancelAsync();
                 }
+
+                serialManager.Dispose();
             }
 
             stopAllSimThreads();            
@@ -1075,27 +1077,41 @@ namespace iDash
 
             //keep iRacing threads alive
             if (irc != null)
+            {
                 while (irc.isStillRunning())
-                {
                     irc.CancelAsync();
-                }
+                irc.Dispose();
+            }
+
             //stop RaceRoom threads
             if (rrc != null)
+            {
                 while (rrc.isStillRunning())
                     rrc.CancelAsync();
+                rrc.Dispose();
+            }
             //stop Assetto threads
             if (acc != null)
+            {
                 while (acc.isStillRunning())
                     acc.CancelAsync();
+                acc.Dispose();
+            }
             //stop rFactor threads
             if (ams != null)
+            {
                 while (ams.isStillRunning())
                     ams.CancelAsync();
+                ams.Dispose();
+            }
             //stop rFactor2 threads
             if (rf2 != null)
+            {
                 while (rf2.isStillRunning())
                     rf2.CancelAsync();
-
+                rf2.Dispose();
+            }
+            
             irc = null;
             rrc = null;
             acc = null;

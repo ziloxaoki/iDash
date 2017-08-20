@@ -366,7 +366,7 @@ int sendMatrixState(int offset, byte *response) {
       response[offset++] = (digitalRead(rowPins[x]) == LOW) ? 1 : 0;
     }   
     digitalWrite(columnPins[i], HIGH); 
-    delay(10);  
+    //delay(10);  
   }   
   
   return offset;
