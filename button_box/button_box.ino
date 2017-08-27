@@ -62,9 +62,11 @@ int BUTTON_PINS[] = { BUTTON_PIN_1, BUTTON_PIN_2 };
 
 int ENABLED_MATRIX_COLUMNS = 7;
 int ENABLED_MATRIX_ROWS = 7;
+int lastButtonState[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int currentButtonState[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+long lastButtonDebounce[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int columnPins[] = {41,40,39,38,37,36,35};
 int rowPins[] = {53,52,51,50,49,48,47};
-//long lastButtonDebounce = 0;
 
 
 const int TOTAL_ROTARY = 4;
@@ -72,7 +74,7 @@ volatile int encoderPos[] = {15000, 15000, 15000, 15000};
 volatile int orientation[] = {0, 0, 0, 0};
 int lastRotaryPos[] = {15000, 15000, 15000, 15000};
 byte lastRotaryState[] = {0, 0, 0, 0};
-//long lastRotaryStateChange = 0;
+long lastRotaryStateChange = 0;
 
 void rotEncoder1(){
   int pinOffset = 0;
@@ -313,7 +315,7 @@ void reAttachInterrupts() {
 int sendRotaryState(int offset, byte *response) {  
   for(int i = 0; i < TOTAL_ROTARY; i++) {                  
 
-//    if(millis() - lastRotaryStateChange > 30) {  
+    if(millis() - lastRotaryStateChange > 50) {  
       if(encoderPos[i] != lastRotaryPos[i]) {      
         if(lastRotaryPos[i] < encoderPos[i]) {  
           //turn left
@@ -324,12 +326,12 @@ int sendRotaryState(int offset, byte *response) {
         }
         lastRotaryPos[i] = encoderPos[i];        
 
-//        lastRotaryStateChange = millis();
+        lastRotaryStateChange = millis();
       } else {
         //not pressed
         lastRotaryState[i] = 0;     
       }  
-//    }
+    }
 
     switch(lastRotaryState[i]) {
       case 0:
@@ -360,11 +362,25 @@ int sendButtonState(int offset, byte *response) {
 }
 
 int sendMatrixState(int offset, byte *response) {   
+  int aux = 0;
   for (int i = 0; i < ENABLED_MATRIX_COLUMNS; i++) {
     digitalWrite(columnPins[i], LOW);
     for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
-      response[offset++] = (digitalRead(rowPins[x]) == LOW) ? 1 : 0;
+      byte pinState = (digitalRead(rowPins[x]) == LOW) ? 1 : 0;
+      
+      if(lastButtonState[aux] != pinState) {
+        lastButtonDebounce[aux] = millis();
+        lastButtonState[aux] = pinState;
+      }
+
+      if(millis() - lastButtonDebounce[aux]  > 50) {
+        currentButtonState[aux] = lastButtonState[aux];        
+      }
+
+      response[offset++] = currentButtonState[aux];
+      aux++;
     }   
+    
     digitalWrite(columnPins[i], HIGH); 
     //delay(10);  
   }   

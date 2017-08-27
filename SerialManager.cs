@@ -191,7 +191,7 @@ namespace iDash
                     }
                     catch(Exception e)
                     {
-                        logger.LogExceptionToFile(e);
+                        //logger.LogExceptionToFile(e);
                         Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
 
                         continue;                          

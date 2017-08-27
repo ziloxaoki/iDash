@@ -215,7 +215,7 @@ volatile int encoderPos[] = {15000, 15000};
 volatile int orientation[] = {0, 0};
 int lastRotaryPos[] = {15000, 15000};
 byte lastRotaryState[] = {0, 0};
-//long lastRotaryStateChange = 0;
+long lastRotaryStateChange = 0;
 
 //volatile long lastRotaryBounce = 0;
 long lastTimeReceivedByte = 0;
@@ -451,7 +451,7 @@ void rotEncoder2(){
 int sendRotaryState(int offset, byte *response) {  
   for(int i = 0; i < TOTAL_ROTARY; i++) {                  
 
-//    if(millis() - lastRotaryStateChange > 30) {  
+    if(millis() - lastRotaryStateChange > 50) {  
       if(encoderPos[i] != lastRotaryPos[i]) {      
         if(lastRotaryPos[i] < encoderPos[i]) {  
           //turn left
@@ -462,12 +462,12 @@ int sendRotaryState(int offset, byte *response) {
         }
         lastRotaryPos[i] = encoderPos[i];        
 
-//        lastRotaryStateChange = millis();
+        lastRotaryStateChange = millis();
       } else {
         //not pressed
         lastRotaryState[i] = 0;     
       }  
-//    }
+    }
 
     switch(lastRotaryState[i]) {
       case 0:
