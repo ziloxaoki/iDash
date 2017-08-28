@@ -182,8 +182,8 @@ int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT},  //A7 Left paddle - INPUT_PULLUP
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
-int BUTTON_LIMITS[8][4][2] = {{{595, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
-                              {{595, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
+int BUTTON_LIMITS[8][4][2] = {{{585, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
+                              {{585, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
                               {{500, 550}, {600, 650}, {670, 700}, {715, 750}},   //A5 Extra 1 - INPUT
                               {{500, 550}, {600, 650}, {670, 700}, {715, 750}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
@@ -191,14 +191,14 @@ int BUTTON_LIMITS[8][4][2] = {{{595, 700}, {-1, -1}, {-1, -1}, {-1, -1}},       
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
 
+int lastButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int currentButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+long lastButtonDebounce[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};                              
+
 int RESET_BUTTOM_LIMITS[] = {850, 870};
 
 int AXIS[4] = {14, 15, 16, 17};  //A0, A1, A2, A3
 int AXIS_LIMITS[4][2] = {{-1, 100}, {-1, 100}, {-1, 100}, {-1, 100}};
-
-int extra_button_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int extra_button_last_states[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   // the previous reading from the input pin               
-long lastButtonDebounce = 0;  
 
 int axis_states[] = {0, 0, 0, 0};
 int axis_last_states[] = {0, 0, 0, 0};   // the previous reading from the input pin               
@@ -509,14 +509,17 @@ int sendAnalogState(int offset, byte *response) {
         //Read switch 1       
         tmpButtonState = 1; 
       }      
-      //if((tmpButtonState != extra_button_last_states[btn]) && (millis() - lastButtonBounce > 100)) {
-      if(tmpButtonState != extra_button_last_states[btn]) {
-        extra_button_last_states[btn++] = tmpButtonState; 
-        response[offset++] = tmpButtonState;
-//        lastButtonBounce = millis(); 
-      } else {
-        response[offset++] = extra_button_last_states[btn++];
-      }      
+      
+      if(lastButtonState[btn] != tmpButtonState) {
+        lastButtonDebounce[btn] = millis();
+        lastButtonState[btn] = tmpButtonState;
+      }
+      
+      if(lastButtonDebounce[btn] > 50) {
+        currentButtonState[btn] = lastButtonState[btn]; 
+      } 
+        
+      response[offset++] = currentButtonState[btn++];
     }      
   }   
 
@@ -720,22 +723,19 @@ void sendButtonStatus(byte header) {
   byte response[100];
   int offset = 0;
 
-  if(millis() - lastButtonDebounce > 30) {
-    //return buttons state      
-    response[offset++] = header;
-    response[offset++] = CMD_BUTTON_STATUS;
-    //axis has to be the last bytes in the array
-    offset = sendAxisState(offset, response);
-    offset = sendButtonState(offset, response);
-    offset = sendAnalogState(offset, response);
-    offset = sendRotaryState(offset, response);  
-    offset = sendAnalogState2(offset, response);
-    response[offset++] = calculateCrc(offset - 1, response);
-    response[offset++] = CMD_END;   
+  //return buttons state      
+  response[offset++] = header;
+  response[offset++] = CMD_BUTTON_STATUS;
+  //axis has to be the last bytes in the array
+  offset = sendAxisState(offset, response);
+  offset = sendButtonState(offset, response);
+  offset = sendAnalogState(offset, response);
+  offset = sendRotaryState(offset, response);  
+  offset = sendAnalogState2(offset, response);
+  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = CMD_END;   
     
-    sendDataToSerial(offset, response);
-    lastButtonDebounce = millis();
-  }
+  sendDataToSerial(offset, response);
 }
 
 void sendButtonVoltage(byte header) {

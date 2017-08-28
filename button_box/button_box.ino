@@ -377,8 +377,7 @@ int sendMatrixState(int offset, byte *response) {
         currentButtonState[aux] = lastButtonState[aux];        
       }
 
-      response[offset++] = currentButtonState[aux];
-      aux++;
+      response[offset++] = currentButtonState[aux++];
     }   
     
     digitalWrite(columnPins[i], HIGH); 
