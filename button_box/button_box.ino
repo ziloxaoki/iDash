@@ -18,17 +18,15 @@ const byte CMD_DEBUG_BUTTON = 202; //CAh
 const byte CMD_INVALID = (byte)0xef; //239d EFh
 const byte INVALID_COMMAND_HEADER = 0xEF;
 
-// 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 41 43 44 45 46 47 48 49 50 51 52 53
-const uint8_t pinNumbers[] = {0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,1,0,3,2,1,0,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,7,2,1,0,7,6,5,4,3,2,1,0,3,2,1,0};
 
-//analogic pins are mapped from 0 to 15 (comminication pins 14 and 15 cannot be used)
+//analogic pins are mapped from 100 to 115 (comminication pins 14 and 15 cannot be used)
 /*#define portOfPin(P)\
-  ((P)>=0&&(P)<8)?&PORTF:((P)>=8&&(P)<16)?&PORTK:((P)>=22&&(P)<30)?&PORTA:((P)>=30&&(P)<38)?&PORTC:((P)>=38)?&PORTD:((P)>=39&&(P)<42)?&PORTG:((P)>=42&&(P)<50)?&PORTL:((P)>=50&&(P)<54)?&PORTB:((P)>=16&&(P)<18)?&PORTH:&PORTD
+  (((P)>=100&&(P)<108)?&PORTF:((P)>=108&&(P)<116)?&PORTK:((P)>=22&&(P)<30)?&PORTA:((P)>=30&&(P)<38)?&PORTC:(((P)==38) || ((P)>=18&&(P)<22))?&PORTD:((P)>=39&&(P)<42)?&PORTG:((P)>=42&&(P)<50)?&PORTL:(((P)>=50&&(P)<54) || ((P)>=10&&(P)<14))?&PORTB:(((P)>=16&&(P)<18) || ((P)>=6&&(P)<10))?&PORTH:&PORTE)
 #define ddrOfPin(P)\
-  ((P)>=0&&(P)<8)?&DDRF:((P)>=8&&(P)<16)?&DDRK:((P)>=22&&(P)<30)?&DDRA:((P)>=30&&(P)<38)?&DDRC:((P)>=38)?&DDRD:((P)>=39&&(P)<42)?&DDRG:((P)>=42&&(P)<50)?&DDRL:((P)>=50&&(P)<54)?&DDRB:((P)>=16&&(P)<18)?&DDRH:&DDRD
+  (((P)>=100&&(P)<108)?&DDRF:((P)>=108&&(P)<116)?&DDRK:((P)>=22&&(P)<30)?&DDRA:((P)>=30&&(P)<38)?&DDRC:(((P)==38) || ((P)>=18&&(P)<22))?&DDRD:((P)>=39&&(P)<42)?&DDRG:((P)>=42&&(P)<50)?&DDRL:(((P)>=50&&(P)<54) || ((P)>=10&&(P)<14))?&DDRB:(((P)>=16&&(P)<18) || ((P)>=6&&(P)<10))?&DDRH:&DDRE)
 #define pinOfPin(P)\
-  ((P)>=0&&(P)<8)?&PINF:((P)>=8&&(P)<16)?&PINK:((P)>=22&&(P)<30)?&PINA:((P)>=30&&(P)<38)?&PINC:((P)>=38)?&PIND:((P)>=39&&(P)<42)?&PING:((P)>=42&&(P)<50)?&PINL:((P)>=50&&(P)<54)?&PINB:((P)>=16&&(P)<18)?&PINH:&PIND
-#define pinIndex(P)((uint8_t)pinNumbers[P])
+  (((P)>=100&&(P)<108)?&PINF:((P)>=108&&(P)<116)?&PINK:((P)>=22&&(P)<30)?&PINA:((P)>=30&&(P)<38)?&PINC:(((P)==38) || ((P)>=18&&(P)<22))?&PIND:((P)>=39&&(P)<42)?&PING:((P)>=42&&(P)<50)?&PINL:(((P)>=50&&(P)<54) || ((P)>=10&&(P)<14))?&PINB:(((P)>=16&&(P)<18) || ((P)>=6&&(P)<10))?&PINH:&PINE)
+#define pinIndex(P)((uint8_t)(((P)>=100&&(P))<108?P-100:((P)>=22&&(P)<30)?P-22:((P)>=30&&(P)<38)?37-P:((P)==38)?7:((P)>=18&&(P)<22)?21-P:((P)>=39&&(P)<42)?41-P:((P)>=42&&(P)<50)?49-P:((P)>=50&&(P)<54)?53-P:((P)>=10&&(P)<14)?P-6:((P)>=16&&(P)<18)?17-P:((P)>=6&&(P)<10)?P-3:((P)==3)?5:((P)==2)?4:((P)==5)?3:((P)==1)?1:0))
 #define pinMask(P)((uint8_t)(1<<pinIndex(P)))
 
 #define pinAsInput(P) *(ddrOfPin(P))&=~pinMask(P)
@@ -38,7 +36,7 @@ const uint8_t pinNumbers[] = {0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,1,0,3,2,1,0,0,1,2,
 #define digitalHigh(P) *(portOfPin(P))|=pinMask(P)
 #define isHigh(P)((*(pinOfPin(P))& pinMask(P))>0)
 #define isLow(P)((*(pinOfPin(P))& pinMask(P))==0)
-#define digitalState(P)((uint8_t)isHigh(P))*/
+#define digitalRead(P)((uint8_t)isHigh(P))*/
 
 
 long lastTimeReceivedByte = 0;
@@ -361,8 +359,14 @@ int sendButtonState(int offset, byte *response) {
   return offset;
 }
 
+
 int sendMatrixState(int offset, byte *response) {   
   int aux = 0;
+
+  for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
+    pinMode(rowPins[x], INPUT_PULLUP);
+  }
+  
   for (int i = 0; i < ENABLED_MATRIX_COLUMNS; i++) {
     digitalWrite(columnPins[i], LOW);
     for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
@@ -370,11 +374,12 @@ int sendMatrixState(int offset, byte *response) {
       
       if(lastButtonState[aux] != pinState) {
         lastButtonDebounce[aux] = millis();
-        lastButtonState[aux] = pinState;
+        lastButtonState[aux] = pinState;           
       }
 
-      if(millis() - lastButtonDebounce[aux]  > 50) {
-        currentButtonState[aux] = lastButtonState[aux];        
+      if(millis() - lastButtonDebounce[aux]  > 100 && lastButtonDebounce[aux] > 0) {
+        currentButtonState[aux] = lastButtonState[aux]; 
+        lastButtonDebounce[aux] = 0;  
       }
 
       response[offset++] = currentButtonState[aux++];

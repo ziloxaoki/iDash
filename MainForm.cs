@@ -54,7 +54,7 @@ namespace iDash
 
         public delegate void HandleButtonActions(List<State> states);
         public HandleButtonActions handleButtonActions;
-        public static bool formFinishedLoading;
+        //private bool formFinishedLoading = false;
 
         private const int TOTAL_NUM_OF_ARDUINOS = 6;
         private const string ARDUINO_ID_PREFIX = "Arduino";
@@ -72,7 +72,7 @@ namespace iDash
             try {
                 //Action Handlers have a pointer to Form, so they can only be initialized after the form.
                 InitializeComponent();
-                this.Shown += new System.EventHandler(FormLoadComplete);
+                //this.Shown += new System.EventHandler(FormLoadComplete);
             }
             catch (Exception e)
             {
@@ -1359,10 +1359,10 @@ namespace iDash
             }
         }
 
-        private void FormLoadComplete(object sender, EventArgs e)
+        /*private void FormLoadComplete(object sender, EventArgs e)
         {
             formFinishedLoading = true;
-        }
+        }*/
 
         private void isTestMode_CheckedChanged(object sender, EventArgs e)
         {

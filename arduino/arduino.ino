@@ -24,7 +24,7 @@
 #define ddrOfPin(P)\
   (((P)>=0&&(P)<8)?&DDRD:(((P)>7&&(P)<14)?&DDRB:&DDRC))
 #define pinOfPin(P)\
-  (((P)>=0&&(P)<8)?&PIND:(((P)>7&&(P)<14)?&PINB:&PINC))
+  (((P)>=0&&(P)<8)?&PIND:((P)>7&&(P)<14)?&PINB:&PINC)
 #define pinIndex(P)((uint8_t)(P>13?P-14:P&7))
 #define pinMask(P)((uint8_t)(1<<pinIndex(P)))
 
@@ -182,8 +182,8 @@ int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT},  //A7 Left paddle - INPUT_PULLUP
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
-int BUTTON_LIMITS[8][4][2] = {{{585, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
-                              {{585, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
+int BUTTON_LIMITS[8][4][2] = {{{590, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
+                              {{590, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
                               {{500, 550}, {600, 650}, {670, 700}, {715, 750}},   //A5 Extra 1 - INPUT
                               {{500, 550}, {600, 650}, {670, 700}, {715, 750}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
@@ -198,7 +198,7 @@ long lastButtonDebounce[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 int RESET_BUTTOM_LIMITS[] = {850, 870};
 
 int AXIS[4] = {14, 15, 16, 17};  //A0, A1, A2, A3
-int AXIS_LIMITS[4][2] = {{-1, 100}, {-1, 100}, {-1, 100}, {-1, 100}};
+int AXIS_LIMITS[4][2] = {{-1, 300}, {-1, 300}, {-1, 300}, {-1, 300}};
 
 int axis_states[] = {0, 0, 0, 0};
 int axis_last_states[] = {0, 0, 0, 0};   // the previous reading from the input pin               
