@@ -91,22 +91,23 @@ namespace iDash
             ushort wscan = (ushort)MapVirtualKey(keycode, 0);
             switch (state)
             {
-                case State.KeyDown | State.KeyHold:
-                    //inputs = getKeyAction(wscan, false);
+                //case State.KeyDown | State.KeyHold:
+                case State.KeyDown:
+                    inputs = getKeyAction(wscan, false);
                     break;
 
                 case State.KeyUp:
-                    inputs = getKeyAction(wscan, false);
-                    SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+                    //inputs = getKeyAction(wscan, false);
+                    //SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
                     inputs = getKeyAction(wscan, true);
-                    SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+                    //SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
                     break;
             } 
             
-            /*if(inputs != null)
+            if(inputs != null)
             {
                 SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
-            }*/           
+            }           
         }
 
         private INPUT[] getKeyAction(ushort key, bool isKeyUp)

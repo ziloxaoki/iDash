@@ -182,8 +182,8 @@ int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT},  //A7 Left paddle - INPUT_PULLUP
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
-int BUTTON_LIMITS[8][4][2] = {{{590, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
-                              {{590, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
+int BUTTON_LIMITS[8][4][2] = {{{592, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
+                              {{592, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
                               {{500, 550}, {600, 650}, {670, 700}, {715, 750}},   //A5 Extra 1 - INPUT
                               {{500, 550}, {600, 650}, {670, 700}, {715, 750}},   //A4 Extra 2 - INPUT                 
                               {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
@@ -515,8 +515,9 @@ int sendAnalogState(int offset, byte *response) {
         lastButtonState[btn] = tmpButtonState;
       }
       
-      if(lastButtonDebounce[btn] > 50) {
+      if((lastButtonDebounce[btn] > 0) && (millis() - lastButtonDebounce[btn] > 25)) {
         currentButtonState[btn] = lastButtonState[btn]; 
+        lastButtonDebounce[btn] = 0;
       } 
         
       response[offset++] = currentButtonState[btn++];

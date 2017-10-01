@@ -377,7 +377,7 @@ int sendMatrixState(int offset, byte *response) {
         lastButtonState[aux] = pinState;           
       }
 
-      if(millis() - lastButtonDebounce[aux]  > 100 && lastButtonDebounce[aux] > 0) {
+      if(lastButtonDebounce[aux] > 0 && millis() - lastButtonDebounce[aux]  > 15) {
         currentButtonState[aux] = lastButtonState[aux]; 
         lastButtonDebounce[aux] = 0;  
       }

@@ -404,6 +404,9 @@ namespace iDash
 
         private void stopAllThreads()
         {
+            unRegisterAllSubscribers();
+            stopAllSimThreads();
+
             foreach (VJoyFeeder vJoyfeeder in vf)
             {
                 vJoyfeeder.Dispose();
@@ -411,17 +414,13 @@ namespace iDash
 
             foreach (SerialManager serialManager in sm)
             {
+                serialManager.CancelAsync();
+
                 while (serialManager.isStillRunning())
                 {
-                    serialManager.CancelAsync();
+                    Thread.Sleep(100);
                 }
-
-                serialManager.Dispose();
-            }
-
-            stopAllSimThreads();            
-
-            unRegisterAllSubscribers();            
+            }                                             
 
             sm.Clear();
             bh.Clear();
@@ -439,7 +438,7 @@ namespace iDash
         {
             stopAllThreads();
             saveAppSettings();
-            Thread.Sleep(2000);
+            Application.Exit();
         }
 
         public void AppendToStatusBar(String s)

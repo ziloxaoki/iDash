@@ -95,14 +95,14 @@ namespace iDash
 
             tryToConnect();
 
+            e.Cancel = true;
+
             NotifyStatusMessage("Stopping Arduino(" + id + ") thread.");
 
-            if (serialPort != null && serialPort.IsOpen)
+            if (serialPort != null)
             {
-                serialPort.Close();
-            }
-
-            e.Cancel = true;
+                Dispose();
+            }            
         }
 
         private bool isArduinoAlive()
@@ -491,7 +491,7 @@ namespace iDash
         //event handler triggered by serial port
         public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
-            if (serialPort.IsOpen)
+            if (serialPort.IsOpen && !CancellationPending)
             {
                 byte[] data = new byte[serialPort.BytesToRead];
                 serialPort.Read(data, 0, data.Length);
