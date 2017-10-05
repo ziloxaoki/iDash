@@ -114,7 +114,9 @@
     <Compile Include="RaceRoomConnector.cs" />
     <Compile Include="RF1Data.cs" />
     <Compile Include="RF1SharedMemoryReader.cs" />
-    <Compile Include="SerialManager.cs" />
+    <Compile Include="SerialManager.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="VJoyFeeder.cs" />
     <EmbeddedResource Include="MainForm.resx">
@@ -179,6 +181,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy $(SolutionDir)\packages\vJoyInterface.dll  $(TargetDir).
+copy $(SolutionDir)\packages\vJoyInterfaceWrap.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRacingSdkWrapper.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRSDKSharp.dll  $(TargetDir).
 copy $(SolutionDir)\packages\YamlDotNet.dll  $(TargetDir).

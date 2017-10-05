@@ -1077,38 +1077,38 @@ namespace iDash
             //keep iRacing threads alive
             if (irc != null)
             {
+                irc.CancelAsync();
                 while (irc.isStillRunning())
-                    irc.CancelAsync();
-                irc.Dispose();
+                    Thread.Sleep(100);
             }
 
             //stop RaceRoom threads
             if (rrc != null)
             {
+                rrc.CancelAsync();
                 while (rrc.isStillRunning())
-                    rrc.CancelAsync();
-                rrc.Dispose();
+                    Thread.Sleep(100);
             }
             //stop Assetto threads
             if (acc != null)
             {
+                acc.CancelAsync();
                 while (acc.isStillRunning())
-                    acc.CancelAsync();
-                acc.Dispose();
+                    Thread.Sleep(100);
             }
             //stop rFactor threads
             if (ams != null)
             {
+                ams.CancelAsync();
                 while (ams.isStillRunning())
-                    ams.CancelAsync();
-                ams.Dispose();
+                    Thread.Sleep(100);
             }
             //stop rFactor2 threads
             if (rf2 != null)
             {
+                rf2.CancelAsync();
                 while (rf2.isStillRunning())
-                    rf2.CancelAsync();
-                rf2.Dispose();
+                    Thread.Sleep(100);
             }
             
             irc = null;

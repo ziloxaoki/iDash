@@ -104,7 +104,6 @@ namespace iDash
             }
 
             NotifyStatusMessage("Automobilista(RFactor) thread stopped.");
-            Dispose();
         }
 
         private string getValue(string name, string type, object clazz)

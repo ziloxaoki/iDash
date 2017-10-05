@@ -85,8 +85,9 @@ namespace iDash
                 Thread.Sleep(Constants.SharedMemoryReadRate);
             }
 
+            wrapper.Stop();
+            
             NotifyStatusMessage("iRacing thread stopped.");
-            Dispose();
         }
 
         protected override string getTelemetryValue(string name, string type, string clazz)

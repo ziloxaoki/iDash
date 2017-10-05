@@ -86,7 +86,6 @@ namespace iDash
             }
 
             NotifyStatusMessage("Assetto Corsa thread stopped.");
-            Dispose();
         }
 
         private string getValue(string name, string type, object clazz)

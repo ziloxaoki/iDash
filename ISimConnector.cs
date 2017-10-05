@@ -29,8 +29,9 @@ namespace iDash
             this.sm = (List<SerialManager>)e.Argument;
             start();
 
+            e.Cancel = true;
             stillRunning = false;
-            e.Cancel = true;            
+            Dispose();
         }
 
         public bool isStillRunning()

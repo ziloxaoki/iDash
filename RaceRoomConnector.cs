@@ -143,7 +143,6 @@ namespace iDash
             }
 
             NotifyStatusMessage("RaceRoom thread stopped.");
-            Dispose();
         }
 
 

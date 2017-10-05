@@ -129,7 +129,6 @@ namespace iDash
             }
 
             NotifyStatusMessage("RFactor2 thread stopped.");
-            Dispose();
         }
 
         private void readGameData()
