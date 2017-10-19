@@ -194,6 +194,7 @@ int BUTTON_LIMITS[8][4][2] = {{{590, 700}, {-1, -1}, {-1, -1}, {-1, -1}},       
 int lastButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int currentButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 long lastButtonDebounce[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};                              
+long autoConfigDebounce = 0;
 
 int RESET_BUTTOM_LIMITS[] = {850, 870};
 
@@ -223,6 +224,7 @@ long lastTimeReceivedByte = 0;
 int debugMode = 0;
 const byte INVALID_COMMAND_HEADER = 0xEF;
 bool isInterruptDisabled[] = {false,false};
+bool isAutoConfigMode = false;
 
 void convertHexToString(int offset, byte *buffer) {
   int i = 0;
@@ -247,6 +249,11 @@ byte MAX7221_ByteReorder(byte x)
 
 void resetTM1637_MAX7221() {
   byte v[] = {' ',' ',0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111};
+  sendToTM1637_MAX7221(v, 22);
+}
+
+void autoConfigTM1637_MAX7221() {
+  byte v[] = {' ',' ',0b01000000,0b00111001,0b01110001,0b01111101,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111,0b00111111};
   sendToTM1637_MAX7221(v, 22);
 }
 
@@ -515,7 +522,7 @@ int sendAnalogState(int offset, byte *response) {
         lastButtonState[btn] = tmpButtonState;
       }
       
-      if((lastButtonDebounce[btn] > 0) && (millis() - lastButtonDebounce[btn] > 25)) {
+      if((lastButtonDebounce[btn] > 0) && (millis() - lastButtonDebounce[btn] > 10)) {
         currentButtonState[btn] = lastButtonState[btn]; 
         lastButtonDebounce[btn] = 0;
       } 
@@ -560,7 +567,14 @@ int sendAnalogState2(int offset, byte *response) {
   return offset;
 }
 
-int sendButtonState(int offset, byte *response) {  
+void updateAutoConfigFlag() {
+  if (digitalState(BUTTON_PINS[0]) == LOW && digitalState(BUTTON_PINS[1]) == LOW && millis() - autoConfigDebounce > 2000) {
+    isAutoConfigMode = !isAutoConfigMode;
+    autoConfigDebounce = millis();
+  }
+}
+
+int sendButtonState(int offset, byte *response) {    
   for (int i = 0; i < ENABLED_BUTTONS_COUNT; i++) {      
     response[offset++] = digitalState(BUTTON_PINS[i]) == HIGH ? 0 : 1;
   }   
@@ -776,9 +790,20 @@ void reAttachInterrupts() {
   }
 }
 
+void configAnalogLimits()  {
+  int reading = analogRead(EXTRA_BUTTONS_INIT[0][0]);
+  if (reading > BUTTON_LIMITS[0][0][0]) 
+    BUTTON_LIMITS[0][0][0] = reading + 10;
+  reading =   analogRead(EXTRA_BUTTONS_INIT[1][0]);
+  if (reading > BUTTON_LIMITS[1][0][0]) 
+    BUTTON_LIMITS[1][0][0] = reading + 10;
+}
+
 void loop() {  
+  updateAutoConfigFlag();
+  
   //haven't received Syn Ack from IDash for too long
-  if(millis() - lastTimeReceivedByte > 1000) {
+  if(millis() - lastTimeReceivedByte > 1000 && !isAutoConfigMode) {
 #ifdef INCLUDE_LED      
     resetTM1637_MAX7221();
 #endif    
@@ -788,15 +813,19 @@ void loop() {
     //sendHandshacking();   
     delay(50);
   }
-  
-  processData();
 
   if (debugMode > 0) {
     sendButtonVoltage(CMD_INIT);
   }
   
-  sendButtonStatus(CMD_INIT); 
-  sendToWS2812B();
-
-  reAttachInterrupts();
+  if(!isAutoConfigMode) {
+    processData();
+    sendButtonStatus(CMD_INIT); 
+    sendToWS2812B();
+    reAttachInterrupts();    
+  } else {
+    sendHandshacking();
+    autoConfigTM1637_MAX7221();
+    configAnalogLimits();
+  }
 }

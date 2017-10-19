@@ -66,6 +66,9 @@
     <Reference Include="AssettoCorsaSharedMemory">
       <HintPath>packages\AssettoCorsaSharedMemory.dll</HintPath>
     </Reference>
+    <Reference Include="F1Speed.Core">
+      <HintPath>packages\F1Speed.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -88,13 +91,20 @@
     <Compile Include="ActionNextView.cs" />
     <Compile Include="ActionPreviousView.cs" />
     <Compile Include="ActionSendInput.cs" />
-    <Compile Include="AssettoCorsaConnector.cs" />
+    <Compile Include="AssettoCorsaConnector.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ButtonHandler.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="GameDefinition.cs" />
     <Compile Include="rF2Data.cs" />
-    <Compile Include="RFactor2Connector.cs" />
-    <Compile Include="RFactorConnector.cs" />
+    <Compile Include="RFactor2Connector.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RFactorConnector.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="RFactorDataReader.cs" />
     <Compile Include="ISimConnector.cs" />
     <Compile Include="Command.cs" />
@@ -111,12 +121,15 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="R3E.cs" />
-    <Compile Include="RaceRoomConnector.cs" />
+    <Compile Include="RaceRoomConnector.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="RF1Data.cs" />
     <Compile Include="RF1SharedMemoryReader.cs" />
     <Compile Include="SerialManager.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="F1TelemetryLapManager.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="VJoyFeeder.cs" />
     <EmbeddedResource Include="MainForm.resx">
@@ -186,7 +199,8 @@ copy $(SolutionDir)\packages\iRacingSdkWrapper.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRSDKSharp.dll  $(TargetDir).
 copy $(SolutionDir)\packages\YamlDotNet.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).
-copy $(SolutionDir)\packages\AssettoCorsaSharedMemory.dll  $(TargetDir).</PostBuildEvent>
+copy $(SolutionDir)\packages\AssettoCorsaSharedMemory.dll  $(TargetDir).
+copy $(SolutionDir)\packages\F1Speed.Core.dll  $(TargetDir).</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
