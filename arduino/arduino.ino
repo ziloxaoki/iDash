@@ -616,8 +616,9 @@ void processCommand(byte *buffer, int commandLength) {
       break;
       
 #ifdef INCLUDE_LED  
-    case CMD_7_SEGS :    
-      sendToTM1637_MAX7221(buffer, commandLength);      
+    case CMD_7_SEGS : 
+      if (!isAutoConfigMode)   
+        sendToTM1637_MAX7221(buffer, commandLength);      
       break;
 #endif
 
@@ -799,33 +800,36 @@ void configAnalogLimits()  {
     BUTTON_LIMITS[1][0][0] = reading + 10;
 }
 
+bool isSerialConnected() {
+  return millis() - lastTimeReceivedByte < 1000;
+}
+
 void loop() {  
-  updateAutoConfigFlag();
-  
   //haven't received Syn Ack from IDash for too long
-  if(millis() - lastTimeReceivedByte > 1000 && !isAutoConfigMode) {
+  if(!isSerialConnected() && !isAutoConfigMode) {
 #ifdef INCLUDE_LED      
     resetTM1637_MAX7221();
 #endif    
     resetWS2812B();  
     //testWS2812B();  
-    debugMode = 0;  
-    //sendHandshacking();   
+    debugMode = 0;     
     delay(50);
-  }
-
+  }  
+  
   if (debugMode > 0) {
     sendButtonVoltage(CMD_INIT);
   }
+
+  processData();
   
-  if(!isAutoConfigMode) {
-    processData();
+  if(!isAutoConfigMode) {        
     sendButtonStatus(CMD_INIT); 
     sendToWS2812B();
     reAttachInterrupts();    
   } else {
-    sendHandshacking();
     autoConfigTM1637_MAX7221();
     configAnalogLimits();
   }
+
+  updateAutoConfigFlag();
 }

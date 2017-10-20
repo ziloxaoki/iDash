@@ -22,7 +22,7 @@ namespace iDash
         //lets try to send a SYN to arduino, 5 times, before it times out
         private const int WAIT_FOR_ARDUINO_DATA = 10;
         private const int WAIT_TO_SEND_COMMAND = 300;
-        private const int HANDSHAKING_INTERVAL = 5000;
+        private const int HANDSHAKING_INTERVAL = 500;
         private int arduinoHas7Seg = 0;
 
         //arduino command length
