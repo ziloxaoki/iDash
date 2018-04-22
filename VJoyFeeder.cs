@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using vJoyInterfaceWrap;
 
 namespace iDash
@@ -181,6 +182,10 @@ namespace iDash
 
                 for (uint i = AXIS_OFFSET; i < states.Count; i++)
                 {
+                    //if(states[(int)i] == State.KeyDown || states[(int)i] == State.KeyHold)
+                    //{
+                    //    Debug.WriteLine(i + "==" + states[(int)i].ToString());
+                    //}
                     joystick.SetBtn(states[(int)i] == State.KeyDown || states[(int)i] == State.KeyHold, jID, i + 1 - AXIS_OFFSET);
                 }
             }

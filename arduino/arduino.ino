@@ -171,32 +171,25 @@ int BUTTON_PINS[] = { BUTTON_PIN_1, BUTTON_PIN_2, BUTTON_PIN_3, BUTTON_PIN_4, BU
 
 const int EXTRA_BUTTONS_TOTAL = 4;  //Extra pins. Each pin can handle multiple buttons
 
-int EXTRA_BUTTONS_INIT[8][4] = {{21, INPUT},  //A7 Left paddle - INPUT_PULLUP
-                                {20, INPUT},  //A6 Right Paddle - INPUT_PULLUP
-                                {19, INPUT},         //A5 Extra 1 - INPUT
-                                {18, INPUT},         //A4 Extra 2 - INPUT
-                                {17, INPUT_PULLUP},  //A3 Toggle switch up
-                                {16, INPUT_PULLUP},  //A2 Toggle switch down
-                                {15, INPUT_PULLUP},  //A1 Toggle switch left
-                                {14, INPUT_PULLUP}}; //A0 Toggle switch right
+int EXTRA_BUTTONS_INIT[4][2] = {{21, INPUT},         //left rotary push button
+                                {20, INPUT},         //right rotaty push button
+                                {19, INPUT},         //A5 red buttons
+                                {18, INPUT}};        //A4 colorful buttons 
+
 
 int MAXIMUM_BUTTONS_PER_ANALOG = 4;
 
-int BUTTON_LIMITS[8][4][2] = {{{590, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A7 Left paddle - INPUT_PULLUP
-                              {{590, 700}, {-1, -1}, {-1, -1}, {-1, -1}},         //A6 Right Paddle - INPUT_PULLUP
-                              {{500, 550}, {600, 650}, {670, 700}, {715, 750}},   //A5 Extra 1 - INPUT
-                              {{500, 550}, {600, 650}, {670, 700}, {715, 750}},   //A4 Extra 2 - INPUT                 
-                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A3
-                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A2
-                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}},           //A1
-                              {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}};          //A0
+int BUTTON_LIMITS[4][4][2] = {{{300,400}, {-1, -1}, {-1, -1}, {-1, -1}},          //left rotary push button
+                              {{550, 650}, {-1, -1}, {-1, -1}, {-1, -1}},         //right rotaty push button
+                              {{480, 525}, {580, 620}, {635, 675}, {680, 750}},   //A5 red buttons
+                              {{480, 525}, {580, 620}, {635, 675}, {680, 750}}};  //A4 colorful buttons                 
 
 int lastButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int currentButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 long lastButtonDebounce[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};                              
 long autoConfigDebounce = 0;
 
-int RESET_BUTTOM_LIMITS[] = {850, 870};
+int RESET_BUTTOM_LIMITS[] = {695, 710};
 
 int AXIS[4] = {14, 15, 16, 17};  //A0, A1, A2, A3
 int AXIS_LIMITS[4][2] = {{-1, 300}, {-1, 300}, {-1, 300}, {-1, 300}};
@@ -458,7 +451,7 @@ void rotEncoder2(){
 int sendRotaryState(int offset, byte *response) {  
   for(int i = 0; i < TOTAL_ROTARY; i++) {                  
 
-    if(millis() - lastRotaryStateChange > 50) {  
+    if(millis() - lastRotaryStateChange > 10) {  
       if(encoderPos[i] != lastRotaryPos[i]) {      
         if(lastRotaryPos[i] < encoderPos[i]) {  
           //turn left
@@ -503,8 +496,12 @@ int sendAnalogState(int offset, byte *response) {
   for(int i = 0; i < EXTRA_BUTTONS_TOTAL; i++) {
     // read the state of the switch into a local variable:
     int reading = analogRead(EXTRA_BUTTONS_INIT[i][0]); 
-
-    if((reading > RESET_BUTTOM_LIMITS[0]) && (reading < RESET_BUTTOM_LIMITS[1])){
+    
+//if (i == 1) {
+//  Serial.println(reading);
+//  delay(1000);
+//}
+    if((i == 0) && (reading > RESET_BUTTOM_LIMITS[0]) && (reading < RESET_BUTTOM_LIMITS[1])){
       resetFunc();
       return;
     }   
@@ -522,7 +519,7 @@ int sendAnalogState(int offset, byte *response) {
         lastButtonState[btn] = tmpButtonState;
       }
       
-      if((lastButtonDebounce[btn] > 0) && (millis() - lastButtonDebounce[btn] > 10)) {
+      if((lastButtonDebounce[btn] > 0) /*&& (millis() - lastButtonDebounce[btn] > 10)*/) {
         currentButtonState[btn] = lastButtonState[btn]; 
         lastButtonDebounce[btn] = 0;
       } 
@@ -567,18 +564,23 @@ int sendAnalogState2(int offset, byte *response) {
   return offset;
 }
 
-void updateAutoConfigFlag() {
-  if (digitalState(BUTTON_PINS[0]) == LOW && digitalState(BUTTON_PINS[1]) == LOW && millis() - autoConfigDebounce > 2000) {
+/*void updateAutoConfigFlag() {
+  if (digitalState(BUTTON_PINS[0]) == LOW && digitalState(BUTTON_PINS[1]) == LOW && millis() - autoConfigDebounce > 1000) {    
     isAutoConfigMode = !isAutoConfigMode;
-    autoConfigDebounce = millis();
+    if(isAutoConfigMode) {
+      BUTTON_LIMITS[0][0][0] = 590;
+      BUTTON_LIMITS[1][0][0] = 590;
+    }
+    autoConfigDebounce = millis();   
   }
-}
+}*/
 
-int sendButtonState(int offset, byte *response) {    
+/*Paddle shifters*/
+int sendButtonState(int offset, byte *response) {     
   for (int i = 0; i < ENABLED_BUTTONS_COUNT; i++) {      
     response[offset++] = digitalState(BUTTON_PINS[i]) == HIGH ? 0 : 1;
   }   
-
+  
   return offset;
 }
 
@@ -742,7 +744,6 @@ void sendButtonStatus(byte header) {
   //return buttons state      
   response[offset++] = header;
   response[offset++] = CMD_BUTTON_STATUS;
-  //axis has to be the last bytes in the array
   offset = sendAxisState(offset, response);
   offset = sendButtonState(offset, response);
   offset = sendAnalogState(offset, response);
@@ -794,10 +795,10 @@ void reAttachInterrupts() {
 void configAnalogLimits()  {
   int reading = analogRead(EXTRA_BUTTONS_INIT[0][0]);
   if (reading > BUTTON_LIMITS[0][0][0]) 
-    BUTTON_LIMITS[0][0][0] = reading + 10;
+    BUTTON_LIMITS[0][0][0] = reading + 12;
   reading =   analogRead(EXTRA_BUTTONS_INIT[1][0]);
   if (reading > BUTTON_LIMITS[1][0][0]) 
-    BUTTON_LIMITS[1][0][0] = reading + 10;
+    BUTTON_LIMITS[1][0][0] = reading + 12;
 }
 
 bool isSerialConnected() {
@@ -831,5 +832,5 @@ void loop() {
     configAnalogLimits();
   }
 
-  updateAutoConfigFlag();
+  //updateAutoConfigFlag();
 }

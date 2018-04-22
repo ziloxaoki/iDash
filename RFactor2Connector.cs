@@ -121,6 +121,7 @@ namespace iDash
                         if (serialManager.deviceContains7Segments())
                         {
                             serialManager.enqueueCommand(Utils.getDisconnectedMsgCmd(), false);
+                            serialManager.enqueueCommand(Utils.getBlackRPMCmd(), false);
                         }
                     }
                 }

@@ -513,6 +513,12 @@ namespace iDash
             return new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
         }
 
+        public static Command getBlackRPMCmd()
+        {
+            byte[] rpmLed = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Constants.LED_NO_BLINK };
+            return new Command(Command.CMD_RGB_SHIFT, rpmLed);
+        }
+
         public static bool IsGameRunning(String processName)
         {
             return Process.GetProcessesByName(processName).Length > 0;

@@ -63,8 +63,8 @@ int ENABLED_MATRIX_ROWS = 7;
 int lastButtonState[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int currentButtonState[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 long lastButtonDebounce[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int columnPins[] = {41,40,39,38,37,36,35};
-int rowPins[] = {53,52,51,50,49,48,47};
+int columnPins[] = {35,34,33,32,31,30,29};
+int rowPins[] = {46,45,44,43,42,41,40};
 
 
 const int TOTAL_ROTARY = 4;
@@ -353,7 +353,7 @@ int sendRotaryState(int offset, byte *response) {
 
 int sendButtonState(int offset, byte *response) {  
   for (int i = 0; i < ENABLED_BUTTONS_COUNT; i++) {      
-    response[offset++] = digitalRead(BUTTON_PINS[i]) == HIGH ? 0 : 1;
+    response[offset++] = digitalRead(BUTTON_PINS[i]) == HIGH ? 0 : 1;    
   }   
   
   return offset;
@@ -362,28 +362,29 @@ int sendButtonState(int offset, byte *response) {
 
 int sendMatrixState(int offset, byte *response) {   
   int aux = 0;
-
-  for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
-    pinMode(rowPins[x], INPUT_PULLUP);
-  }
   
   for (int i = 0; i < ENABLED_MATRIX_COLUMNS; i++) {
+    
     digitalWrite(columnPins[i], LOW);
     for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
       byte pinState = (digitalRead(rowPins[x]) == LOW) ? 1 : 0;
-      
+//if(pinState == 1) {
+//  Serial.println(rowPins[x]);
+//  delay(1000);
+//}
       if(lastButtonState[aux] != pinState) {
         lastButtonDebounce[aux] = millis();
         lastButtonState[aux] = pinState;           
       }
-
+  
       if(lastButtonDebounce[aux] > 0 && millis() - lastButtonDebounce[aux]  > 15) {
         currentButtonState[aux] = lastButtonState[aux]; 
         lastButtonDebounce[aux] = 0;  
       }
-
+  
       response[offset++] = currentButtonState[aux++];
-    }   
+     
+    }  
     
     digitalWrite(columnPins[i], HIGH); 
     //delay(10);  
@@ -409,12 +410,10 @@ void sendButtonStatus(byte header) {
 //  if(millis() - lastButtonDebounce > 30) { 
     response[offset++] = header;
     response[offset++] = CMD_BUTTON_STATUS;
-    //axis has to be the last bytes in the array
+    //axis has to be the first 4 bytes in the array
     offset = sendAxisState(offset, response);
     offset = sendButtonState(offset, response);
-    //offset = sendAnalogState(offset, response);
     offset = sendRotaryState(offset, response);  
-    //offset = sendAnalogState2(offset, response);
     offset = sendMatrixState(offset, response);
     response[offset++] = calculateCrc(offset - 1, response);
     response[offset++] = CMD_END;   

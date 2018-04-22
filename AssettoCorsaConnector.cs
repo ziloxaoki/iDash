@@ -34,6 +34,7 @@ namespace iDash
             ac.StaticInfoUpdated += StaticInfoUpdated;
             ac.GraphicsUpdated += GraphicsUpdated;
             ac.PhysicsUpdated += PhysicsUpdated;
+            ac.Start();
 
             NotifyStatusMessage("Waiting for Assetto Corsa...");
 
@@ -78,6 +79,7 @@ namespace iDash
                         if (serialManager.deviceContains7Segments())
                         {
                             serialManager.enqueueCommand(Utils.getDisconnectedMsgCmd(), false);
+                            serialManager.enqueueCommand(Utils.getBlackRPMCmd(), false);
                         }
                     }
                 }

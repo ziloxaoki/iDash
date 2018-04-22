@@ -32,6 +32,7 @@ namespace iDash
         private AssettoCorsaConnector acc;
         private RFactorConnector ams;
         private RFactor2Connector rf2;
+        private F1Connector f1c;
 
         private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>(Constants.None);
         private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>(Constants.None);
@@ -41,7 +42,7 @@ namespace iDash
         private static List<string> _7Segment = new List<string>();
         private static string strFormat = "";
         private static readonly Object listLock = new Object();
-        private int selectedSimulator = Constants.IRacing;
+        private int selectedSimulator = Constants.IRACING;
 
         public delegate void AppendToStatusBarDelegate(String s);
         public AppendToStatusBarDelegate appendToStatusBar;
@@ -137,7 +138,7 @@ namespace iDash
         }
 
 
-        //parse the view dialog so 7 segment display nows which properties to show
+        //parse the view dialog so 7 segment display knows which properties to show
         private void parseViews()
         {
             if (this.views.Items.Count > 0)
@@ -233,7 +234,7 @@ namespace iDash
             }
 
             //Set iRacing as default game
-            loadViewProperties(Constants.IRacing);
+            loadViewProperties(Constants.IRACING);
 
             string[] aux = Properties.Settings.Default.VJOY_IDS.Split(',');
 
@@ -400,6 +401,8 @@ namespace iDash
                 acc.StatusMessageSubscribers -= UpdateStatusBar;
             if (rf2 != null)
                 rf2.StatusMessageSubscribers -= UpdateStatusBar;
+            if (f1c != null)
+                f1c.StatusMessageSubscribers -= UpdateStatusBar;
         }
 
         private void stopAllThreads()
@@ -1110,17 +1113,25 @@ namespace iDash
                 while (rf2.isStillRunning())
                     Thread.Sleep(100);
             }
-            
+            //stop f1 threads
+            if (f1c != null)
+            {
+                f1c.CancelAsync();
+                while (f1c.isStillRunning())
+                    Thread.Sleep(100);
+            }
+
             irc = null;
             rrc = null;
             acc = null;
             ams = null;
             rf2 = null;
+            f1c = null;
         }
 
         private void iRacingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            selectedSimulator = Constants.IRacing;
+            selectedSimulator = Constants.IRACING;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1146,7 +1157,7 @@ namespace iDash
 
         private void raceroomToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            selectedSimulator = Constants.Raceroom;
+            selectedSimulator = Constants.RACEROOM;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1172,7 +1183,7 @@ namespace iDash
 
         private void assettoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            selectedSimulator = Constants.Assetto;
+            selectedSimulator = Constants.ASSETTO;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1198,7 +1209,7 @@ namespace iDash
 
         private void rFactorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            selectedSimulator = Constants.RFactor;
+            selectedSimulator = Constants.RFACTOR;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1224,7 +1235,7 @@ namespace iDash
 
         private void rFactor2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            selectedSimulator = Constants.RFactor2;
+            selectedSimulator = Constants.RFACTOR2;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(false);
@@ -1242,6 +1253,32 @@ namespace iDash
             }
 
             this.rFactor2ToolStripMenuItem1.PerformClick();
+
+            this.settingsToolStripMenuItem.Enabled = false;
+
+            setButtonHandler(selectedSimulator);
+        }
+
+        private void f1CodemasterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            selectedSimulator = Constants.F1CODEMASTER;
+            foreach (SerialManager serialManager in sm)
+            {
+                serialManager.isSimulatorDisconnected(false);
+            }
+
+            stopAllSimThreads();
+
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+
+            if (f1c == null)
+            {
+                f1c = new F1Connector();
+                f1c.RunWorkerAsync(sm);
+                f1c.StatusMessageSubscribers += UpdateStatusBar;
+            }
+
+            this.f1CodemasterToolStripMenuItem1.PerformClick();
 
             this.settingsToolStripMenuItem.Enabled = false;
 
@@ -1271,7 +1308,7 @@ namespace iDash
             resetAllSettings();
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             this.props.Items.AddRange(Constants.IRacingTelemetryData);
-            this.selectedSimulator = Constants.IRacing;
+            this.selectedSimulator = Constants.IRACING;
 
             loadViewProperties(selectedSimulator);
         }
@@ -1281,7 +1318,7 @@ namespace iDash
             resetAllSettings();
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             this.props.Items.AddRange(Constants.RaceRoomTelemetryData);
-            this.selectedSimulator = Constants.Raceroom;
+            this.selectedSimulator = Constants.RACEROOM;
 
             loadViewProperties(selectedSimulator);
         }
@@ -1291,7 +1328,7 @@ namespace iDash
             resetAllSettings();
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             this.props.Items.AddRange(Constants.AssettoTelemetryData);
-            this.selectedSimulator = Constants.Assetto;
+            this.selectedSimulator = Constants.ASSETTO;
 
             loadViewProperties(selectedSimulator);
         }
@@ -1301,7 +1338,7 @@ namespace iDash
             resetAllSettings();
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             this.props.Items.AddRange(Constants.RFactorTelemetryData);
-            this.selectedSimulator = Constants.RFactor;
+            this.selectedSimulator = Constants.RFACTOR;
 
             loadViewProperties(selectedSimulator);
         }
@@ -1311,7 +1348,17 @@ namespace iDash
             resetAllSettings();
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             this.props.Items.AddRange(Constants.RFactor2TelemetryData);
-            this.selectedSimulator = Constants.RFactor2;
+            this.selectedSimulator = Constants.RFACTOR2;
+
+            loadViewProperties(selectedSimulator);
+        }
+
+        private void f1CodemasterToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            resetAllSettings();
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+            this.props.Items.AddRange(Constants.F1TelemetryData);
+            this.selectedSimulator = Constants.F1CODEMASTER;
 
             loadViewProperties(selectedSimulator);
         }
@@ -1390,7 +1437,7 @@ namespace iDash
         {
             List<GameDefinition> gameDefinitionList = GameDefinition.getAllGameDefinitions();
 
-            while (irc == null && rrc == null && acc == null && ams == null && rf2 == null && !IsDisposed)
+            while (irc == null && rrc == null && acc == null && ams == null && rf2 == null && f1c == null && !IsDisposed)
             {
                 foreach (GameDefinition gd in gameDefinitionList) {
                     Process[] pname = Process.GetProcessesByName(gd.processName);
@@ -1402,7 +1449,6 @@ namespace iDash
                             case GameEnum.ASSETTO_64BIT:
                                 assettoToolStripMenuItem.PerformClick();
                                 break;
-
                             case GameEnum.IRACING_64BIT:
                                 iRacingToolStripMenuItem.PerformClick();
                                 break;
@@ -1414,6 +1460,9 @@ namespace iDash
                                 break;
                             case GameEnum.RF2:
                                 rFactor2ToolStripMenuItem.PerformClick();
+                                break;
+                            case GameEnum.F1_CODEMASTER:
+                                f1CodemasterToolStripMenuItem.PerformClick();
                                 break;
                         }
                     }                        

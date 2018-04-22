@@ -13,27 +13,28 @@ namespace iDash
         public const byte LED_NO_BLINK = 0;
         public const byte LED_BLINK = 1;
 
-        public const int IRacing = 0;
-        public const int Raceroom = 1;
-        public const int Assetto = 2;
-        public const int RFactor = 3;
-        public const int RFactor2 = 4;
-        public const int None = 5;
+        public const int IRACING = 0;
+        public const int RACEROOM = 1;
+        public const int ASSETTO = 2;
+        public const int RFACTOR = 3;
+        public const int RFACTOR2 = 4;
+        public const int F1CODEMASTER = 5;
+        public const int None = 6;
 
         public const int SharedMemoryReadRate = 20;
 
         public const char LIST_SEPARATOR = ',';
         public const char ITEM_SEPARATOR = ';';
         public const char SIGN_EQUALS = '=';
-        public const char SIGN_AMPERSAND = '&';
-
-        public const int MAX_ARDUINOS_SUPPORTED = 6;
+        public const char SIGN_AMPERSAND = '&';        
 
         public static readonly byte[] RPM_PATTERN = { 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 255, 1, 1, 1, 1, 255, 1, 1, 255, 1, 1, 255 };
         public static readonly byte[] BLACK_RGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
         public static readonly byte[] WHITE_RGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 247, 247, 231, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
         public static readonly byte[] YELLOW_RGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 255, 217, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
         public static readonly byte[] BLUE_RGB = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+        public const float Epsilon = 0.00001f;
 
         public enum FLAG_TYPE
         {
@@ -720,6 +721,78 @@ namespace iDash
             "mTireCarcassTemperature.double.rF2Wheel",         // rough average of temperature samples from carcass (Kelvin)
             "mTireInnerLayerTemperature.double[].rF2Wheel",    // rough average of temperature samples from innermost layer of rubber (before carcass) (Kelvin)
             "mExpansion.byte[].rF2Wheel"                       // for future use
+        };
+
+        public static object[] F1TelemetryData = new object[]
+        {
+            "hour.time",
+            "Time.float",
+            "LapTime.time",
+            "LapDistance.float",
+            "FastestLap.float",
+            "Distance.float",
+            "Speed.kmh",
+            "Lap.float",
+            "X.float",
+            "Y.float",
+            "Z.float",
+            "WorldSpeedX.kmh",
+            "WorldSpeedY.kmh",
+            "WorldSpeedZ.kmh",
+            "XR.float",
+            "Roll.float",
+            "ZR.float",
+            "XD.float",
+            "Pitch.float",
+            "ZD.float",
+            "SuspensionPositionRearLeft.float",
+            "SuspensionPositionRearRight.float",
+            "SuspensionPositionFrontLeft.float",
+            "SuspensionPositionFrontRight.float",
+            "SuspensionVelocityRearLeft.float",
+            "SuspensionVelocityRearRight.float",
+            "SuspensionVelocityFrontLeft.float",
+            "SuspensionVelocityFrontRight.float",
+            "WheelSpeedBackLeft.kmh",
+            "WheelSpeedBackRight.kmh",
+            "WheelSpeedFrontLeft.kmh",
+            "WheelSpeedFrontRight.kmh",
+            "Throttle.float",
+            "Steer.float",
+            "Brake.float",
+            "Clutch.float",
+            "Gear.int",
+            "LateralAcceleration.float",
+            "LongitudinalAcceleration.float",
+            "EngineRevs.int",
+            "NewField1.float",
+            "RacePosition.float",
+            "KersRemaining.float",
+            "KersRecharge.float",
+            "DrsStatus.float",
+            "Difficulty.float",
+            "Assists.float",
+            "FuelRemaining.float",
+            "SessionType.float",
+            "NewField10.float",
+            "Sector.float",
+            "TimeSector1.time",
+            "TimeSector2.time",
+            "BrakeTemperatureRearLeft.float",
+            "BrakeTemperatureRearRight.float",
+            "BrakeTemperatureFrontLeft.float",
+            "BrakeTemperatureFrontRight.float",
+            "WheelsPressureRearLeft.float",
+            "WheelsPressureRearRight.float",
+            "WheelsPressureFrontLeft.float",
+            "WheelsPressureFrontRight.float",
+            "CompletedLapsInRace.float",
+            "TotalLapsInRace.float",
+            "TrackLength.float",
+            "PreviousLapTime.time",
+            "MaxRpm.float",
+            "IdleRpm.float",
+            "MaxGears.float"
         };
     }
 }
