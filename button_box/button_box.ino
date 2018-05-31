@@ -63,8 +63,8 @@ int ENABLED_MATRIX_ROWS = 7;
 int lastButtonState[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int currentButtonState[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 long lastButtonDebounce[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int columnPins[] = {35,34,33,32,31,30,29};
-int rowPins[] = {46,45,44,43,42,41,40};
+int rowPins[] = {35,34,33,32,31,30,29};
+int columnPins[] = {46,45,44,43,42,41,40};
 
 
 const int TOTAL_ROTARY = 4;
@@ -369,6 +369,8 @@ int sendMatrixState(int offset, byte *response) {
     for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
       byte pinState = (digitalRead(rowPins[x]) == LOW) ? 1 : 0;
 //if(pinState == 1) {
+//  Serial.print(columnPins[i]);
+//  Serial.print(" - ");
 //  Serial.println(rowPins[x]);
 //  delay(1000);
 //}

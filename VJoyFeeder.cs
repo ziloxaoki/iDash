@@ -16,7 +16,8 @@ namespace iDash
     {
         // Declaring one joystick (Device id 1) and a position structure. 
         private static uint CENTER = 16384;
-        private static uint AXIS_OFFSET = 4;
+        //private static uint AXIS_OFFSET = 4;
+        private static uint AXIS_OFFSET = 0;
         public vJoy joystick;
         public uint jID = 1;
         private uint axisX = 0, axisY = 0;
@@ -178,7 +179,7 @@ namespace iDash
                     joystick.AcquireVJD(jID);
                 }
 
-                setAxis(states);
+                //setAxis(states);
 
                 for (uint i = AXIS_OFFSET; i < states.Count; i++)
                 {

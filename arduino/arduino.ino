@@ -63,30 +63,9 @@ int TM1637_ENABLEDMODULES = 1;
 #define TM1637_DIO1 9
 #define TM1637_CLK1 8
 
-#define TM1637_DIO2 4
-#define TM1637_CLK2 3
-
-#define TM1637_DIO3 4
-#define TM1637_CLK3 3
-
-#define TM1637_DIO4 4
-#define TM1637_CLK4 3
-
-#define TM1637_DIO5 4
-#define TM1637_CLK5 3
-
-#define TM1637_DIO6 4
-#define TM1637_CLK6 3
-
-
 TM1637Display TM1637_module1(TM1637_CLK1, TM1637_DIO1);
-TM1637Display TM1637_module2(TM1637_CLK2, TM1637_DIO2);
-TM1637Display TM1637_module3(TM1637_CLK3, TM1637_DIO3);
-TM1637Display TM1637_module4(TM1637_CLK4, TM1637_DIO4);
-TM1637Display TM1637_module5(TM1637_CLK5, TM1637_DIO5);
-TM1637Display TM1637_module6(TM1637_CLK6, TM1637_DIO6);
 
-TM1637Display * TM1637_screens[] = { &TM1637_module1, &TM1637_module2, &TM1637_module3, &TM1637_module4, &TM1637_module5, &TM1637_module6 };
+TM1637Display * TM1637_screens[] = {&TM1637_module1};
 
 // -------------------------------------------------------------------------------------------------------
 // MAX7219 / MAX7221 7 Segment modules -----------------------------------------------------------------------------
@@ -104,24 +83,6 @@ int MAX7221_ENABLEDMODULES = 2;
 LedControl MAX7221 = LedControl(MAX7221_DATA, MAX7221_CLK, MAX7221_LOAD, MAX7221_ENABLEDMODULES);
 
 #endif
-/*
-struct ScreenItem {
-public:
-  byte Intensity;
-
-  ScreenItem() { }
-};
-
-
-ScreenItem MAX7221_screen1;
-ScreenItem MAX7221_screen2;
-ScreenItem MAX7221_screen3;
-ScreenItem MAX7221_screen4;
-ScreenItem MAX7221_screen5;
-ScreenItem MAX7221_screen6;
-
-ScreenItem * MAX7221_screens[] = { &MAX7221_screen1, &MAX7221_screen2, &MAX7221_screen3, &MAX7221_screen4, &MAX7221_screen5, &MAX7221_screen6 };
-*/
 
 //------------------ Protocol constants
 
@@ -151,52 +112,16 @@ bool isBlinking = false;
 byte ledBuffer[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 Adafruit_NeoPixel WS2812B_strip = Adafruit_NeoPixel(WS2812B_RGBLEDCOUNT, WS2812B_DATAPIN, NEO_GRB + NEO_KHZ800);
+         
 
-// ----------------------- ADDITIONAL BUTTONS ---------------------------------------------------------------
-// https://www.arduino.cc/en/Tutorial/InputPullupSerial
-// ----------------------------------------------------------------------------------------------------------
-int ENABLED_BUTTONS_COUNT = 2; //{"Group":"ADDITIONAL BUTTONS","Name":"ENABLED_BUTTONS_COUNT","Title":"Additional buttons (directly connected to the arduino) buttons count\r\n0 = disabled, >0  = enabled","DefaultValue":"0","Type":"integer","Template":"int ENABLED_BUTTONS_COUNT = {0};"}
-int BUTTON_PIN_1 = 6; //{"Group":"ADDITIONAL BUTTONS","Name":"BUTTON_PIN_1","Title":"1'st Additional button digital pin","DefaultValue":"3","Type":"integer","Template":"int BUTTON_PIN_1 = {0};"}
-int BUTTON_PIN_2 = 7; //{"Group":"ADDITIONAL BUTTONS","Name":"BUTTON_PIN_2","Title":"2'nd Additional button digital pin","DefaultValue":"3","Type":"integer","Template":"int BUTTON_PIN_2 = {0};"}
-int BUTTON_PIN_3 = 7; //{"Group":"ADDITIONAL BUTTONS","Name":"BUTTON_PIN_3","Title":"3'rd Additional button digital pin","DefaultValue":"3","Type":"integer","Template":"int BUTTON_PIN_3 = {0};"}
-int BUTTON_PIN_4 = 7; //{"Group":"ADDITIONAL BUTTONS","Name":"BUTTON_PIN_4","Title":"4'th Additional button digital pin","DefaultValue":"3","Type":"integer","Template":"int BUTTON_PIN_4 = {0};"}
-int BUTTON_PIN_5 = 7; //{"Group":"ADDITIONAL BUTTONS","Name":"BUTTON_PIN_5","Title":"5'th Additional button digital pin","DefaultValue":"3","Type":"integer","Template":"int BUTTON_PIN_5 = {0};"}
-int BUTTON_PIN_6 = 7; //{"Group":"ADDITIONAL BUTTONS","Name":"BUTTON_PIN_6","Title":"6'th Additional button digital pin","DefaultValue":"3","Type":"integer","Template":"int BUTTON_PIN_6 = {0};"}
-int BUTTON_PIN_7 = 7; //{"Group":"ADDITIONAL BUTTONS","Name":"BUTTON_PIN_7","Title":"7'th Additional button digital pin","DefaultValue":"3","Type":"integer","Template":"int BUTTON_PIN_7 = {0};"}
-int BUTTON_PIN_8 = 7; //{"Group":"ADDITIONAL BUTTONS","Name":"BUTTON_PIN_8","Title":"8'th Additional button digital pin","DefaultValue":"3","Type":"integer","Template":"int BUTTON_PIN_8 = {0};"}
-int BUTTON_PINS[] = { BUTTON_PIN_1, BUTTON_PIN_2, BUTTON_PIN_3, BUTTON_PIN_4, BUTTON_PIN_5, BUTTON_PIN_6, BUTTON_PIN_7, BUTTON_PIN_8 };
+int lastButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int currentButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+long lastButtonDebounce[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};                              
 
-
-// -------------------- ANALOG ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-const int EXTRA_BUTTONS_TOTAL = 4;  //Extra pins. Each pin can handle multiple buttons
-
-int EXTRA_BUTTONS_INIT[4][2] = {{21, INPUT},         //left rotary push button
-                                {20, INPUT},         //right rotaty push button
-                                {19, INPUT},         //A5 red buttons
-                                {18, INPUT}};        //A4 colorful buttons 
-
-
-int MAXIMUM_BUTTONS_PER_ANALOG = 4;
-
-int BUTTON_LIMITS[4][4][2] = {{{300,400}, {-1, -1}, {-1, -1}, {-1, -1}},          //left rotary push button
-                              {{550, 650}, {-1, -1}, {-1, -1}, {-1, -1}},         //right rotaty push button
-                              {{480, 525}, {580, 620}, {635, 675}, {680, 750}},   //A5 red buttons
-                              {{480, 525}, {580, 620}, {635, 675}, {680, 750}}};  //A4 colorful buttons                 
-
-int lastButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int currentButtonState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-long lastButtonDebounce[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};                              
-long autoConfigDebounce = 0;
-
-int RESET_BUTTOM_LIMITS[] = {695, 710};
-
-int AXIS[4] = {14, 15, 16, 17};  //A0, A1, A2, A3
-int AXIS_LIMITS[4][2] = {{-1, 300}, {-1, 300}, {-1, 300}, {-1, 300}};
-
-int axis_states[] = {0, 0, 0, 0};
-int axis_last_states[] = {0, 0, 0, 0};   // the previous reading from the input pin               
-//long lastAxisBounce = 0;
+int rowPins[] = {6,7,18,19};
+int columnPins[] = {14,15,16,17};
+int ENABLED_MATRIX_COLUMNS = 4;
+int ENABLED_MATRIX_ROWS = 4;
 
 // -------------------- ROTARY ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -365,32 +290,26 @@ void setup()
     WS2812B_strip.show();
   }
 
-  // EXTERNAL BUTTONS INIT
-  for (int btnIdx = 0; btnIdx < ENABLED_BUTTONS_COUNT; btnIdx++) {
-    pinAsInputPullUp(BUTTON_PINS[btnIdx]);
-  }
-
-  // Extra buttons
-  for(int i = 0; i < EXTRA_BUTTONS_TOTAL; i++) { 
-    if(EXTRA_BUTTONS_INIT[i][1] == INPUT_PULLUP) {
-      pinAsInputPullUp(EXTRA_BUTTONS_INIT[i][0]);
-    } else {
-      pinAsInput(EXTRA_BUTTONS_INIT[i][0]);
-    }
-  }
-
   // Rotary
   for(int i = 0; i < TOTAL_ROTARY; i++) {
     pinAsInputPullUp(encoderPinA[i]);      
     pinAsInputPullUp(encoderPinB[i]);        
   } 
 
-  //Axis
-  for(int i = 0; i < 4; i++) {
-    pinAsInputPullUp(AXIS[i]);
-  }
   attachInterrupt(digitalPinToInterrupt(encoderPinA[0]), rotEncoder1, LOW); 
   attachInterrupt(digitalPinToInterrupt(encoderPinA[1]), rotEncoder2, LOW); 
+
+  // MATRIX
+  for (int x = 0; x < ENABLED_MATRIX_COLUMNS; x++) {
+    pinMode(columnPins[x], OUTPUT);           // set pin to input    
+    digitalWrite(columnPins[x], HIGH);        // initiate high
+    //pinAsOutput(columnPins[x]);    
+  }
+
+  for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
+    pinMode(rowPins[x], INPUT_PULLUP);
+    //pinAsInputPullUp(rowPins[x]);    
+  }
 
 }
 
@@ -421,30 +340,24 @@ void rotEncoder1(){
   detachInterrupt(digitalPinToInterrupt(encoderPinA[0]));
   isInterruptDisabled[0] = true;
   int pinOffset = 0;
-//  if(millis() - lastRotaryBounce > 10) {
-    int pinB = digitalState(encoderPinB[pinOffset]);
-    if(pinB == HIGH) {    
-      encoderPos[pinOffset]++;  
-    } else{
-      encoderPos[pinOffset]--;
-    }
-//  }  
-//  lastRotaryBounce = millis();
+  int pinB = digitalState(encoderPinB[pinOffset]);
+  if(pinB == HIGH) {    
+    encoderPos[pinOffset]++;  
+  } else{
+    encoderPos[pinOffset]--;
+  }
 }
 
 void rotEncoder2(){
   detachInterrupt(digitalPinToInterrupt(encoderPinA[1]));
   isInterruptDisabled[1] = true;
   int pinOffset = 1;
-  //if(millis() - lastRotaryBounce > 10) {
-    int pinB = digitalState(encoderPinB[pinOffset]);
-    if(pinB == HIGH) {    
-      encoderPos[pinOffset]++;  
-    } else{
-      encoderPos[pinOffset]--;
-    }
-  //}  
-  //lastRotaryBounce = millis();
+  int pinB = digitalState(encoderPinB[pinOffset]);
+  if(pinB == HIGH) {    
+    encoderPos[pinOffset]++;  
+  } else{
+    encoderPos[pinOffset]--;
+  }
 }
 
 
@@ -489,96 +402,36 @@ int sendRotaryState(int offset, byte *response) {
 }
 
 
-int sendAnalogState(int offset, byte *response) {
-
-  int btn = 0;
+int sendMatrixState(int offset, byte *response) {   
+  int aux = 0;
   
-  for(int i = 0; i < EXTRA_BUTTONS_TOTAL; i++) {
-    // read the state of the switch into a local variable:
-    int reading = analogRead(EXTRA_BUTTONS_INIT[i][0]); 
+  for (int i = 0; i < ENABLED_MATRIX_COLUMNS; i++) {
     
-//if (i == 1) {
-//  Serial.println(reading);
+    digitalWrite(columnPins[i], LOW);
+    for (int x = 0; x < ENABLED_MATRIX_ROWS; x++) {
+      byte pinState = (digitalRead(rowPins[x]) == LOW) ? 1 : 0;
+//if(pinState == 1) {
+//  Serial.print(rowPins[i]);
+//  Serial.print(" - ");
+//  Serial.println(columnPins[x]);
 //  delay(1000);
 //}
-    if((i == 0) && (reading > RESET_BUTTOM_LIMITS[0]) && (reading < RESET_BUTTOM_LIMITS[1])){
-      resetFunc();
-      return;
-    }   
-
-    for(int x = 0; x < MAXIMUM_BUTTONS_PER_ANALOG; x++) {
-      int tmpButtonState = LOW;             // the current reading from the input pin
-
-      if((reading > BUTTON_LIMITS[i][x][0]) && (reading < BUTTON_LIMITS[i][x][1])){           
-        //Read switch 1       
-        tmpButtonState = 1; 
-      }      
-      
-      if(lastButtonState[btn] != tmpButtonState) {
-        lastButtonDebounce[btn] = millis();
-        lastButtonState[btn] = tmpButtonState;
+      if(lastButtonState[aux] != pinState) {
+        lastButtonDebounce[aux] = millis();
+        lastButtonState[aux] = pinState;           
       }
-      
-      if((lastButtonDebounce[btn] > 0) /*&& (millis() - lastButtonDebounce[btn] > 10)*/) {
-        currentButtonState[btn] = lastButtonState[btn]; 
-        lastButtonDebounce[btn] = 0;
-      } 
-        
-      response[offset++] = currentButtonState[btn++];
-    }      
-  }   
-
-  return offset;  
-}
-
-int sendAxisState(int offset, byte *response) {
-  for(int x=0; x < 4; x++) {
-    response[offset++]=0;
-  }
-
-  return offset;
-}
-
-int sendAnalogState2(int offset, byte *response) {
-
-  for (int i = 0; i < 4; i++) {
-    int reading = analogRead(AXIS[i]);
-
-    int tmpAxisState = LOW;             // the current reading from the input pin
-
-    if((reading > AXIS_LIMITS[i][0]) && (reading < AXIS_LIMITS[i][1])){           
-      //Read switch 1       
-      tmpAxisState = 1; 
-    }
-//    if((tmpAxisState != axis_last_states[i]) && (millis() - lastAxisBounce > 100)) {
-    if(tmpAxisState != axis_last_states[i]) {
-      axis_last_states[i] = tmpAxisState; 
-      response[offset++] = tmpAxisState;
-//      lastAxisBounce = millis(); 
-    } else {
-      response[offset++] = axis_last_states[i];
-    }        
-    
-  }
   
-  return offset;
-}
-
-/*void updateAutoConfigFlag() {
-  if (digitalState(BUTTON_PINS[0]) == LOW && digitalState(BUTTON_PINS[1]) == LOW && millis() - autoConfigDebounce > 1000) {    
-    isAutoConfigMode = !isAutoConfigMode;
-    if(isAutoConfigMode) {
-      BUTTON_LIMITS[0][0][0] = 590;
-      BUTTON_LIMITS[1][0][0] = 590;
-    }
-    autoConfigDebounce = millis();   
-  }
-}*/
-
-/*Paddle shifters*/
-int sendButtonState(int offset, byte *response) {     
-  for (int i = 0; i < ENABLED_BUTTONS_COUNT; i++) {      
-    response[offset++] = digitalState(BUTTON_PINS[i]) == HIGH ? 0 : 1;
+      if(lastButtonDebounce[aux] > 0 && millis() - lastButtonDebounce[aux]  > 15) {
+        currentButtonState[aux] = lastButtonState[aux]; 
+        lastButtonDebounce[aux] = 0;  
+      }
+  
+      response[offset++] = currentButtonState[aux++];
+     
+    }  
+    
+    digitalWrite(columnPins[i], HIGH); 
+    //delay(10);  
   }   
   
   return offset;
@@ -733,7 +586,7 @@ void sendHandshacking() {
   offset = appendArduinoId(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
-  
+
   sendDataToSerial(offset, response);
 }
 
@@ -744,37 +597,19 @@ void sendButtonStatus(byte header) {
   //return buttons state      
   response[offset++] = header;
   response[offset++] = CMD_BUTTON_STATUS;
-  offset = sendAxisState(offset, response);
-  offset = sendButtonState(offset, response);
-  offset = sendAnalogState(offset, response);
   offset = sendRotaryState(offset, response);  
-  offset = sendAnalogState2(offset, response);
+  offset = sendMatrixState(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;   
-    
-  sendDataToSerial(offset, response);
+
+/*for(int x=0; x<offset; x++)  {
+  Serial.print(response[x]);
+  Serial.print(" - ");
+
 }
+Serial.println();
+delay(2000);*/    
 
-void sendButtonVoltage(byte header) {
-  byte response[20];
-  int offset = 0;
-   
-  response[offset++] = header;
-  response[offset++] = CMD_DEBUG_BUTTON;
-
-  int btn = 0;
-  
-  for(int i = 0; i < EXTRA_BUTTONS_TOTAL; i++) {
-    // read the state of the switch into a local variable:
-    int pin = EXTRA_BUTTONS_INIT[i][0];
-    int reading = analogRead(pin);    
-
-    response[offset++]  = pin;
-    response[offset++]  = reading / 256; 
-    response[offset++]  = reading % 256;
-  }
-  response[offset++] = calculateCrc(offset - 1, response);
-  response[offset++] = CMD_END;   
   sendDataToSerial(offset, response);
 }
 
@@ -792,15 +627,6 @@ void reAttachInterrupts() {
   }
 }
 
-void configAnalogLimits()  {
-  int reading = analogRead(EXTRA_BUTTONS_INIT[0][0]);
-  if (reading > BUTTON_LIMITS[0][0][0]) 
-    BUTTON_LIMITS[0][0][0] = reading + 12;
-  reading =   analogRead(EXTRA_BUTTONS_INIT[1][0]);
-  if (reading > BUTTON_LIMITS[1][0][0]) 
-    BUTTON_LIMITS[1][0][0] = reading + 12;
-}
-
 bool isSerialConnected() {
   return millis() - lastTimeReceivedByte < 1000;
 }
@@ -816,10 +642,6 @@ void loop() {
     debugMode = 0;     
     delay(50);
   }  
-  
-  if (debugMode > 0) {
-    sendButtonVoltage(CMD_INIT);
-  }
 
   processData();
   
@@ -829,8 +651,5 @@ void loop() {
     reAttachInterrupts();    
   } else {
     autoConfigTM1637_MAX7221();
-    configAnalogLimits();
   }
-
-  //updateAutoConfigFlag();
 }
