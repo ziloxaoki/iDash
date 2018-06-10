@@ -431,9 +431,12 @@ int sendMatrixState(int offset, byte *response) {
     }  
     
     digitalWrite(columnPins[i], HIGH); 
-    //delay(10);  
-  }   
-  
+    //delay(10);      
+  }     
+
+  if(offset > 8 && response[6] == 1 && response[9] == 1) {
+    arduinoReset();
+  }
   return offset;
 }
 
@@ -605,10 +608,9 @@ void sendButtonStatus(byte header) {
 /*for(int x=0; x<offset; x++)  {
   Serial.print(response[x]);
   Serial.print(" - ");
-
 }
 Serial.println();
-delay(2000);*/    
+delay(2000);    */
 
   sendDataToSerial(offset, response);
 }
