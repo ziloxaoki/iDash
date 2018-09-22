@@ -82,6 +82,8 @@ namespace iDash
             this.clearData = new System.Windows.Forms.Button();
             this.debugData = new System.Windows.Forms.RichTextBox();
             this.configurationTab = new System.Windows.Forms.TabPage();
+            this.label10 = new System.Windows.Forms.Label();
+            this.maxRpm = new System.Windows.Forms.TextBox();
             this.autoConnectCheckbox = new System.Windows.Forms.CheckBox();
             this.portStatusBox6 = new System.Windows.Forms.PictureBox();
             this.portStatusBox5 = new System.Windows.Forms.PictureBox();
@@ -678,6 +680,8 @@ namespace iDash
             // 
             // configurationTab
             // 
+            this.configurationTab.Controls.Add(this.label10);
+            this.configurationTab.Controls.Add(this.maxRpm);
             this.configurationTab.Controls.Add(this.autoConnectCheckbox);
             this.configurationTab.Controls.Add(this.portStatusBox6);
             this.configurationTab.Controls.Add(this.portStatusBox5);
@@ -711,6 +715,25 @@ namespace iDash
             this.configurationTab.TabIndex = 2;
             this.configurationTab.Text = "Configuration";
             this.configurationTab.UseVisualStyleBackColor = true;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(361, 67);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(265, 13);
+            this.label10.TabIndex = 27;
+            this.label10.Text = "%. Max rpm for shift light. ir=90, acs=95, acc=85, rf=95.";
+            // 
+            // maxRpm
+            // 
+            this.maxRpm.Location = new System.Drawing.Point(326, 61);
+            this.maxRpm.MaxLength = 2;
+            this.maxRpm.Name = "maxRpm";
+            this.maxRpm.Size = new System.Drawing.Size(28, 20);
+            this.maxRpm.TabIndex = 26;
+            this.maxRpm.Text = "90";
+            this.maxRpm.TextChanged += new System.EventHandler(this.maxRpm_TextChanged);
             // 
             // autoConnectCheckbox
             // 
@@ -1435,6 +1458,8 @@ namespace iDash
         private System.Windows.Forms.Button clearStatusBar;
         private System.Windows.Forms.ToolStripMenuItem f1CodemasterToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem f1CodemasterToolStripMenuItem;
+        private System.Windows.Forms.TextBox maxRpm;
+        private System.Windows.Forms.Label label10;
     }
 }
 

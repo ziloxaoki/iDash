@@ -23,6 +23,7 @@ namespace iDash
         public const string UPDATE_BUTTON_VOLTAGE = "!-UPDATE_BUTTON_VOLTAGE";
         public const string UPDATE_ARDUINO_ID = "!-UPDATE_ARDUINO_ID";
         public const string UPDATE_ARDUINO_DISCONNECTED = "!-UPDATE_ARDUINO_DISCONNECTED";
+        public static float maxRPM = 90f; 
 
         private List<SerialManager> sm = new List<SerialManager>();
         private List<ButtonHandler> bh = new List<ButtonHandler>();
@@ -284,6 +285,8 @@ namespace iDash
                 }
 
                 autoConnectCheckbox.Checked = Properties.Settings.Default.AUTOCONNECT;
+
+                this.maxRpm.Text = Properties.Settings.Default.MAX_RPM;
             }
             catch (Exception e)
             {
@@ -356,8 +359,8 @@ namespace iDash
             }
 
             Properties.Settings.Default.COMPORT_IDS = String.Join(",", comPortIds);
-
             Properties.Settings.Default.AUTOCONNECT = autoConnectCheckbox.Checked;
+            Properties.Settings.Default.MAX_RPM = Convert.ToString(maxRPM);
 
             Properties.Settings.Default.Save();
         }
@@ -1447,6 +1450,7 @@ namespace iDash
                         {
                             case GameEnum.ASSETTO_32BIT:
                             case GameEnum.ASSETTO_64BIT:
+                            case GameEnum.ASSETTO_COMP_64BIT:
                                 assettoToolStripMenuItem.PerformClick();
                                 break;
                             case GameEnum.IRACING_64BIT:
@@ -1476,6 +1480,11 @@ namespace iDash
         private void clearStatusBar_Click(object sender, EventArgs e)
         {
             statusBar.Clear();
+        }
+
+        private void maxRpm_TextChanged(object sender, EventArgs e)
+        {
+            maxRPM = Convert.ToInt16(this.maxRpm.Text);
         }
     }    
 }

@@ -94,5 +94,17 @@ namespace iDash.Properties {
                 this["AUTOCONNECT"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public string MAX_RPM {
+            get {
+                return ((string)(this["MAX_RPM"]));
+            }
+            set {
+                this["MAX_RPM"] = value;
+            }
+        }
     }
 }

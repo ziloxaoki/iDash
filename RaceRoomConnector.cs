@@ -78,7 +78,7 @@ namespace iDash
                                 float lastRpm = RpsToRpm(data.MaxEngineRps);
                                 float firstRpm = FIRST_RPM * lastRpm;
                                 //calibrate shift gear light rpm
-                                lastRpm *= 0.95f;
+                                lastRpm *= MainForm.maxRPM;
                                 float currentRpm = RpsToRpm(data.EngineRps);
 
                                 int flag = 0;

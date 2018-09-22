@@ -47,7 +47,7 @@ namespace iDash
                                 float lastRpm = wrapper.data.engineMaxRPM;
                                 float firstRpm = FIRST_RPM * lastRpm;
                                 //calibrate shift gear light rpm
-                                lastRpm *= 0.95f;
+                                lastRpm *= MainForm.maxRPM;
                                 float currentRpm = wrapper.data.engineRPM;
 
                                 int flag = wrapper.data.vehicle[0].inPits > 0 ? (int)Constants.FLAG_TYPE.IN_PIT_FLAG : 0;

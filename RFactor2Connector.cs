@@ -73,7 +73,7 @@ namespace iDash
                             float lastRpm = (float)currrF2State.mEngineMaxRPM;
                             float firstRpm = FIRST_RPM * lastRpm;
                             //calibrate shift gear light rpm
-                            lastRpm *= 0.97f;
+                            lastRpm *= MainForm.maxRPM;
                             float currentRpm = (float)currrF2State.mEngineRPM;
 
                             int flag = 0;

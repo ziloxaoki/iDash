@@ -7,7 +7,7 @@ namespace iDash
 {
     public enum GameEnum
     {
-        RACE_ROOM, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, RF2, ASSETTO_64BIT, ASSETTO_32BIT, IRACING_64BIT, F1_CODEMASTER
+        RACE_ROOM, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, RF2, ASSETTO_64BIT, ASSETTO_32BIT, IRACING_64BIT, F1_CODEMASTER, ASSETTO_COMP_64BIT
     }
     public class GameDefinition
     {
@@ -35,6 +35,8 @@ namespace iDash
             "acs_launch_exe", "acs_launch_params", "launch_acs");
         public static GameDefinition assetto32Bit = new GameDefinition(GameEnum.ASSETTO_32BIT, "assetto_32_bit", "acs_x86",
             "acs_launch_exe", "acs_launch_params", "launch_acs");
+        public static GameDefinition assettoComp64Bit = new GameDefinition(GameEnum.ASSETTO_COMP_64BIT, "assetto_comp_64_bit", "acc",
+            "acc_exe", "acc_params", "launch_acc");
         public static GameDefinition f1Codemaster = new GameDefinition(GameEnum.F1_CODEMASTER, "F1 Codemaster", "F1_2017",
             "F1_2017_exe", "f1_launch_params", "launch_f1"); 
 
@@ -46,6 +48,7 @@ namespace iDash
             definitions.Add(automobilista); definitions.Add(gameStockCar); definitions.Add(marcas);
             definitions.Add(ftruck); definitions.Add(rFactor1); definitions.Add(assetto32Bit); definitions.Add(assetto64Bit);
             definitions.Add(raceRoom); definitions.Add(rfactor2); definitions.Add(iracing); definitions.Add(f1Codemaster);
+            definitions.Add(assettoComp64Bit);
             return definitions;
         }
 

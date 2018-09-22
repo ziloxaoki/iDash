@@ -20,5 +20,8 @@
     <Setting Name="AUTOCONNECT" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="MAX_RPM" Type="System.String" Scope="User">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
