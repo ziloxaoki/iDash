@@ -728,7 +728,7 @@ namespace iDash
             // maxRpm
             // 
             this.maxRpm.Location = new System.Drawing.Point(326, 61);
-            this.maxRpm.MaxLength = 2;
+            this.maxRpm.MaxLength = 3;
             this.maxRpm.Name = "maxRpm";
             this.maxRpm.Size = new System.Drawing.Size(28, 20);
             this.maxRpm.TabIndex = 26;

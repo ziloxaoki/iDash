@@ -23,7 +23,7 @@ namespace iDash
         public const string UPDATE_BUTTON_VOLTAGE = "!-UPDATE_BUTTON_VOLTAGE";
         public const string UPDATE_ARDUINO_ID = "!-UPDATE_ARDUINO_ID";
         public const string UPDATE_ARDUINO_DISCONNECTED = "!-UPDATE_ARDUINO_DISCONNECTED";
-        public static float maxRPM = 90f; 
+        public static float maxRPM = 0.90f; 
 
         private List<SerialManager> sm = new List<SerialManager>();
         private List<ButtonHandler> bh = new List<ButtonHandler>();
@@ -287,6 +287,7 @@ namespace iDash
                 autoConnectCheckbox.Checked = Properties.Settings.Default.AUTOCONNECT;
 
                 this.maxRpm.Text = Properties.Settings.Default.MAX_RPM;
+                maxRPM = String.IsNullOrEmpty(this.maxRpm.Text) ? 0.90f : float.Parse(this.maxRpm.Text) / 100;
             }
             catch (Exception e)
             {
@@ -360,7 +361,7 @@ namespace iDash
 
             Properties.Settings.Default.COMPORT_IDS = String.Join(",", comPortIds);
             Properties.Settings.Default.AUTOCONNECT = autoConnectCheckbox.Checked;
-            Properties.Settings.Default.MAX_RPM = Convert.ToString(maxRPM);
+            Properties.Settings.Default.MAX_RPM = this.maxRpm.Text;
 
             Properties.Settings.Default.Save();
         }
@@ -1484,7 +1485,7 @@ namespace iDash
 
         private void maxRpm_TextChanged(object sender, EventArgs e)
         {
-            maxRPM = Convert.ToInt16(this.maxRpm.Text);
+            maxRPM = String.IsNullOrEmpty(this.maxRpm.Text) ? 0.90f : float.Parse(this.maxRpm.Text)/100;
         }
     }    
 }
