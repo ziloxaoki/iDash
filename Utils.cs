@@ -507,7 +507,8 @@ namespace iDash
 
         public static Command getDisconnectedMsgCmd()
         {
-            string msg = "-OFF." + DateTime.Now.ToString("dd.MM.yyyy") + DateTime.Now.ToString("hh.mm.ss.ff");
+            string time = DateTime.Now.ToString("hh.mm");
+            string msg = time + DateTime.Now.ToString("dd.MM.yyyy") + DateTime.Now.ToString("hh.mm.ss.ff");
 
             byte[] b = Utils.getBytes(msg);
             return new Command(Command.CMD_7_SEGS, Utils.convertByteTo7Segment(b, 0));
