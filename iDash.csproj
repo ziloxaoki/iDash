@@ -69,6 +69,9 @@
     <Reference Include="F1Speed.Core">
       <HintPath>packages\F1Speed.Core.dll</HintPath>
     </Reference>
+    <Reference Include="InputSimulator">
+      <HintPath>packages\InputSimulator.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\..\F1Speed-master\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
@@ -209,7 +212,8 @@ copy $(SolutionDir)\packages\iRSDKSharp.dll  $(TargetDir).
 copy $(SolutionDir)\packages\YamlDotNet.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).
 copy $(SolutionDir)\packages\AssettoCorsaSharedMemory.dll  $(TargetDir).
-copy $(SolutionDir)\packages\F1Speed.Core.dll  $(TargetDir).</PostBuildEvent>
+copy $(SolutionDir)\packages\F1Speed.Core.dll  $(TargetDir).
+copy $(SolutionDir)\packages\InputSimulator.dll  $(TargetDir).</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
