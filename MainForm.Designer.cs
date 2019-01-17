@@ -128,6 +128,7 @@ namespace iDash
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.f1CodemasterToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.clearStatusBar = new System.Windows.Forms.Button();
+            this.label11 = new System.Windows.Forms.Label();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -399,6 +400,7 @@ namespace iDash
             // 
             // buttons
             // 
+            this.buttons.Controls.Add(this.label11);
             this.buttons.Controls.Add(this.isClockWise);
             this.buttons.Controls.Add(this.label4);
             this.buttons.Controls.Add(this.keystrokeButton);
@@ -1320,6 +1322,16 @@ namespace iDash
             this.clearStatusBar.UseVisualStyleBackColor = true;
             this.clearStatusBar.Click += new System.EventHandler(this.clearStatusBar_Click);
             // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(43, 661);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(602, 31);
+            this.label11.TabIndex = 35;
+            this.label11.Text = "Buttons are disabled while this tab has the focus.";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1460,6 +1472,7 @@ namespace iDash
         private System.Windows.Forms.ToolStripMenuItem f1CodemasterToolStripMenuItem;
         private System.Windows.Forms.TextBox maxRpm;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label11;
     }
 }
 
