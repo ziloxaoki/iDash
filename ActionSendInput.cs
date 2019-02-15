@@ -27,17 +27,60 @@ namespace iDash
 
         public override void process(string action, State state)
         {
-            ushort keycode = (ushort)Utils.ConvertCharToVirtualKey(action);
+            string[] actions = action.Split('+');
+            List<VirtualKeyCode> keycodes = new List<VirtualKeyCode>();
+            List<VirtualKeyCode> modifierKeyCodes = new List<VirtualKeyCode>();
+
+
+            if (actions != null)
+            {
+                foreach (string a in actions)
+                {
+                    VirtualKeyCode keycode = (VirtualKeyCode)Utils.ConvertCharToVirtualKey(a);
+                    switch (keycode)
+                    {
+                        case VirtualKeyCode.CONTROL:
+                        case VirtualKeyCode.RCONTROL:
+                        case VirtualKeyCode.LCONTROL:
+                        case VirtualKeyCode.SHIFT:
+                        case VirtualKeyCode.RSHIFT:
+                        case VirtualKeyCode.LSHIFT:
+                        case VirtualKeyCode.MENU:
+                        case VirtualKeyCode.LWIN:
+                        case VirtualKeyCode.RWIN:
+                            modifierKeyCodes.Add(keycode);
+                            break;
+
+                        default:
+                            keycodes.Add(keycode);
+                            break;
+                    }
+                }
+            }            
             
             switch (state)
-            {
-                //case State.KeyDown | State.KeyHold:
+            {                
                 case State.KeyDown:
-                    InputSimulator.SimulateKeyDown((VirtualKeyCode)keycode);
+                    if (modifierKeyCodes.Count == 0)
+                    {
+                        foreach (VirtualKeyCode keycode in keycodes) {
+                            InputSimulator.SimulateKeyDown(keycode);
+                        }
+                    }
                     break;
 
                 case State.KeyUp:
-                    InputSimulator.SimulateKeyUp((VirtualKeyCode)keycode);
+                    if (modifierKeyCodes.Count > 0)
+                    {
+                        InputSimulator.SimulateModifiedKeyStroke(modifierKeyCodes, keycodes);
+                    }
+                    else
+                    {
+                        foreach (VirtualKeyCode keycode in keycodes)
+                        {
+                            InputSimulator.SimulateKeyDown(keycode);
+                        }
+                    }
                     break;
             }        
         }

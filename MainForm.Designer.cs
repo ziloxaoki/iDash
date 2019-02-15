@@ -56,9 +56,10 @@ namespace iDash
             this.selected = new System.Windows.Forms.ListBox();
             this.props = new System.Windows.Forms.ListBox();
             this.buttons = new System.Windows.Forms.TabPage();
+            this.keyMap = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.isClockWise = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.keystrokeButton = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.deleteButtonBind = new System.Windows.Forms.Button();
             this.buttonView2Down = new System.Windows.Forms.Button();
@@ -128,7 +129,6 @@ namespace iDash
             this.rFactor2ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.f1CodemasterToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.clearStatusBar = new System.Windows.Forms.Button();
-            this.label11 = new System.Windows.Forms.Label();
             this.mainTab.SuspendLayout();
             this.settingsTab.SuspendLayout();
             this.leftTab.SuspendLayout();
@@ -400,10 +400,10 @@ namespace iDash
             // 
             // buttons
             // 
+            this.buttons.Controls.Add(this.keyMap);
             this.buttons.Controls.Add(this.label11);
             this.buttons.Controls.Add(this.isClockWise);
             this.buttons.Controls.Add(this.label4);
-            this.buttons.Controls.Add(this.keystrokeButton);
             this.buttons.Controls.Add(this.label5);
             this.buttons.Controls.Add(this.deleteButtonBind);
             this.buttons.Controls.Add(this.buttonView2Down);
@@ -422,6 +422,29 @@ namespace iDash
             this.buttons.Text = "Buttons";
             this.buttons.UseVisualStyleBackColor = true;
             // 
+            // keyMap
+            // 
+            this.keyMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.keyMap.Location = new System.Drawing.Point(1074, 664);
+            this.keyMap.Name = "keyMap";
+            this.keyMap.ReadOnly = true;
+            this.keyMap.ShortcutsEnabled = false;
+            this.keyMap.Size = new System.Drawing.Size(331, 30);
+            this.keyMap.TabIndex = 36;
+            this.keyMap.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyMap_KeyDown);
+            this.keyMap.KeyUp += new System.Windows.Forms.KeyEventHandler(this.keyMap_KeyUp);
+            this.keyMap.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.keyMap_PreviewKeyDown);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(43, 661);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(602, 31);
+            this.label11.TabIndex = 35;
+            this.label11.Text = "Buttons are disabled while this tab has the focus.";
+            // 
             // isClockWise
             // 
             this.isClockWise.AutoSize = true;
@@ -438,22 +461,11 @@ namespace iDash
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(1172, 661);
+            this.label4.Location = new System.Drawing.Point(954, 661);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(176, 33);
+            this.label4.Size = new System.Drawing.Size(114, 33);
             this.label4.TabIndex = 33;
-            this.label4.Text = "Press a key.";
-            this.label4.Visible = false;
-            // 
-            // keystrokeButton
-            // 
-            this.keystrokeButton.Location = new System.Drawing.Point(974, 652);
-            this.keystrokeButton.Name = "keystrokeButton";
-            this.keystrokeButton.Size = new System.Drawing.Size(170, 48);
-            this.keystrokeButton.TabIndex = 32;
-            this.keystrokeButton.Text = "Map to Keyboard";
-            this.keystrokeButton.UseVisualStyleBackColor = true;
-            this.keystrokeButton.Click += new System.EventHandler(this.keystroke_Click);
+            this.label4.Text = "Hotkey:";
             // 
             // label5
             // 
@@ -468,7 +480,7 @@ namespace iDash
             // deleteButtonBind
             // 
             this.deleteButtonBind.Image = global::iDash.Properties.Resources.bin;
-            this.deleteButtonBind.Location = new System.Drawing.Point(1487, 661);
+            this.deleteButtonBind.Location = new System.Drawing.Point(1472, 658);
             this.deleteButtonBind.Name = "deleteButtonBind";
             this.deleteButtonBind.Size = new System.Drawing.Size(48, 48);
             this.deleteButtonBind.TabIndex = 28;
@@ -545,6 +557,8 @@ namespace iDash
             // buttonsActive
             // 
             this.buttonsActive.FormattingEnabled = true;
+            this.buttonsActive.Items.AddRange(new object[] {
+            "ButtonX"});
             this.buttonsActive.Location = new System.Drawing.Point(4, 3);
             this.buttonsActive.Name = "buttonsActive";
             this.buttonsActive.Size = new System.Drawing.Size(695, 706);
@@ -1322,16 +1336,6 @@ namespace iDash
             this.clearStatusBar.UseVisualStyleBackColor = true;
             this.clearStatusBar.Click += new System.EventHandler(this.clearStatusBar_Click);
             // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(43, 661);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(602, 31);
-            this.label11.TabIndex = 35;
-            this.label11.Text = "Buttons are disabled while this tab has the focus.";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1347,7 +1351,6 @@ namespace iDash
             this.Name = "MainForm";
             this.Text = "iDash";
             this.Load += new System.EventHandler(this.MainForm_Load);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             this.mainTab.ResumeLayout(false);
             this.settingsTab.ResumeLayout(false);
             this.leftTab.ResumeLayout(false);
@@ -1414,7 +1417,6 @@ namespace iDash
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox isSimConnected;
-        private System.Windows.Forms.Button keystrokeButton;
         private System.Windows.Forms.Button deleteButtonBind;
         private System.Windows.Forms.Button addButtonBind;
         private System.Windows.Forms.Label label4;
@@ -1473,6 +1475,7 @@ namespace iDash
         private System.Windows.Forms.TextBox maxRpm;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox keyMap;
     }
 }
 

@@ -152,6 +152,7 @@ namespace iDash
             {
                 YamlQuery yLastRPM = e.SessionInfo["DriverInfo"]["DriverCarSLLastRPM"];
                 YamlQuery yShiftRPM = e.SessionInfo["DriverInfo"]["DriverCarSLShiftRPM"];
+                
                 //YamlQuery yIsOnPit = e.SessionInfo["DriverInfo"]["OnPitRoad"];             
 
                 if (yShiftRPM != null)

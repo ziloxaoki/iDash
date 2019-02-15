@@ -52,7 +52,6 @@ namespace iDash
           
         private bool isSearchingButton = false;
         private const string BUTTON_PREFIX = "Button_";
-        private bool isWaitingForKey = false;
 
         public delegate void HandleButtonActions(List<State> states);
         public HandleButtonActions handleButtonActions;
@@ -64,7 +63,7 @@ namespace iDash
         private const string COMPORT_COMBO_CONTROL_NAME_PREFIX = "serialPortCombo";
         private const string CONNECTION_STATUS_COMBO_CONTROL_NAME_PREFIX = "portStatusBox";
         private const string VJOY_COMBO_VALUE_PREFIX = "vjoy";
-        private const string ARDUINO_LABEL_CONTROL_NAME_PREFIX = "deviceLabel";
+        private const string ARDUINO_LABEL_CONTROL_NAME_PREFIX = "deviceLabel";        
 
         private Logger logger = new Logger();
 
@@ -954,23 +953,54 @@ namespace iDash
 
         private void addButtonBind_Click(object sender, EventArgs e)
         {
-            if(buttonsActive.SelectedIndex > -1 && buttonActions.SelectedIndex > -1)
+            /*
+             if (isWaitingForKey)
             {
+                isWaitingForKey = false;
+                label4.Visible = false;
                 string buttonId = buttonsActive.SelectedItem.ToString();
-
+                string buttonAction = "";
                 int buttonBinded = isButtonBinded(buttonId);
                 //button not binded yet
-                if (buttonBinded >= 0)
+                if (buttonBinded < 0)
                 {
-                    return;
+                    buttonAction = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + e.KeyCode;
+                    views2.Items.Add(buttonAction);
                 }
-
-                string value = buttonId + Constants.SIGN_EQUALS + buttonActions.SelectedItem.ToString();
-
-                if (!views2.Items.Contains(value))
+                else
                 {
+                    string actionsBinded = views2.Items[buttonBinded].ToString().Split('=')[1];
+                    buttonAction = actionsBinded + "," + e.KeyCode;
+                    views2.Items[buttonBinded] = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + buttonAction;
+                }                    
+
+                syncViews();
+            }*/
+            if (buttonsActive.SelectedIndex > -1 && (buttonActions.SelectedIndex > -1 || keyMap.Text.Length > 0))
+            {
+                string value = "";
+                string buttonId = buttonsActive.SelectedItem.ToString();
+                int buttonBinded = isButtonBinded(buttonId);
+
+                if (keyMap.Text.Length > 0)
+                {
+                    //button not binded yet
+                    if (buttonBinded < 0)
+                    {
+                        value = buttonId + Constants.SIGN_EQUALS + keyMap.Text;
+                        views2.Items.Add(value);
+                    }
+                    else
+                    {
+                        string actionsBinded = views2.Items[buttonBinded].ToString().Split('=')[1];
+                        value = actionsBinded + "," + keyMap.Text;
+                        views2.Items[buttonBinded] = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + value;
+                    }
+                }
+                else
+                {                                       
+                    value = buttonId + Constants.SIGN_EQUALS + buttonActions.SelectedItem.ToString();
                     views2.Items.Add(value);
-                    syncViews();
                 }
             }
             else
@@ -1015,31 +1045,6 @@ namespace iDash
             }
 
             initDevices();
-        }
-
-        private async void keystroke_Click(object sender, EventArgs e)
-        {
-            if (buttonsActive.SelectedIndex > -1)
-            {                
-                isWaitingForKey = true;
-                label4.Visible = true;
-                while(isWaitingForKey)
-                {
-                    if (label4.ForeColor == Color.Black)
-                        label4.ForeColor = Color.Red;
-                    else
-                        label4.ForeColor = Color.Black;
-                    await Task.Delay(250);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a button.",
-                                "Important Note",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error,
-                                MessageBoxDefaultButton.Button1);
-            }      
         }
 
         private void resetConnectionUI()
@@ -1367,32 +1372,6 @@ namespace iDash
             loadViewProperties(selectedSimulator);
         }
 
-        private void MainForm_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (isWaitingForKey)
-            {
-                isWaitingForKey = false;
-                label4.Visible = false;
-                string buttonId = buttonsActive.SelectedItem.ToString();
-                string buttonAction = "";
-                int buttonBinded = isButtonBinded(buttonId);
-                //button not binded yet
-                if (buttonBinded < 0)
-                {
-                    buttonAction = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + e.KeyCode;
-                    views2.Items.Add(buttonAction);
-                }
-                else
-                {
-                    string actionsBinded = views2.Items[buttonBinded].ToString().Split('=')[1];
-                    buttonAction = actionsBinded + "," + e.KeyCode;
-                    views2.Items[buttonBinded] = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + buttonAction;
-                }                    
-
-                syncViews();
-            }
-        }
-
         private void IsDisabledSerial_CheckedChanged(object sender, EventArgs e)
         {
             foreach (SerialManager serialManager in sm)
@@ -1486,6 +1465,39 @@ namespace iDash
         private void maxRpm_TextChanged(object sender, EventArgs e)
         {
             maxRPM = String.IsNullOrEmpty(this.maxRpm.Text) ? 0.90f : float.Parse(this.maxRpm.Text)/100;
+        }
+
+        private void keyMap_KeyDown(object sender, KeyEventArgs e)
+        {
+            keyMap.Clear();
+        }
+
+        private void keyMap_KeyUp(object sender, KeyEventArgs e)
+        {
+            KeysConverter kc = new KeysConverter();
+            string keyChar = kc.ConvertToString(e.KeyValue);
+
+            if (e.KeyValue != 8 && e.KeyValue != 46)
+            {
+                if (keyMap.Text.Length > 0)
+                {
+                    keyMap.Text += "+" + keyChar;
+                }
+                else
+                {
+                    keyMap.Text = keyChar;
+                }
+            }
+            else
+                keyMap.Clear();
+        }
+
+        private void keyMap_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyData == Keys.Tab)
+            {
+                e.IsInputKey = true;
+            }
         }
     }    
 }
