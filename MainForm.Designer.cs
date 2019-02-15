@@ -557,8 +557,6 @@ namespace iDash
             // buttonsActive
             // 
             this.buttonsActive.FormattingEnabled = true;
-            this.buttonsActive.Items.AddRange(new object[] {
-            "ButtonX"});
             this.buttonsActive.Location = new System.Drawing.Point(4, 3);
             this.buttonsActive.Name = "buttonsActive";
             this.buttonsActive.Size = new System.Drawing.Size(695, 706);
