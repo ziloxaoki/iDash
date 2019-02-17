@@ -66,15 +66,15 @@ namespace iDash
         {
             //bStates[0] is the arduino id
             //bStates[1] is the command id
-            for (int i = 2; i < bStates.Length - 2; i++)
+            for (int i = 2; i < bStates.Length - 1; i++)
             {
                 //button is not pressed or was released
                 if (bStates[i] == 0)
                 {
                     //if button is valid update the state to the next up state
-                    if (i < currentStates.Count)
+                    if (i < currentStates.Count + 2)
                     {
-                        currentStates[i] = currentStates[i].NextUpState();
+                        currentStates[i - 2] = currentStates[i - 2].NextUpState();
                     }
                     else
                     {
@@ -85,9 +85,9 @@ namespace iDash
                 else
                 {
                     //if button is valid update the state to the next down state
-                    if (i < currentStates.Count)
+                    if (i < currentStates.Count + 2)
                     {
-                        currentStates[i] = currentStates[i].NextDownState();
+                        currentStates[i - 2] = currentStates[i - 2].NextDownState();
                     }
                     else
                     {
