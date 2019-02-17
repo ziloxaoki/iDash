@@ -51,9 +51,9 @@ namespace iDash
         public AppendToDebugDialogDelegate appendToDebugDialog;      
           
         private bool isSearchingButton = false;
-        private const string BUTTON_PREFIX = "Button_";
+        //private const string BUTTON_PREFIX = "Button_";
 
-        public delegate void HandleButtonActions(List<State> states);
+        public delegate void HandleButtonActions(List<State> states, int arduinoId);
         public HandleButtonActions handleButtonActions;
         //private bool formFinishedLoading = false;
 
@@ -812,20 +812,20 @@ namespace iDash
             //loadViewProperties();
         }
 
-        private void addButtonToList(int index)
+        private void addButtonToList(int index, int arduinoId)
         {
             if (buttonsActive != null)
             {
-                if (!buttonsActive.Items.Contains(BUTTON_PREFIX + index))
+                if (!buttonsActive.Items.Contains(arduinoId + "_" + index))
                 {
-                    buttonsActive.Items.Add(BUTTON_PREFIX + index);
+                    buttonsActive.Items.Add(arduinoId + "_" + index);
                     buttonsActive.SelectedIndex = buttonsActive.Items.Count - 1;
                 }
                 else
                 {
                     for (int x = 0; x < buttonsActive.Items.Count; x++)
                     {
-                        if (buttonsActive.Items[x].ToString() == BUTTON_PREFIX + index)
+                        if (buttonsActive.Items[x].ToString() == arduinoId + "_" + index)
                         {
                             buttonsActive.SelectedIndex = x;
                         }
@@ -843,7 +843,7 @@ namespace iDash
         }
 
         //send key action to game
-        private void handleButtons(List<State> states)
+        private void handleButtons(List<State> states, int arduinoId)
         {
             if (states != null)
             {                                
@@ -854,7 +854,7 @@ namespace iDash
                         //it is configuring button
                         if (isSearchingButton)
                         {
-                            this.addButtonToList(x);
+                            this.addButtonToList(x, arduinoId);
                         }
                         else
                         {
@@ -864,7 +864,7 @@ namespace iDash
                                 string[] split = bActions[y].ToString().Split(Constants.SIGN_EQUALS);
                                 bool isAntiClockwise = split[0].Contains("-");
                                 string buttonId = split[0].Replace("+", "").Replace("-", "");
-                                if (buttonId.Equals(BUTTON_PREFIX + x))
+                                if (buttonId.Equals(arduinoId + "_" + x))
                                 {                                    
                                     string[] commandSplit = split[1].Split(Constants.LIST_SEPARATOR);
                                     int nextAction = 0;
@@ -912,12 +912,12 @@ namespace iDash
             }            
         }
 
-        public void ButtonStateReceived(List<State> states)
+        public void ButtonStateReceived(List<State> states, int arduinoId)
         {
             if (this.views2.InvokeRequired)
             {
                 this.BeginInvoke
-                    (handleButtonActions, states);
+                    (handleButtonActions, states, arduinoId);
             }
         }
 

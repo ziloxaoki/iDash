@@ -48,7 +48,8 @@ const int encoderPinB[] = {25,24,27,26};
 
 
 //id cannot start with Arduino
-String id = "Button Box";
+String name_ = "Button Box";
+int id = 22;
 int TYPE = 1; //0 = Dash, 1 = Button Box
 // ----------------------- ADDITIONAL BUTTONS ---------------------------------------------------------------
 // https://www.arduino.cc/en/Tutorial/InputPullupSerial
@@ -192,6 +193,7 @@ void sendDebugModeState(byte header, byte state) {
   
   //handshaking
   response[offset++] = header;
+  response[offset++] = id;
   //set debug mode response
   response[offset++] = CMD_RESPONSE_SET_DEBUG_MODE;
   response[offset++] = state;
@@ -212,8 +214,8 @@ void sendDataToSerial(int commandLength, byte *response) {
 }
 
 int appendArduinoId(int offset, byte *buffer) {
-  for (int x = 0; x < id.length(); x++) {
-    buffer[offset++] = id[x];   
+  for (int x = 0; x < name_.length(); x++) {
+    buffer[offset++] = name_[x];   
   }
 
   return offset;
@@ -225,8 +227,9 @@ void sendHandshacking() {
   
   //handshaking
   response[offset++] = CMD_INIT;
+  response[offset++] = id;
   response[offset++] = CMD_SYN;
-  response[offset++] = TYPE;
+  response[offset++] = TYPE;  
   offset = appendArduinoId(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
@@ -411,6 +414,7 @@ void sendButtonStatus(byte header) {
   //return buttons state     
 //  if(millis() - lastButtonDebounce > 30) { 
     response[offset++] = header;
+    response[offset++] = id;
     response[offset++] = CMD_BUTTON_STATUS;
     //axis has to be the first 4 bytes in the array
     offset = sendAxisState(offset, response);

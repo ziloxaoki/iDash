@@ -260,10 +260,10 @@ namespace iDash
             return 0;
         }    
 
-        private string retrieveArduinoId(Command command)
+        private string retrieveArduinoName(Command command)
         {
             char[] c = Encoding.UTF8.GetString(command.getData()).ToCharArray();
-            string result = new string(Utils.getSubArray(c, 2, c.Length - 3));            
+            string result = new string(Utils.getSubArray(c, 3, c.Length - 3));            
 
             return result;
         }
@@ -273,19 +273,19 @@ namespace iDash
             string type = "invalid";
             //called by processData that is already sync
             try {                
-                byte c = command.getData()[0];
+                byte c = command.getData()[1];
                 switch (c)
                 {
                     //ACK message sent by Arduino
                     case Command.CMD_SYN:
-                        arduinoHas7Seg = command.getData()[1];
-                        id = retrieveArduinoId(command);
+                        arduinoHas7Seg = command.getData()[2];
+                        id = retrieveArduinoName(command);
                         NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_ID + ":{0},{1}", id, portName));
                         break;
                     //Arduino response to the set debug mode command
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:
                         voltages = new int[8, 3];
-                        arduinoDebugMode = (DebugMode)command.getData()[1];                     
+                        arduinoDebugMode = (DebugMode)command.getData()[2];                     
                         break;
                     //Arduino buttons state message
                     case Command.CMD_BUTTON_STATUS:                            
@@ -295,7 +295,7 @@ namespace iDash
                     case Command.CMD_DEBUG_BUTTON:
                         StringBuilder sb = new StringBuilder();
                         byte[] cmd = command.getData();
-                        for (int x = 1; x < cmd.Length - 1; x++) {
+                        for (int x = 2; x < cmd.Length - 1; x++) {
                             int pin = cmd[x];
                             int voltage = (cmd[++x] * 256) + cmd[++x];
                             updateVoltageLimits(pin, voltage);                            

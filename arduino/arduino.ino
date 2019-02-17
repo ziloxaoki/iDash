@@ -44,7 +44,8 @@
 
 #ifdef WHEEL
 //id cannot start with Arduino
-String id = "Wheel";
+String name_ = "Wheel";
+int id = 33;
 //String id = "Button Box"
 int TYPE = 0; //0 = Dash, 1 = Button Box
 #endif
@@ -561,6 +562,7 @@ void sendDebugModeState(byte header, byte state) {
   
   //handshaking
   response[offset++] = header;
+  response[offset++] = id;
   //set debug mode response
   response[offset++] = CMD_RESPONSE_SET_DEBUG_MODE;
   response[offset++] = state;
@@ -571,8 +573,8 @@ void sendDebugModeState(byte header, byte state) {
 }
 
 int appendArduinoId(int offset, byte *buffer) {
-  for (int x = 0; x < id.length(); x++) {
-    buffer[offset++] = id[x];   
+  for (int x = 0; x < name_.length(); x++) {
+    buffer[offset++] = name_[x];   
   }
 
   return offset;
@@ -584,6 +586,7 @@ void sendHandshacking() {
   
   //handshaking
   response[offset++] = CMD_INIT;
+  response[offset++] = id;
   response[offset++] = CMD_SYN;
   response[offset++] = TYPE;
   offset = appendArduinoId(offset, response);
@@ -599,6 +602,7 @@ void sendButtonStatus(byte header) {
 
   //return buttons state      
   response[offset++] = header;
+  response[offset++] = id;
   response[offset++] = CMD_BUTTON_STATUS;
   offset = sendRotaryState(offset, response);  
   offset = sendMatrixState(offset, response);

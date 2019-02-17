@@ -167,7 +167,7 @@ namespace iDash
             joystick.SetAxis((int)axisY, jID, HID_USAGES.HID_USAGE_Y);
         }
 
-        public void ButtonStateReceived(List<State> states)
+        public void ButtonStateReceived(List<State> states, int vJoyId)
         {
             //When usb was disconnected it was losing the VJD
             if (joystick != null)

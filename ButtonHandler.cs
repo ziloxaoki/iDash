@@ -55,7 +55,7 @@ namespace iDash
         List<State> currentStates = new List<State>();
 
         //----------------------------------------- Events
-        public delegate void ButtonStateHandler(List<State> states);
+        public delegate void ButtonStateHandler(List<State> states, int arduinoId);
         public ButtonStateHandler buttonStateHandler;
 
         public ButtonHandler(SerialManager sm) : base(sm) {
@@ -64,7 +64,9 @@ namespace iDash
 
         private void updateKeyState(byte[] bStates)
         {
-            for (int i = 0; i < bStates.Length; i++)
+            //bStates[0] is the arduino id
+            //bStates[1] is the command id
+            for (int i = 2; i < bStates.Length - 2; i++)
             {
                 //button is not pressed or was released
                 if (bStates[i] == 0)
@@ -95,27 +97,27 @@ namespace iDash
                 }
             }
             
-            NotifyButtonStateReceived(currentStates);
+            NotifyButtonStateReceived(currentStates, bStates[0]);
         } 
 
         public override void executeCommand(Command command)
         {
             //is the command a status button command
-            if(command.getData()[0] == Command.CMD_BUTTON_STATUS)
+            if(command.getData()[1] == Command.CMD_BUTTON_STATUS)
             {
-                this.updateKeyState(Utils.getSubArray(command.getData(), 1, command.getData().Length - 1));
+                this.updateKeyState(command.getData());
             }
         }
 
         //----------------------------------------- Events
         //notify subscribers about button state received event
-        public void NotifyButtonStateReceived(List<State> args)
+        public void NotifyButtonStateReceived(List<State> args, int arduinoId)
         {
             ButtonStateHandler handler = buttonStateHandler;
 
             if (handler != null)
             {
-                handler(args);
+                handler(args, arduinoId);
             }
         }
     }
