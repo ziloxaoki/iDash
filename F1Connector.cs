@@ -22,7 +22,7 @@ namespace iDash
         // Constants
         private const int PORTNUM = 20777;
         private const string IP = "127.0.0.1";
-        private const int TIMERINTERVAL = 20;        // refresh data every 10th of a sec
+        private const int TIMERINTERVAL = 10;        // refresh data every 10th of a sec
 
         // This is the IP endpoint we are connecting to (i.e. the IP Address and Port F1 2012 is sending to)
         //private IPEndPoint remoteIP = new IPEndPoint(IPAddress.Parse(IP), PORTNUM);        
