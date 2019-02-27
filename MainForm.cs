@@ -951,57 +951,42 @@ namespace iDash
             return -1;
         }
 
+        private void bindButtonToKey(string buttonId, string keyMap)
+        {
+            string value = "";
+            int buttonBinded = isButtonBinded(buttonId);
+
+            //button not binded yet
+            if (buttonBinded < 0)
+            {
+                value = buttonId + Constants.SIGN_EQUALS + keyMap;
+                views2.Items.Add(value);
+            }
+            else
+            {
+                string actionsBinded = views2.Items[buttonBinded].ToString().Split('=')[1];
+                value = actionsBinded + "," + keyMap;
+                views2.Items[buttonBinded] = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + value;
+            }
+        }
+
         private void addButtonBind_Click(object sender, EventArgs e)
         {
-            /*
-             if (isWaitingForKey)
-            {
-                isWaitingForKey = false;
-                label4.Visible = false;
-                string buttonId = buttonsActive.SelectedItem.ToString();
-                string buttonAction = "";
-                int buttonBinded = isButtonBinded(buttonId);
-                //button not binded yet
-                if (buttonBinded < 0)
-                {
-                    buttonAction = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + e.KeyCode;
-                    views2.Items.Add(buttonAction);
-                }
-                else
-                {
-                    string actionsBinded = views2.Items[buttonBinded].ToString().Split('=')[1];
-                    buttonAction = actionsBinded + "," + e.KeyCode;
-                    views2.Items[buttonBinded] = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + buttonAction;
-                }                    
-
-                syncViews();
-            }*/
             if (buttonsActive.SelectedIndex > -1 && (buttonActions.SelectedIndex > -1 || keyMap.Text.Length > 0))
             {
-                string value = "";
+                
                 string buttonId = buttonsActive.SelectedItem.ToString();
-                int buttonBinded = isButtonBinded(buttonId);
 
                 if (keyMap.Text.Length > 0)
                 {
-                    //button not binded yet
-                    if (buttonBinded < 0)
-                    {
-                        value = buttonId + Constants.SIGN_EQUALS + keyMap.Text;
-                        views2.Items.Add(value);
-                    }
-                    else
-                    {
-                        string actionsBinded = views2.Items[buttonBinded].ToString().Split('=')[1];
-                        value = actionsBinded + "," + keyMap.Text;
-                        views2.Items[buttonBinded] = buttonId + (isClockWise.Checked ? "+" : "-") + Constants.SIGN_EQUALS + value;
-                    }
+                    bindButtonToKey(buttonId, keyMap.Text.ToString());
                 }
                 else
-                {                                       
-                    value = buttonId + Constants.SIGN_EQUALS + buttonActions.SelectedItem.ToString();
-                    views2.Items.Add(value);
+                {
+                    bindButtonToKey(buttonId, buttonActions.SelectedItem.ToString());
                 }
+
+                keyMap.Clear();
             }
             else
             {
