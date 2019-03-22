@@ -81,8 +81,9 @@
     <Reference Include="AssettoCorsaSharedMemory">
       <HintPath>packages\AssettoCorsaSharedMemory.dll</HintPath>
     </Reference>
-    <Reference Include="F1Speed.Core">
-      <HintPath>packages\F1Speed.Core.dll</HintPath>
+    <Reference Include="F1UdpNet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\F1UdpNet.dll</HintPath>
     </Reference>
     <Reference Include="InputSimulator">
       <HintPath>packages\InputSimulator.dll</HintPath>
@@ -224,10 +225,6 @@
     <None Include="Resources\arrowup.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\F1UdpNet-master\F1UdpNet\F1UdpNet.csproj">
-      <Project>{219691CF-090C-44BB-B819-21020CEEE277}</Project>
-      <Name>F1UdpNet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\iRacingSdkWrapper-master\iRacingSdkWrapper\iRacingSdkWrapper.csproj">
       <Project>{d6db568b-35b3-49eb-8cb3-e4e5f1424247}</Project>
       <Name>iRacingSdkWrapper</Name>
@@ -258,7 +255,7 @@ copy $(SolutionDir)\packages\iRSDKSharp.dll  $(TargetDir).
 copy $(SolutionDir)\packages\YamlDotNet.dll  $(TargetDir).
 copy $(SolutionDir)\packages\iRacingSimulator.dll  $(TargetDir).
 copy $(SolutionDir)\packages\AssettoCorsaSharedMemory.dll  $(TargetDir).
-copy $(SolutionDir)\packages\F1Speed.Core.dll  $(TargetDir).
+copy $(SolutionDir)\packages\F1UdpNet.dll  $(TargetDir).
 copy $(SolutionDir)\packages\InputSimulator.dll  $(TargetDir).</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

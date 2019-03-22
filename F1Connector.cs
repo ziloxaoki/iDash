@@ -1,5 +1,4 @@
-﻿using F1Speed.Core;
-using F1UdpNet;
+﻿using F1UdpNet;
 using System.Reactive;
 using System;
 using System.Globalization;
