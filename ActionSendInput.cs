@@ -78,7 +78,7 @@ namespace iDash
                     {
                         foreach (VirtualKeyCode keycode in keycodes)
                         {
-                            InputSimulator.SimulateKeyDown(keycode);
+                            InputSimulator.SimulateKeyUp(keycode);
                         }
                     }
                     break;
