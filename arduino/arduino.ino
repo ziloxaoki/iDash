@@ -332,7 +332,7 @@ bool isValidSignal(bool isHigh, int pinOffset) {
 
 void arduinoReset() // Restarts program from beginning but does not reset the peripherals and registers
 {
-  asm volatile ("  jmp 0");  
+  asm volatile ("  jmp 0");    
 }
 
 void(* resetFunc) (void) = 0;
@@ -434,8 +434,10 @@ int sendMatrixState(int offset, byte *response) {
     digitalWrite(columnPins[i], HIGH); 
     //delay(10);      
   }     
-
-  if(offset > 8 && response[6] == 1 && response[9] == 1) {
+  
+  if(offset > 11 && response[11] == 1 && response[14] == 1) {
+//      Serial.print(" RESET ");
+//      Serial.flush();
     arduinoReset();
   }
   return offset;
@@ -614,7 +616,7 @@ void sendButtonStatus(byte header) {
   Serial.print(" - ");
 }
 Serial.println();
-delay(2000);    */
+delay(2000);*/    
 
   sendDataToSerial(offset, response);
 }
