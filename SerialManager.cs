@@ -22,7 +22,7 @@ namespace iDash
         //lets try to send a SYN to arduino, 5 times, before it times out
         private const int WAIT_FOR_ARDUINO_DATA = 10;
         private const int WAIT_TO_SEND_COMMAND = 300;
-        private const int HANDSHAKING_INTERVAL = 500;
+        private const int HANDSHAKING_INTERVAL = 100;
         private int arduinoHas7Seg = 0;
 
         //arduino command length
@@ -162,7 +162,6 @@ namespace iDash
                     if (Utils.getCurrentTimeMillis() - lastHandshaking > HANDSHAKING_INTERVAL)
                     {
                         sendSynAck();
-                        lastHandshaking = Utils.getCurrentTimeMillis();
                     }
 
                     consumeCommandQueue();
@@ -207,6 +206,7 @@ namespace iDash
 
                     //Thread.Sleep(WAIT_SERIAL_CONNECT);
                     isArduinoConnected = true;
+                    sendSynAck();
                 }
 
                 Thread.Sleep(Constants.SharedMemoryReadRate);
@@ -218,15 +218,16 @@ namespace iDash
 
         private void sendSynAck()
         {
-            Command synack = new Command(Command.CMD_SYN_ACK, new byte[0]);
-            enqueueCommand(synack, true);
-        }    
+            Command synack = new Command(Command.CMD_SYN_ACK, null);
+            serialPort.Write(synack.getRawData(), 0, synack.getLength());
+            lastHandshaking = Utils.getCurrentTimeMillis();
+        }
 
         private int updateVoltageLimits(int pinNumber, int voltage)
         {
-            for (int x=0; x < voltages.Length; x++)
+            for (int x = 0; x < voltages.Length; x++)
             {
-                if(voltages[x,0] == 0 || voltages[x,0] == pinNumber)
+                if (voltages[x, 0] == 0 || voltages[x, 0] == pinNumber)
                 {
                     if (voltage > MIN_VOLTAGE)
                     {
@@ -272,7 +273,8 @@ namespace iDash
         {
             string type = "invalid";
             //called by processData that is already sync
-            try {                
+            try
+            {
                 byte c = command.getData()[1];
                 switch (c)
                 {
@@ -285,26 +287,27 @@ namespace iDash
                     //Arduino response to the set debug mode command
                     case Command.CMD_RESPONSE_SET_DEBUG_MODE:
                         voltages = new int[8, 3];
-                        arduinoDebugMode = (DebugMode)command.getData()[2];                     
+                        arduinoDebugMode = (DebugMode)command.getData()[2];
                         break;
                     //Arduino buttons state message
-                    case Command.CMD_BUTTON_STATUS:                            
+                    case Command.CMD_BUTTON_STATUS:
                         NotifyCommandReceived(command);
                         break;
                     //Arduino button voltage
                     case Command.CMD_DEBUG_BUTTON:
                         StringBuilder sb = new StringBuilder();
                         byte[] cmd = command.getData();
-                        for (int x = 2; x < cmd.Length - 1; x++) {
+                        for (int x = 2; x < cmd.Length - 1; x++)
+                        {
                             int pin = cmd[x];
                             int voltage = (cmd[++x] * 256) + cmd[++x];
-                            updateVoltageLimits(pin, voltage);                            
+                            updateVoltageLimits(pin, voltage);
                         }
-                        for (int x=0; x < 8; x++)
+                        for (int x = 0; x < 8; x++)
                         {
                             sb.Append(String.Format("pin {0}={1}-{2}  ", voltages[x, 0], voltages[x, 1], voltages[x, 2]));
                         }
-                        NotifyMessage(String.Format(MainForm.UPDATE_BUTTON_VOLTAGE + ":{0}",sb.ToString()));
+                        NotifyMessage(String.Format(MainForm.UPDATE_BUTTON_VOLTAGE + ":{0}", sb.ToString()));
                         break;
                     //Arduino response when crc command failed
                     case Command.CMD_INVALID:
@@ -312,11 +315,14 @@ namespace iDash
                 }
                 type = command.getByteCodeName();
 
-                if (formDebugMode == DebugMode.Default) {
-                    if (isDisabledSerial) {
-                        if (command.getRawData()[0] == Command.CMD_INIT_DEBUG) {
-                            NotifyMessage(String.Format("Command processed:{0} - ({1})\n", 
-                                Utils.byteArrayToString(command.getRawData(), false), 
+                if (formDebugMode == DebugMode.Default)
+                {
+                    if (isDisabledSerial)
+                    {
+                        if (command.getRawData()[0] == Command.CMD_INIT_DEBUG)
+                        {
+                            NotifyMessage(String.Format("Command processed:{0} - ({1})\n",
+                                Utils.byteArrayToString(command.getRawData(), false),
                                 type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
                         }
@@ -330,14 +336,14 @@ namespace iDash
                         }
                     }
                 }
-            } 
-            catch(Exception e)
+            }
+            catch (Exception e)
             {
                 logger.LogExceptionToFile(e);
             }
 
-            return type;                        
-        }      
+            return type;
+        }
 
 
         private bool hasToSendCommand(Command command)
@@ -348,14 +354,14 @@ namespace iDash
                 //check if command is already sent
                 if (command.getRawData()[1] == c.getRawData()[1])
                 {
-                    if (Enumerable.SequenceEqual(command.getRawData(),c.getRawData()))
+                    if (Enumerable.SequenceEqual(command.getRawData(), c.getRawData()))
                     {
-                        if (Utils.getCurrentTimeMillis() - lastCommandSent > WAIT_TO_SEND_COMMAND && 
+                        if (Utils.getCurrentTimeMillis() - lastCommandSent > WAIT_TO_SEND_COMMAND &&
                             serialPort.IsOpen && !isDisabledSerial)
                         {
                             lastCommandSent = Utils.getCurrentTimeMillis();
                             return true;
-                        } 
+                        }
                         else
                         {
                             return false;
@@ -375,7 +381,7 @@ namespace iDash
 
         public void enqueueCommand(Command command, bool forcePost)
         {
-            lock(commandQueue)
+            lock (commandQueue)
             {
                 if (serialPort.IsOpen && (!isDisabledSerial || forcePost))
                 {
@@ -427,7 +433,8 @@ namespace iDash
 
             lock (readLock)
             {
-                if (serialData != null) { 
+                if (serialData != null)
+                {
                     foreach (byte b in serialData)
                     {
                         switch (b)
@@ -473,7 +480,7 @@ namespace iDash
                                     logger.LogDataToFile(" - CMD_INVALID \n");
                                 }
                                 break;
-                        }                        
+                        }
                     }
                 }
             }
@@ -487,7 +494,7 @@ namespace iDash
         {
             return arduinoHas7Seg == Constants.DASH;
         }
-                
+
         //event handler triggered by serial port
         public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
@@ -519,7 +526,7 @@ namespace iDash
         //notify subscribers (statusbar) that a message has to be logged
         public void NotifyStatusMessage(string args)
         {
-            lock(notifyLock)
+            lock (notifyLock)
             {
                 StatusMessageHandler handler = StatusMessageSubscribers;
 

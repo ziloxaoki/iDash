@@ -181,9 +181,11 @@ int calculateCrc(int dataLength, byte *response) {
   for(int i = 0; i < dataLength; i++) {    
     crc += response[i];
   }
-
+//Serial.print("sum:");
+//Serial.println(crc);
   crc %= 256;
-
+//Serial.print("crc:");
+//Serial.println(crc);
   return crc;
 }
 
@@ -207,10 +209,12 @@ void sendDebugModeState(byte header, byte state) {
 void sendDataToSerial(int commandLength, byte *response) {
   Serial.write(response, commandLength);  
   Serial.flush();
-//  for(int x=0; x<commandLength; x++)
-//  Serial.print(response[x]);
-//  Serial.println();
-//  delay(500);
+//for(int x=0; x<commandLength; x++) {
+//Serial.print(response[x]);
+//Serial.print('-');
+//}
+//Serial.println();
+//delay(500);
 }
 
 int appendArduinoId(int offset, byte *buffer) {
@@ -222,7 +226,7 @@ int appendArduinoId(int offset, byte *buffer) {
 }
 
 void sendHandshacking() {
-  byte response[4];
+  byte response[100];
   int offset = 0;
   
   //handshaking
@@ -231,7 +235,7 @@ void sendHandshacking() {
   response[offset++] = CMD_SYN;
   response[offset++] = TYPE;  
   offset = appendArduinoId(offset, response);
-  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = calculateCrc(offset, response);
   response[offset++] = CMD_END;
   
   sendDataToSerial(offset, response);
@@ -261,7 +265,7 @@ void processCommand(byte *buffer, int commandLength) {
 
 
 void processData() {  
-  static byte buffer[100]; 
+  static byte buffer[4]; 
   static int byteRead = 0;
   
   int commandLength = 0;
@@ -467,8 +471,8 @@ void loop() {
   
   processData();
   
-  sendButtonStatus(CMD_INIT);
-
+  //sendButtonStatus(CMD_INIT);
+  //sendHandshacking();
+  delay(10);
   reAttachInterrupts();
 }
-
