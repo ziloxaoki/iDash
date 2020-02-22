@@ -35,8 +35,8 @@ namespace iDash
         private RFactor2Connector rf2;
         private F1Connector f1c;
 
-        private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>(Constants.None);
-        private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>(Constants.None);
+        private List<ArrayList> TM1637ListBoxItems = new List<ArrayList>(Constants.NONE);
+        private List<ArrayList> ButtonsListBoxItems = new List<ArrayList>(Constants.NONE);
         private Dictionary<String, int> buttonStateMap = new Dictionary<String, int>();
         private ArrayList bActions = new ArrayList();
 
@@ -1144,8 +1144,7 @@ namespace iDash
 
             this.iRacingToolStripMenuItem1.PerformClick();
 
-            this.settingsToolStripMenuItem.Enabled = false;
-
+            //this.settingsToolStripMenuItem.Enabled = false;
             setButtonHandler(selectedSimulator);
         }
 
@@ -1170,8 +1169,7 @@ namespace iDash
 
             this.raceRoomToolStripMenuItem1.PerformClick();
 
-            this.settingsToolStripMenuItem.Enabled = false;
-
+            //this.settingsToolStripMenuItem.Enabled = false;
             setButtonHandler(selectedSimulator);
         }               
 
@@ -1196,8 +1194,7 @@ namespace iDash
 
             this.assettoToolStripMenuItem1.PerformClick();
 
-            this.settingsToolStripMenuItem.Enabled = false;
-
+            //this.settingsToolStripMenuItem.Enabled = false;
             setButtonHandler(selectedSimulator);
         }
 
@@ -1222,8 +1219,7 @@ namespace iDash
 
             this.amsToolStripMenuItem1.PerformClick();
 
-            this.settingsToolStripMenuItem.Enabled = false;
-
+            //this.settingsToolStripMenuItem.Enabled = false;
             setButtonHandler(selectedSimulator);
         }
 
@@ -1248,8 +1244,7 @@ namespace iDash
 
             this.rFactor2ToolStripMenuItem1.PerformClick();
 
-            this.settingsToolStripMenuItem.Enabled = false;
-
+            //this.settingsToolStripMenuItem.Enabled = false;
             setButtonHandler(selectedSimulator);
         }
 
@@ -1274,14 +1269,13 @@ namespace iDash
 
             this.f1CodemasterToolStripMenuItem1.PerformClick();
 
-            this.settingsToolStripMenuItem.Enabled = false;
-
+            //this.settingsToolStripMenuItem.Enabled = false;
             setButtonHandler(selectedSimulator);
         }
 
         private void noneToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            selectedSimulator = Constants.None;
+            selectedSimulator = Constants.NONE;
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.isSimulatorDisconnected(true);
@@ -1291,10 +1285,15 @@ namespace iDash
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             statusBar.AppendText("Simulator disconnected.");
 
-            if (autoConnectCheckbox.Checked)
+            /*if (autoConnectCheckbox.Checked)
             {
                 autoConnectToSimulator();
-            }
+            }*/
+
+            this.generalToolStripMenuItem.PerformClick();
+
+            //this.settingsToolStripMenuItem.Enabled = false;
+            setButtonHandler(selectedSimulator);
         }
 
         private void iRacingToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -1353,6 +1352,15 @@ namespace iDash
             ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
             this.props.Items.AddRange(Constants.F1TelemetryData);
             this.selectedSimulator = Constants.F1CODEMASTER;
+
+            loadViewProperties(selectedSimulator);
+        }
+
+        private void generalToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            resetAllSettings();
+            ((ToolStripMenuItem)sender).CheckState = CheckState.Checked;
+            this.selectedSimulator = Constants.NONE;
 
             loadViewProperties(selectedSimulator);
         }
@@ -1483,6 +1491,6 @@ namespace iDash
             {
                 e.IsInputKey = true;
             }
-        }
+        }        
     }    
 }

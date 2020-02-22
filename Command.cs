@@ -30,8 +30,8 @@ namespace iDash
                 this.rawData = new byte[commandLength];
                 Array.Copy(buffer, 0, rawData, 0, commandLength);
                 this.data = new byte[commandLength - 2];
-                Array.Copy(buffer, 1, data, 0, commandLength - 3);
-                this.crc = buffer[commandLength - 2];
+                Array.Copy(buffer, 0, data, 0, commandLength - 2);
+                this.crc = buffer[commandLength - 1];
             }
         }
 
@@ -120,13 +120,13 @@ namespace iDash
 
         public static byte calculateCRC(byte[] data)
         {
-            int crc = 0;
+            int sum = 0;
             foreach (byte b in data)
             {
-                crc += b;
+                sum += b;
             }
 
-            crc %= 256;
+            int crc = sum % 256;
 
             return (byte)crc;
         }
@@ -176,6 +176,13 @@ namespace iDash
             }
 
             return false;
+        }
+
+        public bool isValid()
+        {
+            int crc = calculateCRC(this.data);
+            int dataCrc = this.rawData[rawData.Length - 2];
+            return crc == dataCrc;
         }
 
         public bool isCommandX(byte c, byte[] command)

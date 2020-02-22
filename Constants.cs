@@ -19,7 +19,7 @@ namespace iDash
         public const int RFACTOR = 3;
         public const int RFACTOR2 = 4;
         public const int F1CODEMASTER = 5;
-        public const int None = 6;
+        public const int NONE = 6;
 
         public const int SharedMemoryReadRate = 20;
 

@@ -75,6 +75,8 @@ int lastRotaryPos[] = {15000, 15000, 15000, 15000};
 byte lastRotaryState[] = {0, 0, 0, 0};
 long lastRotaryStateChange = 0;
 
+byte oldButtonState[100];
+
 void rotEncoder1(){
   int pinOffset = 0;
   detachInterrupt(digitalPinToInterrupt(encoderPinA[pinOffset]));
@@ -410,6 +412,18 @@ int sendAxisState(int offset, byte *response) {
   return offset;
 }
 
+boolean stateHasChanged(int offset, byte* resp) {
+  boolean result = false;
+  for(int i=0; i < offset; i++) {
+    if(resp[i] != oldButtonState[i]) {
+      oldButtonState[i] = resp[i];
+      result = true;
+    }
+  }
+
+  return result;
+}
+
 void sendButtonStatus(byte header) {
   byte response[100];
   initBuffer(response, 100);
@@ -427,8 +441,11 @@ void sendButtonStatus(byte header) {
     offset = sendMatrixState(offset, response);
     response[offset++] = calculateCrc(offset - 1, response);
     response[offset++] = CMD_END;   
-    
-    sendDataToSerial(offset, response);  
+
+    if (stateHasChanged(offset - 1, response)) {
+      sendDataToSerial(offset, response);  
+    }
+        
 //    lastButtonDebounce = millis();
 //  }
 }
@@ -471,7 +488,7 @@ void loop() {
   
   processData();
   
-  //sendButtonStatus(CMD_INIT);
+  sendButtonStatus(CMD_INIT);
   //sendHandshacking();
   delay(10);
   reAttachInterrupts();

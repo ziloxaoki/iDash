@@ -74,7 +74,7 @@ TM1637Display * TM1637_screens[] = {&TM1637_module1};
 // -------------------------------------------------------------------------------------------------------
 
 // 0 disabled, > 0 enabled
-int MAX7221_ENABLEDMODULES = 2;
+int MAX7221_ENABLEDMODULES = 0;
 // DATA IN - pin of the first MAX7221
 #define MAX7221_DATA 11
 // CLK - pin of the first MAX7221
@@ -592,7 +592,7 @@ void sendHandshacking() {
   response[offset++] = CMD_SYN;
   response[offset++] = TYPE;
   offset = appendArduinoId(offset, response);
-  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = calculateCrc(offset, response);
   response[offset++] = CMD_END;
 
   sendDataToSerial(offset, response);

@@ -145,7 +145,7 @@ namespace iDash
 
             while (!CancellationPending)
             {
-                if (isArduinoAlive())
+                if (serialPort.IsOpen)
                 {
                     if (notificationSent.Contains(portName))
                     {
@@ -275,7 +275,7 @@ namespace iDash
             //called by processData that is already sync
             try
             {
-                byte c = command.getData()[1];
+                byte c = command.getData()[2];
                 switch (c)
                 {
                     //ACK message sent by Arduino

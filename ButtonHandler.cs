@@ -64,9 +64,10 @@ namespace iDash
 
         private void updateKeyState(byte[] bStates)
         {
-            //bStates[0] is the arduino id
-            //bStates[1] is the command id
-            for (int i = 2; i < bStates.Length - 1; i++)
+            //bStates[0] is the command header
+            //bStates[1] is the arduino id
+            //bStates[2] is the command id
+            for (int i = 3; i < bStates.Length - 1; i++)
             {
                 //button is not pressed or was released
                 if (bStates[i] == 0)
@@ -103,7 +104,7 @@ namespace iDash
         public override void executeCommand(Command command)
         {
             //is the command a status button command
-            if(command.getData()[1] == Command.CMD_BUTTON_STATUS)
+            if(command.getData()[2] == Command.CMD_BUTTON_STATUS)
             {
                 this.updateKeyState(command.getData());
             }
