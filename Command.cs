@@ -76,7 +76,10 @@ namespace iDash
 
         public string getByteCodeName()
         {
-            switch (rawData[1])
+            //0 - command header
+            //1 - arduino id
+            //2 - command id
+            switch (rawData[2])
             {
                 case CMD_SET_DEBUG_MODE:
                     return "CMD_SET_DEBUG_MODE";

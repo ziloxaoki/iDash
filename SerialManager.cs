@@ -17,7 +17,7 @@ namespace iDash
         private const int BUFFER_SIZE = 100;
         private const int WAIT_TO_RECONNECT = 500;        
         //arduino will wait 5 secs for a SYN ACK        
-        private const int ARDUINO_TIMED_OUT = 2000;
+        private const int ARDUINO_TIMED_OUT = 5000;
         private const int WAIT_SERIAL_CONNECT = 100;
         //lets try to send a SYN to arduino, 5 times, before it times out
         private const int WAIT_FOR_ARDUINO_DATA = 10;
@@ -105,10 +105,10 @@ namespace iDash
             }            
         }
 
-        private bool isArduinoAlive()
+        /*private bool isArduinoAlive()
         {
             return !Utils.hasTimedOut(lastArduinoResponse, ARDUINO_TIMED_OUT);
-        }
+        }*/
 
         public string getId()
         {
