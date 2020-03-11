@@ -239,6 +239,7 @@ void sendHandshacking() {
   offset = appendArduinoId(offset, response);
   response[offset++] = calculateCrc(offset, response);
   response[offset++] = CMD_END;
+  response[offset++] = (byte)0; //EOF
   
   sendDataToSerial(offset, response);
 }
@@ -489,7 +490,7 @@ void loop() {
   processData();
   
   sendButtonStatus(CMD_INIT);
-  //sendHandshacking();
+  sendHandshacking();
   delay(10);
   reAttachInterrupts();
 }

@@ -90,7 +90,7 @@ namespace iDash
             serialPort.DataBits = 8;             
             serialPort.BaudRate = 38400;         
             serialPort.DtrEnable = false;
-            serialPort.RtsEnable = false;  
+            serialPort.RtsEnable = false;
             serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                                     
 
             tryToConnect();
@@ -159,10 +159,10 @@ namespace iDash
                         sendDefaultMsg();
                     }
 
-                    if (Utils.getCurrentTimeMillis() - lastHandshaking > HANDSHAKING_INTERVAL)
-                    {
-                        sendSynAck();
-                    }
+                    //if (Utils.getCurrentTimeMillis() - lastHandshaking > HANDSHAKING_INTERVAL)
+                    //{
+                    //    sendSynAck();
+                    //}
 
                     consumeCommandQueue();
                     //Thread.Sleep(WAIT_FOR_ARDUINO_DATA);                    

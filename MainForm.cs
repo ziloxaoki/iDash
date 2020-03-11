@@ -168,7 +168,7 @@ namespace iDash
         private void syncViews()
         {
             //int selectedSimulator = getSelectedConfiguration();
-            if (selectedSimulator < settingsToolStripMenuItem.DropDownItems.Count)
+            if (selectedSimulator <= settingsToolStripMenuItem.DropDownItems.Count)
             {
                 ArrayList objCollection = new ArrayList();
                 objCollection.AddRange(Utils.convertObjectCollectionToStringArray(views.Items));

@@ -656,6 +656,7 @@ void loop() {
   if(!isAutoConfigMode) {        
     sendButtonStatus(CMD_INIT); 
     sendToWS2812B();
+    sendHandshacking();
     reAttachInterrupts();    
   } else {
     autoConfigTM1637_MAX7221();
