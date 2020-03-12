@@ -91,7 +91,8 @@ namespace iDash
             serialPort.BaudRate = 38400;         
             serialPort.DtrEnable = false;
             serialPort.RtsEnable = false;
-            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received even handler                                     
+            serialPort.ReceivedBytesThreshold = 20;
+            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received event handler                                     
 
             tryToConnect();
 
@@ -194,7 +195,7 @@ namespace iDash
 
                     try
                     {
-                        serialPort.Open();        //open serial port                
+                        serialPort.Open();        //open serial port   
                     }
                     catch(Exception e)
                     {                        
