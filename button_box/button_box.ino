@@ -206,8 +206,7 @@ void sendDebugModeState(byte header, byte state) {
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
 
-  sendDataToSerial(offset, response);
-  lastHandshakeSent = millis();
+  sendDataToSerial(offset, response);  
 }
 
 
@@ -243,7 +242,6 @@ void sendHandshacking() {
     offset = appendArduinoId(offset, response);
     response[offset++] = calculateCrc(offset, response);
     response[offset++] = CMD_END;
-    response[offset++] = (byte)0; //EOF
 
     sendDataToSerial(offset, response);
     lastHandshakeSent = millis();

@@ -92,7 +92,7 @@ namespace iDash
             serialPort.DtrEnable = false;
             serialPort.RtsEnable = false;
             serialPort.ReceivedBytesThreshold = 20;
-            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received event handler                                     
+            //serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received event handler                                     
 
             tryToConnect();
 
@@ -163,8 +163,8 @@ namespace iDash
                     //if (Utils.getCurrentTimeMillis() - lastHandshaking > HANDSHAKING_INTERVAL)
                     //{
                     //    sendSynAck();
-                    //}
-
+                    //}                    
+                    listenPort();
                     consumeCommandQueue();
                     //Thread.Sleep(WAIT_FOR_ARDUINO_DATA);                    
                 }
@@ -207,7 +207,8 @@ namespace iDash
 
                     //Thread.Sleep(WAIT_SERIAL_CONNECT);
                     isArduinoConnected = true;
-                    sendSynAck();
+                    
+                    sendSynAck();                    
                 }
 
                 Thread.Sleep(Constants.SharedMemoryReadRate);
@@ -330,7 +331,7 @@ namespace iDash
                     }
                     else
                     {
-                        if ((c != Command.CMD_BUTTON_STATUS && c != Command.CMD_SYN && c != Command.CMD_DEBUG_BUTTON) || Utils.hasTimedOut(lastMessageLogged, 1000))
+                        if (Utils.hasTimedOut(lastMessageLogged, 1000))
                         {
                             NotifyMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
                             lastMessageLogged = Utils.getCurrentTimeMillis();
@@ -497,7 +498,7 @@ namespace iDash
         }
 
         //event handler triggered by serial port
-        public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+        /*public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             if (serialPort.IsOpen && !CancellationPending)
             {
@@ -511,6 +512,29 @@ namespace iDash
                     processData(data);
                 }
             }
+        }*/
+
+        public void listenPort()
+        {
+
+            byte[] buffer = new byte[100];
+            Action kickoffRead = null;
+
+            kickoffRead = delegate
+            {
+                serialPort.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
+                {
+                    if (serialPort.IsOpen)
+                    {
+                        int actualLength = serialPort.BaseStream.EndRead(ar);
+                        byte[] data = new byte[actualLength];
+                        Buffer.BlockCopy(buffer, 0, data, 0, actualLength);
+                        lastArduinoResponse = Utils.getCurrentTimeMillis();
+                        processData(data);
+                    }
+                }, null);
+            };
+            kickoffRead();
         }
 
         //notify subscribers that a command was received
