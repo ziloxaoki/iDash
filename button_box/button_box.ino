@@ -230,7 +230,7 @@ int appendArduinoId(int offset, byte *buffer) {
 }
 
 void sendHandshacking() {
-  if (millis() - lastHandshakeSent > 1500) {
+  if (millis() - lastHandshakeSent > 500) {
     byte response[100];
     int offset = 0;
 

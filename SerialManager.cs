@@ -266,7 +266,7 @@ namespace iDash
         private string retrieveArduinoName(Command command)
         {
             char[] c = Encoding.UTF8.GetString(command.getData()).ToCharArray();
-            string result = new string(Utils.getSubArray(c, 3, c.Length - 3));            
+            string result = new string(Utils.getSubArray(c, 4, c.Length - 4));            
 
             return result;
         }
