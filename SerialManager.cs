@@ -165,7 +165,7 @@ namespace iDash
                     //{
                     //    sendSynAck();
                     //}                    
-                    listenPort();
+                    readSerialData();
                     consumeCommandQueue();
                     //Thread.Sleep(WAIT_FOR_ARDUINO_DATA);                    
                 }
@@ -203,7 +203,7 @@ namespace iDash
                         //logger.LogExceptionToFile(e);
                         Thread.Sleep(WAIT_TO_RECONNECT);        //port is probably closing, wait...  
 
-                        continue;                          
+                       // continue;                          
                     }
 
                     //Thread.Sleep(WAIT_SERIAL_CONNECT);
@@ -515,27 +515,24 @@ namespace iDash
             }
         }*/
 
-        public void listenPort()
+        public void readSerialData()
         {
 
             byte[] buffer = new byte[100];
             Action kickoffRead = null;
 
-            kickoffRead = delegate
+            kickoffRead = (Action)(() => serialPort.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
             {
-                serialPort.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
+                if (serialPort.IsOpen)
                 {
-                    if (serialPort.IsOpen)
-                    {
-                        int actualLength = serialPort.BaseStream.EndRead(ar);
-                        byte[] data = new byte[actualLength];
-                        Buffer.BlockCopy(buffer, 0, data, 0, actualLength);
-                        lastArduinoResponse = Utils.getCurrentTimeMillis();
-                        processData(data);
-                    }
-                }, null);
-            };
-            kickoffRead();
+                    int count = serialPort.BaseStream.EndRead(ar);
+                    byte[] dst = new byte[count];
+                    Buffer.BlockCopy(buffer, 0, dst, 0, count);
+                    lastArduinoResponse = Utils.getCurrentTimeMillis();
+                    processData(dst);
+                    kickoffRead();
+                }
+            }, null)); kickoffRead();
         }
 
         //notify subscribers that a command was received
