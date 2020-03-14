@@ -178,6 +178,10 @@ void initBuffer(byte *buffer, int size) {
   return buffer;
 }
 
+void arduinoReset() // Restarts program from beginning but does not reset the peripherals and registers
+{
+  asm volatile ("  jmp 0");    
+}
 
 int calculateCrc(int dataLength, byte *response) {
   int crc = 0;
@@ -205,6 +209,8 @@ void sendDebugModeState(byte header, byte state) {
   response[offset++] = state;
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
+  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
+  response[offset++] = '\n';
 
   sendDataToSerial(offset, response);  
 }
@@ -242,6 +248,8 @@ void sendHandshacking() {
     offset = appendArduinoId(offset, response);
     response[offset++] = calculateCrc(offset, response);
     response[offset++] = CMD_END;
+    //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
+    response[offset++] = '\n';
 
     sendDataToSerial(offset, response);
     lastHandshakeSent = millis();
@@ -430,6 +438,7 @@ boolean stateHasChanged(int offset, byte* resp) {
 }
 
 void sendButtonStatus(byte header) {
+  
   byte response[100];
   initBuffer(response, 100);
   int offset = 0;
@@ -444,6 +453,14 @@ void sendButtonStatus(byte header) {
   offset = sendMatrixState(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
+  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
+  response[offset++] = '\n';
+  
+  if (response[45] == 1 && response[44] == 1) {
+    arduinoReset();
+    return;  
+  }
+  
   //send the command at least once a second to keep button state in app up-to-date
   if (stateHasChanged(offset - 1, response) || millis - lastButtonStateSent > 1000) {
     sendDataToSerial(offset, response);

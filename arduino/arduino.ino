@@ -144,6 +144,10 @@ int debugMode = 0;
 const byte INVALID_COMMAND_HEADER = 0xEF;
 bool isInterruptDisabled[] = {false,false};
 bool isAutoConfigMode = false;
+long lastHandshakeSent = 0;
+long lastButtonStateSent = 0;
+byte oldButtonState[100];
+
 
 void convertHexToString(int offset, byte *buffer) {
   int i = 0;
@@ -570,6 +574,8 @@ void sendDebugModeState(byte header, byte state) {
   response[offset++] = state;
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
+  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
+  response[offset++] = '\n';
   
   sendDataToSerial(offset, response);
 }
@@ -583,19 +589,36 @@ int appendArduinoId(int offset, byte *buffer) {
 }
 
 void sendHandshacking() {
-  byte response[4];
-  int offset = 0;
-  
-  //handshaking
-  response[offset++] = CMD_INIT;
-  response[offset++] = id;
-  response[offset++] = CMD_SYN;
-  response[offset++] = TYPE;
-  offset = appendArduinoId(offset, response);
-  response[offset++] = calculateCrc(offset, response);
-  response[offset++] = CMD_END;
+  if (millis() - lastHandshakeSent > 500) {
+    byte response[100];
+    int offset = 0;
 
-  sendDataToSerial(offset, response);
+    //handshaking
+    response[offset++] = CMD_INIT;
+    response[offset++] = id;
+    response[offset++] = CMD_SYN;
+    response[offset++] = TYPE;
+    offset = appendArduinoId(offset, response);
+    response[offset++] = calculateCrc(offset, response);
+    response[offset++] = CMD_END;
+    //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
+    response[offset++] = '\n';
+
+    sendDataToSerial(offset, response);
+    lastHandshakeSent = millis();
+  }
+}
+
+boolean stateHasChanged(int offset, byte* resp) {
+  boolean result = false;
+  for (int i = 0; i < offset; i++) {
+    if (resp[i] != oldButtonState[i]) {
+      oldButtonState[i] = resp[i];
+      result = true;
+    }
+  }
+
+  return result;
 }
 
 void sendButtonStatus(byte header) {
@@ -609,7 +632,9 @@ void sendButtonStatus(byte header) {
   offset = sendRotaryState(offset, response);  
   offset = sendMatrixState(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
-  response[offset++] = CMD_END;   
+  response[offset++] = CMD_END; 
+  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
+  response[offset++] = '\n';  
 
 /*for(int x=0; x<offset; x++)  {
   Serial.print(response[x]);
@@ -618,7 +643,10 @@ void sendButtonStatus(byte header) {
 Serial.println();
 delay(2000);*/    
 
-  sendDataToSerial(offset, response);
+   if (stateHasChanged(offset - 1, response) || millis - lastButtonStateSent > 1000) {
+    sendDataToSerial(offset, response);
+    lastButtonStateSent = millis();
+  }
 }
 
 void reAttachInterrupts() {
