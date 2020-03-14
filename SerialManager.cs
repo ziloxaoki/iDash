@@ -92,6 +92,7 @@ namespace iDash
             serialPort.DtrEnable = false;
             serialPort.RtsEnable = false;
             serialPort.ReceivedBytesThreshold = 20;
+            serialPort.NewLine = Environment.NewLine;
             //serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received event handler                                     
 
             tryToConnect();
