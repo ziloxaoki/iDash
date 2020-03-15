@@ -91,9 +91,9 @@ namespace iDash
             serialPort.BaudRate = 38400;         
             serialPort.DtrEnable = false;
             serialPort.RtsEnable = false;
-            serialPort.ReceivedBytesThreshold = 20;
+            serialPort.ReceivedBytesThreshold = 100;
             serialPort.NewLine = Environment.NewLine;
-            //serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received event handler                                     
+            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);//received event handler                                     
 
             tryToConnect();
 
@@ -165,7 +165,7 @@ namespace iDash
                     //{
                     //    sendSynAck();
                     //}                    
-                    readSerialData();
+                    //readSerialData();
                     consumeCommandQueue();
                     //Thread.Sleep(WAIT_FOR_ARDUINO_DATA);                    
                 }
@@ -209,7 +209,7 @@ namespace iDash
                     //Thread.Sleep(WAIT_SERIAL_CONNECT);
                     isArduinoConnected = true;
                     
-                    sendSynAck();                    
+                    //sendSynAck();                    
                 }
 
                 Thread.Sleep(Constants.SharedMemoryReadRate);
@@ -334,8 +334,11 @@ namespace iDash
                     {
                         if (Utils.hasTimedOut(lastMessageLogged, 1000))
                         {
-                            NotifyMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
-                            lastMessageLogged = Utils.getCurrentTimeMillis();
+                            if (command.getData()[2] != Command.CMD_SYN)
+                            {
+                                NotifyMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
+                                lastMessageLogged = Utils.getCurrentTimeMillis();
+                            }
                         }
                     }
                 }
@@ -499,7 +502,7 @@ namespace iDash
         }
 
         //event handler triggered by serial port
-        /*public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+        public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             if (serialPort.IsOpen && !CancellationPending)
             {
@@ -513,9 +516,9 @@ namespace iDash
                     processData(data);
                 }
             }
-        }*/
+        }
 
-        public void readSerialData()
+        /*public void readSerialData()
         {
 
             byte[] buffer = new byte[100];
@@ -527,13 +530,13 @@ namespace iDash
                 {
                     int count = serialPort.BaseStream.EndRead(ar);
                     byte[] dst = new byte[count];
-                    Buffer.BlockCopy(buffer, 0, dst, 0, count);
+                    Buffer.BlockCopy(buffer, 0, dst, 0, count - 1);
                     lastArduinoResponse = Utils.getCurrentTimeMillis();
                     processData(dst);
                     kickoffRead();
                 }
             }, null)); kickoffRead();
-        }
+        }*/
 
         //notify subscribers that a command was received
         protected virtual void NotifyCommandReceived(Command args)

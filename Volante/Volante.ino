@@ -293,7 +293,7 @@ void processData() {
   int commandLength = 0;
 
   long startReading = millis();
-  while (Serial.available()) {
+  while (Serial.available() || byteRead == 100) {
     commandLength = readline(Serial.read(), buffer, byteRead++);       
     if (commandLength > 0) {  
       int crc = calculateCrc(commandLength, buffer); 
@@ -309,11 +309,10 @@ void processData() {
         }
       }
     }    
-    if (byteRead == 100) {
-      buffer[0] = 0;
-      byteRead = 0;
-    }
   }
+
+  buffer[0] = 0;
+  byteRead = 0;
   /*byte t[] = {'^',CMD_7_SEGS,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91};
   byte s[] = {'^',CMD_RGB_SHIFT,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,129,10};
   processCommand(s, 0);*/

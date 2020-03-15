@@ -142,7 +142,6 @@ void rotEncoder4() {
 int readline(int readch, byte *buffer, int len)
 {
   static int pos = 0;
-  int rpos;
 
   switch (readch) {
     case CMD_INIT_DEBUG:
@@ -152,14 +151,11 @@ int readline(int readch, byte *buffer, int len)
       buffer[pos] = 0;
       break;
     case CMD_END: // End command
-      rpos = pos;
       pos = 0;  // Reset position index ready for next time
-      return rpos - 1; //last char is the crc
+      return len - 1; //last char is the crc
     default:
-      if (pos < len - 1) {
-        buffer[pos++] = readch;
-        buffer[pos] = 0;
-      }
+      buffer[pos++] = readch;
+      buffer[pos] = 0;
   }
 
   //flag to show that arduino is receiving data from App.
@@ -236,7 +232,7 @@ int appendArduinoId(int offset, byte *buffer) {
 }
 
 void sendHandshacking() {
-  if (millis() - lastHandshakeSent > 500) {
+  if (millis() - lastHandshakeSent > 100) {
     byte response[100];
     int offset = 0;
 
@@ -280,13 +276,13 @@ void processCommand(byte *buffer, int commandLength) {
 
 
 void processData() {
-  static byte buffer[4];
+  static byte buffer[100];
   static int byteRead = 0;
 
   int commandLength = 0;
 
   long startReading = millis();
-  while (Serial.available()) {
+  while (Serial.available() > 0 || byteRead == 99) {
     commandLength = readline(Serial.read(), buffer, byteRead++);
     if (commandLength > 0) {
       int crc = calculateCrc(commandLength, buffer);
@@ -302,11 +298,10 @@ void processData() {
         }
       }
     }
-    if (byteRead == 100) {
-      buffer[0] = 0;
-      byteRead = 0;
-    }
   }
+
+  buffer[0] = 0;
+  byteRead = 0;
 }
 
 void reAttachInterrupts() {
@@ -427,7 +422,7 @@ int sendAxisState(int offset, byte *response) {
 
 boolean stateHasChanged(int offset, byte* resp) {
   boolean result = false;
-  for (int i = 0; i < offset; i++) {
+  for (int i = 3; i < offset - 5; i++) {
     if (resp[i] != oldButtonState[i]) {
       oldButtonState[i] = resp[i];
       result = true;
@@ -442,7 +437,7 @@ void sendButtonStatus(byte header) {
   byte response[100];
   initBuffer(response, 100);
   int offset = 0;
-  
+  //Serial.println("pqp");
   response[offset++] = header;
   response[offset++] = id;
   response[offset++] = CMD_BUTTON_STATUS;
@@ -455,6 +450,7 @@ void sendButtonStatus(byte header) {
   response[offset++] = CMD_END;
   //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
   response[offset++] = '\n';
+  //Serial.println("pqp2");
   
   if (response[45] == 1 && response[44] == 1) {
     arduinoReset();
@@ -462,8 +458,8 @@ void sendButtonStatus(byte header) {
   }
   
   //send the command at least once a second to keep button state in app up-to-date
-  if (stateHasChanged(offset - 1, response) || millis - lastButtonStateSent > 1000) {
-    sendDataToSerial(offset, response);
+  if (stateHasChanged(offset - 1, response) || millis() - lastButtonStateSent > 10) {
+    sendDataToSerial(offset - 1, response);
     lastButtonStateSent = millis();
   }
 }
@@ -504,7 +500,7 @@ void setup()
 
 void loop() {
 
-  processData();
+  //processData();
 
   sendButtonStatus(CMD_INIT);
   sendHandshacking();
