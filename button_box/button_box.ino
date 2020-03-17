@@ -205,8 +205,6 @@ void sendDebugModeState(byte header, byte state) {
   response[offset++] = state;
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
-  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
-  response[offset++] = '\n';
 
   sendDataToSerial(offset, response);  
 }
@@ -214,13 +212,17 @@ void sendDebugModeState(byte header, byte state) {
 
 void sendDataToSerial(int commandLength, byte *response) {
   Serial.write(response, commandLength);
+  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
+  //Serial.write('\n');
   Serial.flush();
-  //for(int x=0; x<commandLength; x++) {
-  //Serial.print(response[x]);
-  //Serial.print('-');
-  //}
-  //Serial.println();
-  //delay(500);
+  /*for(int x=0; x<commandLength; x++) {
+  Serial.print(response[x]);
+  Serial.print('-');
+  }
+  Serial.print('=');
+  Serial.print(commandLength);
+  Serial.println();
+  delay(500);*/
 }
 
 int appendArduinoId(int offset, byte *buffer) {
@@ -244,8 +246,6 @@ void sendHandshacking() {
     offset = appendArduinoId(offset, response);
     response[offset++] = calculateCrc(offset, response);
     response[offset++] = CMD_END;
-    //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
-    response[offset++] = '\n';
 
     sendDataToSerial(offset, response);
     lastHandshakeSent = millis();
@@ -432,13 +432,13 @@ boolean stateHasChanged(int offset, byte* resp) {
   return result;
 }
 
-void sendButtonStatus(byte header) {
+void sendButtonStatus() {
   
   byte response[100];
   initBuffer(response, 100);
   int offset = 0;
   //Serial.println("pqp");
-  response[offset++] = header;
+  response[offset++] = CMD_INIT;
   response[offset++] = id;
   response[offset++] = CMD_BUTTON_STATUS;
   //axis has to be the first 4 bytes in the array
@@ -448,10 +448,7 @@ void sendButtonStatus(byte header) {
   offset = sendMatrixState(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
-  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
-  response[offset++] = '\n';
-  //Serial.println("pqp2");
-  
+
   if (response[45] == 1 && response[44] == 1) {
     arduinoReset();
     return;  
@@ -459,7 +456,7 @@ void sendButtonStatus(byte header) {
   
   //send the command at least once a second to keep button state in app up-to-date
   if (stateHasChanged(offset - 1, response) || millis() - lastButtonStateSent > 10) {
-    sendDataToSerial(offset - 1, response);
+    sendDataToSerial(offset, response);
     lastButtonStateSent = millis();
   }
 }
@@ -502,7 +499,7 @@ void loop() {
 
   //processData();
 
-  sendButtonStatus(CMD_INIT);
+  sendButtonStatus();
   sendHandshacking();
   reAttachInterrupts();
 }
