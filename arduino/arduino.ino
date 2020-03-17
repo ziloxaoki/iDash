@@ -461,6 +461,8 @@ int calculateCrc(int dataLength, byte *response) {
 
 void sendDataToSerial(int commandLength, byte *response) {
   Serial.write(response, commandLength);  
+  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
+  //Serial.write('\n');
   Serial.flush();
 //  for(int x=0; x<commandLength; x++)
 //  Serial.print(response[x]);
@@ -573,8 +575,6 @@ void sendDebugModeState(byte header, byte state) {
   response[offset++] = state;
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
-  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
-  response[offset++] = '\n';
   
   sendDataToSerial(offset, response);
 }
@@ -600,8 +600,6 @@ void sendHandshacking() {
     offset = appendArduinoId(offset, response);
     response[offset++] = calculateCrc(offset, response);
     response[offset++] = CMD_END;
-    //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
-    response[offset++] = '\n';
 
     sendDataToSerial(offset, response);
     lastHandshakeSent = millis();
@@ -632,8 +630,6 @@ void sendButtonStatus(byte header) {
   offset = sendMatrixState(offset, response);
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END; 
-  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
-  response[offset++] = '\n';  
 
 /*for(int x=0; x<offset; x++)  {
   Serial.print(response[x]);
@@ -642,7 +638,7 @@ void sendButtonStatus(byte header) {
 Serial.println();
 delay(2000);*/    
 
-   if (stateHasChanged(offset - 1, response) || millis() - lastButtonStateSent > 1000) {
+   if (stateHasChanged(offset - 1, response) || millis() - lastButtonStateSent > 10) {
     sendDataToSerial(offset, response);
     lastButtonStateSent = millis();
   }
