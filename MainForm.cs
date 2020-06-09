@@ -123,7 +123,8 @@ namespace iDash
                         vJoyFeeder.initializeJoystick();
                     }
 
-                    this.iRacingToolStripMenuItem1.PerformClick();                                       
+                    this.noneToolStripMenuItem.PerformClick();   
+                    
                 }
             }
 
@@ -1014,7 +1015,7 @@ namespace iDash
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            this.iRacingToolStripMenuItem1.CheckState = CheckState.Checked;
+            this.noneToolStripMenuItem.CheckState = CheckState.Checked;
 
             //restore TM1637 and Buttons settings
             restoreAppConfiguration();
