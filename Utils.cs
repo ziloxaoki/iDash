@@ -537,6 +537,17 @@ namespace iDash
             logger.LogMessageToFile(string.Format("benchmark - {0} {1}", sb.ToString(), Utils.getCurrentTimeMillis() - benchmarkTime), true);
             benchmarkTime = Utils.getCurrentTimeMillis();
         }
+
+        public static void printByteArray(byte[] bytes)
+        {
+            var sb = new StringBuilder("new byte[] { ");
+            foreach (var b in bytes)
+            {
+                sb.Append(b + ", ");
+            }
+            sb.Append("}");
+            Console.WriteLine(sb.ToString());
+        }
     }    
 
     public enum DebugMode

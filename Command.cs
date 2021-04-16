@@ -27,11 +27,15 @@ namespace iDash
 
             if (isValidCommand(buffer))
             {
+                //buffer[0] is the command header
+                //buffer[1] is the arduino id
+                //buffer[2] is the command id
+                //Utils.printByteArray(Utils.getSubArray(buffer, 0, commandLength));
                 this.rawData = new byte[commandLength];
                 Array.Copy(buffer, 0, rawData, 0, commandLength);
                 this.data = new byte[commandLength - 2];
                 Array.Copy(buffer, 0, data, 0, commandLength - 2);
-                this.crc = buffer[commandLength - 1];
+                this.crc = buffer[commandLength - 2];
             }
         }
 
@@ -173,7 +177,7 @@ namespace iDash
             if (command != null && commandLength > 3 && (command[0] == CMD_INIT || command[0] == CMD_INIT_DEBUG) && command[commandLength - 1] == CMD_END)
             {
                 byte[] temp = new byte[commandLength - 2];
-                Array.Copy(command, 0, temp, 0, temp.Length);
+                Array.Copy(command, 0, temp, 0, commandLength - 2);
                 byte tCrc = calculateCRC(temp);
                 return command[commandLength - 2] == tCrc;
             }

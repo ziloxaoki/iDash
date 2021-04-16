@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace iDash
 {
@@ -62,20 +61,27 @@ namespace iDash
             sm.CommandReceivedSubscribers += new SerialManager.CommandReceivedHandler(executeCommand);
         }
 
+        private byte[] extractButtonStates(byte[] array)
+        {
+            return Utils.getSubArray(array, 3, array.Length - 3);
+        }
+
         private void updateKeyState(byte[] bStates)
         {
             //bStates[0] is the command header
             //bStates[1] is the arduino id
             //bStates[2] is the command id
-            for (int i = 3; i < bStates.Length - 1; i++)
+            bStates = extractButtonStates(bStates);
+            //Utils.printByteArray(bStates);
+            for (int i = 0; i < bStates.Length; i++)
             {
                 //button is not pressed or was released
                 if (bStates[i] == 0)
                 {
                     //if button is valid update the state to the next up state
-                    if (i < currentStates.Count + 2)
+                    if (i < currentStates.Count)
                     {
-                        currentStates[i - 2] = currentStates[i - 2].NextUpState();
+                        currentStates[i] = currentStates[i].NextUpState();
                     }
                     else
                     {
@@ -86,9 +92,9 @@ namespace iDash
                 else
                 {
                     //if button is valid update the state to the next down state
-                    if (i < currentStates.Count + 2)
+                    if (i < currentStates.Count)
                     {
-                        currentStates[i - 2] = currentStates[i - 2].NextDownState();
+                        currentStates[i] = currentStates[i].NextDownState();
                     }
                     else
                     {
@@ -99,7 +105,7 @@ namespace iDash
             }
             
             NotifyButtonStateReceived(currentStates, bStates[0]);
-        } 
+        }        
 
         public override void executeCommand(Command command)
         {

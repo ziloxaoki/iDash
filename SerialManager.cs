@@ -457,12 +457,12 @@ namespace iDash
 
                             //end of command char found, send command to be processed
                             case Command.CMD_END:
-                                serialCommand[commandLength] = b;
-
-                                Command command = new Command(serialCommand);
-
-                                if (command != null && command.getLength() > 0)
+                                serialCommand[commandLength++] = b;                            
+                                if (commandLength > 3)
                                 {
+                                    //Utils.printByteArray(Utils.getSubArray(serialCommand, 0, commandLength));
+                                    Command command = new Command(Utils.getSubArray(serialCommand, 0, commandLength));
+                                    //Utils.printByteArray(command.getRawData());
                                     string type = processCommand(command);
                                     logData.Append(b);
                                     logData.Append(" - " + type + "\n");
@@ -530,6 +530,9 @@ namespace iDash
             Array.Copy(buffer, bytesReceived, bytesRead);
 
             lastArduinoResponse = Utils.getCurrentTimeMillis();
+            
+            //print bytes received from arduino in the console
+            //Utils.printByteArray(bytesReceived);
             processData(bytesReceived);
         }
 

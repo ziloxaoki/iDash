@@ -147,6 +147,7 @@ bool isAutoConfigMode = false;
 long lastHandshakeSent = 0;
 long lastButtonStateSent = 0;
 byte oldButtonState[100];
+bool isButtonDebug = false;
 
 
 void convertHexToString(int offset, byte *buffer) {
@@ -460,13 +461,17 @@ int calculateCrc(int dataLength, byte *response) {
 }
 
 void sendDataToSerial(int commandLength, byte *response) {
-  Serial.write(response, commandLength);  
-  //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
-  //Serial.write('\n');
-  Serial.flush();
-//  for(int x=0; x<commandLength; x++)
-//  Serial.print(response[x]);
-//  Serial.println();
+  if (!isButtonDebug) {
+    Serial.write(response, commandLength);  
+    //DataReceived event will trigger only when a few characters are sent, including ‘0x0A’ (‘\n’)
+    //Serial.write('\n');
+    Serial.flush();
+  } else {
+    for(int x=0; x<commandLength; x++)
+      Serial.print(response[x]);
+    Serial.println();
+    delay(1500);     
+  }
 }
 
 void processCommand(byte *buffer, int commandLength) {  
@@ -628,15 +633,17 @@ void sendButtonStatus(byte header) {
   response[offset++] = CMD_BUTTON_STATUS;
   offset = sendRotaryState(offset, response);  
   offset = sendMatrixState(offset, response);
-  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = calculateCrc(offset, response);
   response[offset++] = CMD_END; 
 
-/*for(int x=0; x<offset; x++)  {
-  Serial.print(response[x]);
-  Serial.print(" - ");
-}
-Serial.println();
-delay(2000);*/    
+  /*if (isButtonDebug) {
+    for(int x=0; x<offset; x++)  {
+      Serial.print(response[x]);
+      Serial.print(" - ");
+    }
+    Serial.println();
+    delay(2000);
+  }*/
 
    if (stateHasChanged(offset - 1, response) || millis() - lastButtonStateSent > 10) {
     sendDataToSerial(offset, response);
@@ -678,9 +685,11 @@ void loop() {
   
   if(!isAutoConfigMode) {        
     sendButtonStatus(CMD_INIT); 
-    sendToWS2812B();
-    sendHandshacking();
-    reAttachInterrupts();    
+    if (!isButtonDebug) {
+      sendToWS2812B();
+      sendHandshacking();
+      reAttachInterrupts();
+    }    
   } else {
     autoConfigTM1637_MAX7221();
   }
