@@ -85,8 +85,8 @@ namespace iDash
             NotifyStatusMessage(String.Format("Numner of Continuous POVs\t{0}", ContPovNumber));
             NotifyStatusMessage(String.Format("Numner of Descrete POVs\t{0}", DiscPovNumber));
             NotifyStatusMessage(String.Format("Axis X\t\t{0}", AxisX ? "Yes" : "No"));
-            NotifyStatusMessage(String.Format("Axis Y\t\t{0}", AxisX ? "Yes" : "No"));
-            NotifyStatusMessage(String.Format("Axis Z\t\t{0}", AxisX ? "Yes" : "No"));
+            NotifyStatusMessage(String.Format("Axis Y\t\t{0}", AxisY ? "Yes" : "No"));
+            NotifyStatusMessage(String.Format("Axis Z\t\t{0}", AxisZ ? "Yes" : "No"));
             NotifyStatusMessage(String.Format("Axis Rx\t\t{0}", AxisRX ? "Yes" : "No"));
             NotifyStatusMessage(String.Format("Axis Rz\t\t{0}", AxisRZ ? "Yes" : "No"));
 
