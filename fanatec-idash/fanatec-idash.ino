@@ -139,15 +139,15 @@ void initOutputPins() {
 
 void sendToTM1637(byte *buffer) {
   byte offset = 0;
-  //first char(0) is the command start and second char is the command header  
-  for(byte i = 2; i < 6; i++) {
+  //first char(0) is the command start, second char is the device id and third char is the command header  
+  for(byte i = 3; i < 7; i++) {
     tm1637.display(offset++, buffer[i]);
   }
 }
 
 void updateLedBuffer(byte *buffer) {
   //first char(0) is the command start and second char is the command header 
-  uint8_t k = 2;
+  uint8_t k = 3;
   uint8_t l = 0;
   //last byte indicates blink mode, 0 = no blink and 1 = blink
   isBlinking = buffer[(WS2812B_RGBLEDCOUNT * 3) + k] == 1;  
@@ -197,15 +197,15 @@ void sendToWS2812B() {
 }
 
 void sendDataToSerial(int commandLength, byte *response) {
-  //Serial.write(response, commandLength);  
-  //Serial.flush();
+  Serial.write(response, commandLength);  
+  Serial.flush();
   /*for(int x=0; x<commandLength; x++) 
   Serial.print(response[x]);
   Serial.println();*/
 }
 
 void sendDebugModeState(byte header, byte state) {
-  byte response[5];
+  byte response[6];
   int offset = 0;
   
   //handshaking
@@ -250,7 +250,7 @@ void sendHandshacking() {
   response[offset++] = CMD_SYN;
   response[offset++] = TYPE;
   offset = appendArduinoId(offset, response);
-  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = calculateCrc(offset, response);
   response[offset++] = CMD_END;
 
   sendDataToSerial(offset, response);
@@ -260,23 +260,25 @@ int readline(int readch, byte *buffer, int len)
 {  
   static int pos = 0;
   int rpos;
-
+  
   switch (readch) {
     case CMD_INIT_DEBUG:
-    case CMD_INIT: // command init found
+    case CMD_INIT: // command init found	
       pos = 0;
       buffer[pos++] = readch;
-      buffer[pos] = 0;
+	  buffer[pos] = 0;	  
       break;        
-    case CMD_END: // End command
+    case CMD_END: // End command		
       rpos = pos;
-      pos = 0;  // Reset position index ready for next time
-      return rpos - 1; //last char is the crc
+      pos = 0;  // Reset position index ready for next time	  
+      return rpos - 1; //last byte is the crc so it is not part of command	  
     default:
-      if (pos < len-1) {
+		if (len == 100) {
+			pos = 0;
+			rpos = 0;
+		}  
         buffer[pos++] = readch;
         buffer[pos] = 0;
-      }
   }
 
   //flag to show that arduino is receiving data from App.    
@@ -295,34 +297,27 @@ void processData() {
   long startReading = millis();
   while (Serial.available() || byteRead == 100) {
     commandLength = readline(Serial.read(), buffer, byteRead++);       
-    if (commandLength > 0) {  
-      int crc = calculateCrc(commandLength, buffer); 
+	if (commandLength > 0) {
+		int crc = calculateCrc(commandLength, buffer); 	  	
 
-      if(crc == buffer[commandLength]) {    
-        processCommand(buffer, commandLength);
-      } else {
-        if(debugMode > 0) {          
-          Serial.write(INVALID_COMMAND_HEADER);
-          sendDataToSerial(commandLength, buffer);          
-          Serial.write(CMD_END);
-          buffer[0] = 0;
-        }
-      }
-    }    
+		if(crc == buffer[commandLength]) {
+			processCommand(buffer, commandLength);
+		} else {
+			//todo: send invalid data to serial for debugging
+		}
+		break;
+	}
   }
 
   buffer[0] = 0;
   byteRead = 0;
-  /*byte t[] = {'^',CMD_7_SEGS,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91};
-  byte s[] = {'^',CMD_RGB_SHIFT,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255,129,10};
-  processCommand(s, 0);*/
 }
 
 void processCommand(byte *buffer, int commandLength) {  
   //debug
-  switch(buffer[1]) {
+  switch(buffer[2]) {
     case CMD_SET_DEBUG_MODE :
-      debugMode = buffer[2];      
+      debugMode = buffer[3];      
       sendDebugModeState(buffer[0], debugMode);       
       break;
     

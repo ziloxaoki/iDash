@@ -555,7 +555,6 @@ namespace iDash
             foreach (SerialManager serialManager in sm)
             {
                 serialManager.formDebugMode = (DebugMode)debugModes.SelectedIndex;
-
                 Command command = new Command(Command.CMD_SET_DEBUG_MODE, state);
 
                 //make sure Arduino and IDash debug state are in sync
@@ -565,7 +564,6 @@ namespace iDash
                     await Task.Delay(WAIT_ARDUINO_SET_DEBUG_MODE);
                     //update state if value in combobox changed
                     state[0] = (byte)debugModes.SelectedIndex;
-                    serialManager.formDebugMode = (DebugMode)debugModes.SelectedIndex;
                 }
             }
 

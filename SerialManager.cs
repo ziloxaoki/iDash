@@ -119,7 +119,9 @@ namespace iDash
 
         private void sendDefaultMsg()
         {
-            byte[] rpmLed = Constants.BLACK_RGB;
+            byte[] rpmLed = new byte[Constants.BLACK_RGB.Length + 1];
+            Array.Copy(Constants.RPM_PATTERN, 0, rpmLed, 0, Constants.RPM_PATTERN.Length);
+            rpmLed[rpmLed.Length - 1] = Constants.LED_NO_BLINK;
 
             int milSec = DateTime.Now.Millisecond;
 
@@ -131,7 +133,8 @@ namespace iDash
 
             if (deviceContains7Segments())
             {
-                this.enqueueCommand(new Command(Command.CMD_RGB_SHIFT, rpmLed), false);                
+                Command command = new Command(Command.CMD_RGB_SHIFT, rpmLed);
+                this.enqueueCommand(command, false);                
                 this.enqueueCommand(Utils.getDisconnectedMsgCmd(), false);
             }
         }    
@@ -266,7 +269,7 @@ namespace iDash
 
         private string retrieveArduinoName(Command command)
         {
-            char[] c = Encoding.UTF8.GetString(command.getData()).ToCharArray();
+            char[] c = Encoding.UTF8.GetString(command.getRawData()).ToCharArray();
             string result = new string(Utils.getSubArray(c, 4, c.Length - 4));            
 
             return result;
@@ -275,81 +278,91 @@ namespace iDash
         private string processCommand(Command command)
         {
             string type = "invalid";
-            //called by processData that is already sync
-            try
-            {
-                byte c = command.getData()[2];
-                switch (c)
-                {
-                    //ACK message sent by Arduino
-                    case Command.CMD_SYN:
-                        arduinoHas7Seg = command.getData()[2];
-                        id = retrieveArduinoName(command);
-                        NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_ID + ":{0},{1}", id, portName));
-                        break;
-                    //Arduino response to the set debug mode command
-                    case Command.CMD_RESPONSE_SET_DEBUG_MODE:
-                        voltages = new int[8, 3];
-                        arduinoDebugMode = (DebugMode)command.getData()[2];
-                        break;
-                    //Arduino buttons state message
-                    case Command.CMD_BUTTON_STATUS:
-                        NotifyCommandReceived(command);
-                        break;
-                    //Arduino button voltage
-                    case Command.CMD_DEBUG_BUTTON:
-                        StringBuilder sb = new StringBuilder();
-                        byte[] cmd = command.getData();
-                        for (int x = 2; x < cmd.Length - 1; x++)
-                        {
-                            int pin = cmd[x];
-                            int voltage = (cmd[++x] * 256) + cmd[++x];
-                            updateVoltageLimits(pin, voltage);
-                        }
-                        for (int x = 0; x < 8; x++)
-                        {
-                            sb.Append(String.Format("pin {0}={1}-{2}  ", voltages[x, 0], voltages[x, 1], voltages[x, 2]));
-                        }
-                        NotifyMessage(String.Format(MainForm.UPDATE_BUTTON_VOLTAGE + ":{0}", sb.ToString()));
-                        break;
-                    //Arduino response when crc command failed
-                    case Command.CMD_INVALID:
-                        break;
-                }
-                type = command.getByteCodeName();
 
-                if (formDebugMode == DebugMode.Default)
+            if (command != null)
+            {
+                //called by processData that is already sync
+                try
                 {
-                    if (isDisabledSerial)
+                    byte c = command.getCommandId();
+                    switch (c)
                     {
-                        if (command.getRawData()[0] == Command.CMD_INIT_DEBUG)
-                        {
-                            NotifyMessage(String.Format("Command processed:{0} - ({1})\n",
-                                Utils.byteArrayToString(command.getRawData(), false),
-                                type));
-                            lastMessageLogged = Utils.getCurrentTimeMillis();
-                        }
+                        //ACK message sent by Arduino
+                        case Command.CMD_SYN:
+                            arduinoHas7Seg = command.getRawData()[3];
+                            id = retrieveArduinoName(command);
+                            NotifyMessage(String.Format(MainForm.UPDATE_ARDUINO_ID + ":{0},{1}", id, portName));
+                            break;
+                        //Arduino response to the set debug mode command
+                        case Command.CMD_RESPONSE_SET_DEBUG_MODE:
+                            voltages = new int[8, 3];
+                            arduinoDebugMode = (DebugMode)command.getRawData()[3];
+                            break;
+                        //Arduino buttons state message
+                        case Command.CMD_BUTTON_STATUS:
+                            NotifyCommandReceived(command);
+                            break;
+                        //Arduino button voltage
+                        case Command.CMD_DEBUG_BUTTON:
+                            StringBuilder sb = new StringBuilder();
+                            byte[] cmd = command.getData();
+                            for (int x = 2; x < cmd.Length - 1; x++)
+                            {
+                                int pin = cmd[x];
+                                int voltage = (cmd[++x] * 256) + cmd[++x];
+                                updateVoltageLimits(pin, voltage);
+                            }
+                            for (int x = 0; x < 8; x++)
+                            {
+                                sb.Append(String.Format("pin {0}={1}-{2}  ", voltages[x, 0], voltages[x, 1], voltages[x, 2]));
+                            }
+                            NotifyMessage(String.Format(MainForm.UPDATE_BUTTON_VOLTAGE + ":{0}", sb.ToString()));
+                            break;
+                        //Arduino response when crc command failed
+                        case Command.CMD_INVALID:
+                            if (formDebugMode == DebugMode.Verbose)
+                            {
+                                NotifyStatusMessage("CMD_INVALID(arduino):" + Utils.byteArrayToString(serialCommand, false)); //if there are not is any COM port in PC show message
+                            }
+                            break;
                     }
-                    else
+
+                    type = command.getByteCodeName();
+
+                    if (formDebugMode == DebugMode.Default)
                     {
-                        if (Utils.hasTimedOut(lastMessageLogged, 1000))
+                        if (isDisabledSerial)
                         {
-                            //if (command.getData()[2] != Command.CMD_SYN)
-                            //{
-                                NotifyMessage(String.Format("Command processed:{0} - ({1})\n", Utils.byteArrayToString(command.getRawData(), asHex), type));
+                            if (command.getRawData()[0] == Command.CMD_INIT_DEBUG)
+                            {
+                                NotifyMessage(String.Format("Command processed:{0} - ({1})",
+                                    Utils.byteArrayToString(command.getRawData(), false),
+                                    type));
                                 lastMessageLogged = Utils.getCurrentTimeMillis();
-                            //}
+                            }
+                        }
+                        else
+                        {
+                            if (Utils.hasTimedOut(lastMessageLogged, 1000))
+                            {
+                                //if (command.getData()[2] != Command.CMD_SYN)
+                                //{
+                                NotifyMessage(String.Format("Command processed:{0} - ({1})", Utils.byteArrayToString(command.getRawData(), asHex), type));
+                                lastMessageLogged = Utils.getCurrentTimeMillis();
+                                //}
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                logger.LogExceptionToFile(e);
-            }
+                catch (Exception e)
+                {
+                    logger.LogExceptionToFile(e);
+                }
 
+            }
             return type;
         }
+        
 
 
         private bool hasToSendCommand(Command command)
@@ -408,12 +421,12 @@ namespace iDash
                         bs += command.getLength();
                         serialPort.Write(command.getRawData(), 0, command.getLength());
 
-                        /*if (formDebugMode == DebugMode.Verbose)
+                        if (formDebugMode == DebugMode.Verbose)
                         {
-                            Logger.LogDataToFile(String.Format("Data sent:{0} - ({1})\n", 
+                            NotifyStatusMessage(String.Format("sent:{0} - ({1})", 
                                 Utils.byteArrayToString(command.getRawData(), asHex),
-                                command.getCommandType()));
-                        }*/
+                                command.getCommandId()));
+                        }
                     }
                     catch (Exception e)
                     {
@@ -450,26 +463,27 @@ namespace iDash
                             case Command.CMD_INIT:
                                 serialCommand[0] = b;
                                 commandLength = 1;
-
-                                logData.Append("\n");
                                 logData.Append(b + "-");
                                 break;
 
                             //end of command char found, send command to be processed
                             case Command.CMD_END:
-                                serialCommand[commandLength++] = b;                            
-                                if (commandLength > 3)
-                                {
-                                    //Utils.printByteArray(Utils.getSubArray(serialCommand, 0, commandLength));
-                                    Command command = new Command(Utils.getSubArray(serialCommand, 0, commandLength));
-                                    //Utils.printByteArray(command.getRawData());
-                                    string type = processCommand(command);
-                                    logData.Append(b);
-                                    logData.Append(" - " + type + "\n");
+                                if (formDebugMode == DebugMode.Verbose) { 
+                                    NotifyStatusMessage("received:" + Utils.byteArrayToString(serialCommand, false)); //if there are not is any COM port in PC show message
                                 }
-                                commandLength = 0;
-                                Utils.resetArray(serialCommand);
-                                break;
+                                serialCommand[commandLength++] = b;                            
+                                    if (commandLength > 3)
+                                    {
+                                        //Utils.printByteArray(Utils.getSubArray(serialCommand, 0, commandLength));
+                                        Command command = new Command(Utils.getSubArray(serialCommand, 0, commandLength));
+                                        //Utils.printByteArray(command.getRawData());
+                                        string type = processCommand(command);
+                                        logData.Append(b);
+                                        logData.Append(" - " + type + "\n");
+                                    }
+                                    commandLength = 0;
+                                    Utils.resetArray(serialCommand);
+                                    break;
 
                             //command init char already found, start adding the command data to buffer
                             default:
@@ -480,10 +494,13 @@ namespace iDash
                                 }
                                 if (commandLength == BUFFER_SIZE - 1)
                                 {
-                                    commandLength = 0;
+                                    commandLength = 0;                                        
+                                    if (formDebugMode == DebugMode.Verbose)
+                                    {
+                                        NotifyStatusMessage("received:" + Utils.byteArrayToString(serialCommand, false)); //if there are not is any COM port in PC show message
+                                    }
+                                    logData.Append(" - CMD_INVALID");
                                     Utils.resetArray(serialCommand);
-
-                                    logger.LogDataToFile(" - CMD_INVALID \n");
                                 }
                                 break;
                         }
@@ -492,7 +509,7 @@ namespace iDash
             //}
             if (formDebugMode == DebugMode.Verbose)
             {
-                logger.LogDataToFile(logData.ToString()+"\n");
+                logger.LogDataToFile("\n\n["+logData.ToString()+"]\n\n");
             }
         }
 
@@ -500,23 +517,6 @@ namespace iDash
         {
             return arduinoHas7Seg == Constants.DASH;
         }
-
-        //event handler triggered by serial port
-        /*public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
-        {
-            if (serialPort.IsOpen && !CancellationPending)
-            {
-                byte[] data = new byte[serialPort.BytesToRead];
-                serialPort.Read(data, 0, data.Length);
-
-                lastArduinoResponse = Utils.getCurrentTimeMillis();
-
-                if (data.Length > 0 && isArduinoConnected)
-                {                    
-                    processData(data);
-                }
-            }
-        }*/
 
         public async Task readSerialData()
         {
@@ -530,9 +530,9 @@ namespace iDash
             Array.Copy(buffer, bytesReceived, bytesRead);
 
             lastArduinoResponse = Utils.getCurrentTimeMillis();
-            
-            //print bytes received from arduino in the console
-            //Utils.printByteArray(bytesReceived);
+
+            //write bytes received from arduino in the log file
+            logger.LogDataToFile("bytes: "+Utils.byteArrayToString(bytesReceived, false)+"\n");
             processData(bytesReceived);
         }
 

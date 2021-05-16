@@ -61,17 +61,8 @@ namespace iDash
             sm.CommandReceivedSubscribers += new SerialManager.CommandReceivedHandler(executeCommand);
         }
 
-        private byte[] extractButtonStates(byte[] array)
-        {
-            return Utils.getSubArray(array, 3, array.Length - 3);
-        }
-
         private void updateKeyState(byte[] bStates)
         {
-            //bStates[0] is the command header
-            //bStates[1] is the arduino id
-            //bStates[2] is the command id
-            bStates = extractButtonStates(bStates);
             //Utils.printByteArray(bStates);
             for (int i = 0; i < bStates.Length; i++)
             {
@@ -110,7 +101,7 @@ namespace iDash
         public override void executeCommand(Command command)
         {
             //is the command a status button command
-            if(command.getData()[2] == Command.CMD_BUTTON_STATUS)
+            if(command.getCommandId() == Command.CMD_BUTTON_STATUS)
             {
                 this.updateKeyState(command.getData());
             }

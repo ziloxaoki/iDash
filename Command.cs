@@ -4,8 +4,8 @@ namespace iDash
 {
     public class Command
     {
+        //Never use bit 0 in the command as it will indicate an end of string and command will be broken
         private byte[] rawData;
-        private byte[] data;
         private byte crc;
         //BC e BF
         public const byte CMD_INIT = 200; //C8h
@@ -20,6 +20,7 @@ namespace iDash
         public const byte CMD_RGB_SHIFT = (byte)'C'; //67d 43h
         public const byte CMD_BUTTON_STATUS = (byte)'D'; //68d 44h
         public const byte CMD_INVALID = (byte)0xef; //239d EFh
+        public const byte CMD_DATA_INIT_OFFSET = (byte)3;
 
         public Command(byte[] buffer)
         {
@@ -33,18 +34,16 @@ namespace iDash
                 //Utils.printByteArray(Utils.getSubArray(buffer, 0, commandLength));
                 this.rawData = new byte[commandLength];
                 Array.Copy(buffer, 0, rawData, 0, commandLength);
-                this.data = new byte[commandLength - 2];
-                Array.Copy(buffer, 0, data, 0, commandLength - 2);
                 this.crc = buffer[commandLength - 2];
             }
         }
 
-        public Command(byte command, byte[] cData) : this(command, cData, false) { }
+        public Command(byte commandId, byte[] cData) : this(commandId, cData, false) { }
 
-        public Command(byte command, byte[] cData, bool isDebug)
+        public Command(byte commandId, byte[] cData, bool isDebug)
         {
-            //header, code, crc, end
-            int commandLength = 4;
+            //header, device, id, crc, end
+            int commandLength = 5;
             if (cData != null)
             {
                 commandLength += cData.Length;
@@ -52,28 +51,21 @@ namespace iDash
             //int commandLength = getLength(cData) + 4;
             //rawdata
             this.rawData = new byte[commandLength];
-            this.rawData[0] = CMD_INIT;
-            this.rawData[1] = command;
+            Utils.resetArray(rawData);
+            this.rawData[0] = CMD_INIT;            
+            this.rawData[1] = 99;
+            this.rawData[2] = commandId;
 
-            if(commandLength > 4)
-                Array.Copy(cData, 0, rawData, 2, cData.Length);
-
-            //data - exclude crc and end
-            this.data = new byte[commandLength - 2];
-            this.data[0] = CMD_INIT;
-            this.data[1] = command;
+            if(commandLength > 5)
+                Array.Copy(cData, 0, rawData, 3, cData.Length);
 
             if(isDebug)
             {
                 this.rawData[0] = CMD_INIT_DEBUG;
-                this.data[0] = CMD_INIT_DEBUG;
             }
 
-            if (commandLength > 4)
-                Array.Copy(cData, 0, data, 2, cData.Length);
-
-            //set crc            
-            this.crc = calculateCRC(this.data);
+            //crc = rawdata - 2 last bytes (crc and cmd_end), but the last 2 bytes are still 0 so they don't affect crc value           
+            this.crc = calculateCRC(rawData);
             this.rawData[commandLength - 2] = this.crc;
             this.rawData[commandLength - 1] = Command.CMD_END;                
         }
@@ -83,43 +75,46 @@ namespace iDash
             //0 - command header
             //1 - arduino id
             //2 - command id
-            switch (rawData[2])
+            if (this.rawData.Length > 2)
             {
-                case CMD_SET_DEBUG_MODE:
-                    return "CMD_SET_DEBUG_MODE";
+                switch (rawData[2])
+                {
+                    case CMD_SET_DEBUG_MODE:
+                        return "CMD_SET_DEBUG_MODE";
 
-                case CMD_RESPONSE_SET_DEBUG_MODE:
-                    return "CMD_RESPONSE_SET_DEBUG_MODE";
+                    case CMD_RESPONSE_SET_DEBUG_MODE:
+                        return "CMD_RESPONSE_SET_DEBUG_MODE";
 
-                case CMD_SYN:
-                    return "CMD_SYN";
+                    case CMD_SYN:
+                        return "CMD_SYN";
 
-                case CMD_7_SEGS:
-                    return "CMD_7_SEGS";
+                    case CMD_7_SEGS:
+                        return "CMD_7_SEGS";
 
-                case CMD_SYN_ACK:
-                    return "CMD_SYN_ACK";
+                    case CMD_SYN_ACK:
+                        return "CMD_SYN_ACK";
 
-                case CMD_RGB_SHIFT:
-                    return "CMD_RGB_SHIFT";
+                    case CMD_RGB_SHIFT:
+                        return "CMD_RGB_SHIFT";
 
-                case CMD_BUTTON_STATUS:
-                    return "CMD_BUTTON_STATUS";
+                    case CMD_BUTTON_STATUS:
+                        return "CMD_BUTTON_STATUS";
 
-                case CMD_DEBUG_BUTTON:
-                    return "CMD_DEBUG_BUTTON";
+                    case CMD_DEBUG_BUTTON:
+                        return "CMD_DEBUG_BUTTON";
 
-                case CMD_INVALID:
-                    return "CMD_INVALID";
+                    case CMD_INVALID:
+                        return "CMD_INVALID";
 
-                case CMD_INIT:
-                    return "CMD_INIT";
+                    case CMD_INIT:
+                        return "CMD_INIT";
 
-                case CMD_INIT_DEBUG:
-                    return "CMD_INIT_DEBUG";
+                    case CMD_INIT_DEBUG:
+                        return "CMD_INIT_DEBUG";
 
-                case CMD_END:
-                    return "CMD_END";
+                    case CMD_END:
+                        return "CMD_END";
+                }
             }
 
             return "invalid";
@@ -161,9 +156,10 @@ namespace iDash
             return getLength(rawData);
         }
 
+        //data excludes cmd_init, cmd_device, cmd_id, crc and cmd_end
         public byte[] getData()
         {
-            return data;
+            return Utils.getSubArray(rawData, 3, rawData.Length - 5);
         }
 
         public byte[] getRawData()
@@ -176,9 +172,7 @@ namespace iDash
             int commandLength = getLength(command);
             if (command != null && commandLength > 3 && (command[0] == CMD_INIT || command[0] == CMD_INIT_DEBUG) && command[commandLength - 1] == CMD_END)
             {
-                byte[] temp = new byte[commandLength - 2];
-                Array.Copy(command, 0, temp, 0, commandLength - 2);
-                byte tCrc = calculateCRC(temp);
+                byte tCrc = calculateCRC(Utils.getSubArray(command, 0, command.Length - 2));
                 return command[commandLength - 2] == tCrc;
             }
 
@@ -186,8 +180,8 @@ namespace iDash
         }
 
         public bool isValid()
-        {
-            int crc = calculateCRC(this.data);
+        {            
+            int crc = calculateCRC(Utils.getSubArray(rawData, 0, rawData.Length - 2));
             int dataCrc = this.rawData[rawData.Length - 2];
             return crc == dataCrc;
         }
@@ -195,6 +189,26 @@ namespace iDash
         public bool isCommandX(byte c, byte[] command)
         {
             return isValidCommand(command) && command[1] == c;
+        }
+
+        public byte getCommandId()
+        {
+            if (rawData != null && rawData.Length > 4)
+            {
+                return rawData[2];
+            }
+
+            return 0;
+        }
+
+        public byte getDeviceId()
+        {
+            if (rawData != null && rawData.Length > 4)
+            {
+                return rawData[1];
+            }
+
+            return 0;
         }
     }
 }

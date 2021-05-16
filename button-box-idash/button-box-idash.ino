@@ -140,27 +140,33 @@ void rotEncoder4() {
 }
 
 int readline(int readch, byte *buffer, int len)
-{
+{  
   static int pos = 0;
-
+  int rpos;
+  
   switch (readch) {
     case CMD_INIT_DEBUG:
-    case CMD_INIT: // command init found
+    case CMD_INIT: // command init found	
       pos = 0;
       buffer[pos++] = readch;
-      buffer[pos] = 0;
-      break;
-    case CMD_END: // End command
-      pos = 0;  // Reset position index ready for next time
-      return len - 1; //last char is the crc
+	  buffer[pos] = 0;	  
+      break;        
+    case CMD_END: // End command		
+      rpos = pos;
+      pos = 0;  // Reset position index ready for next time	  
+      return rpos - 1; //last byte is the crc so it is not part of command	  
     default:
-      buffer[pos++] = readch;
-      buffer[pos] = 0;
+		if (len == 100) {
+			pos = 0;
+			rpos = 0;
+		}  
+        buffer[pos++] = readch;
+        buffer[pos] = 0;
   }
 
-  //flag to show that arduino is receiving data from App.
+  //flag to show that arduino is receiving data from App.    
   lastTimeReceivedByte = millis();
-
+  
   // No end of command has been found, so return -1.
   return -1;
 }
@@ -194,7 +200,7 @@ int calculateCrc(int dataLength, byte *response) {
 }
 
 void sendDebugModeState(byte header, byte state) {
-  byte response[5];
+  byte response[6];
   int offset = 0;
 
   //handshaking
@@ -203,7 +209,7 @@ void sendDebugModeState(byte header, byte state) {
   //set debug mode response
   response[offset++] = CMD_RESPONSE_SET_DEBUG_MODE;
   response[offset++] = state;
-  response[offset++] = calculateCrc(offset - 1, response);
+  response[offset++] = calculateCrc(offset, response);
   response[offset++] = CMD_END;
 
   sendDataToSerial(offset, response);  
@@ -255,9 +261,9 @@ void sendHandshacking() {
 
 void processCommand(byte *buffer, int commandLength) {
   //debug
-  switch (buffer[1]) {
+  switch (buffer[2]) {
     case CMD_SET_DEBUG_MODE :
-      debugMode = buffer[2];
+      debugMode = buffer[3];
       sendDebugModeState(buffer[0], debugMode);
       break;
 
@@ -274,30 +280,25 @@ void processCommand(byte *buffer, int commandLength) {
   buffer[0] = 0;
 }
 
-
-void processData() {
+void processData() {  
   static byte buffer[100];
   static int byteRead = 0;
-
+  
   int commandLength = 0;
 
   long startReading = millis();
-  while (Serial.available() > 0 || byteRead == 99) {
-    commandLength = readline(Serial.read(), buffer, byteRead++);
-    if (commandLength > 0) {
-      int crc = calculateCrc(commandLength, buffer);
+  while (Serial.available() || byteRead == 100) {
+    commandLength = readline(Serial.read(), buffer, byteRead++);       
+	if (commandLength > 0) {
+		int crc = calculateCrc(commandLength, buffer); 	  	
 
-      if (crc == buffer[commandLength]) {
-        processCommand(buffer, commandLength);
-      } else {
-        if (debugMode > 0) {
-          Serial.write(INVALID_COMMAND_HEADER);
-          sendDataToSerial(commandLength, buffer);
-          Serial.write(CMD_END);
-          buffer[0] = 0;
-        }
-      }
-    }
+		if(crc == buffer[commandLength]) {
+			processCommand(buffer, commandLength);
+		} else {
+			//sendInvalidDataBack(buffer, commandLength);
+		}
+		break;
+	}
   }
 
   buffer[0] = 0;
@@ -449,10 +450,10 @@ void sendButtonStatus() {
   response[offset++] = calculateCrc(offset - 1, response);
   response[offset++] = CMD_END;
 
-  if (response[45] == 1 && response[44] == 1) {
+  /*if (response[45] == 1 && response[44] == 1) {
     arduinoReset();
     return;  
-  }
+  }*/
   
   //send the command at least once a second to keep button state in app up-to-date
   if (stateHasChanged(offset - 1, response) || millis() - lastButtonStateSent > 10) {
