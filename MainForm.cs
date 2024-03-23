@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
@@ -63,7 +64,11 @@ namespace iDash
         private const string COMPORT_COMBO_CONTROL_NAME_PREFIX = "serialPortCombo";
         private const string CONNECTION_STATUS_COMBO_CONTROL_NAME_PREFIX = "portStatusBox";
         private const string VJOY_COMBO_VALUE_PREFIX = "vjoy";
-        private const string ARDUINO_LABEL_CONTROL_NAME_PREFIX = "deviceLabel";        
+        private const string ARDUINO_LABEL_CONTROL_NAME_PREFIX = "deviceLabel";
+
+        private HashSet<Keys> PressedKeys = new HashSet<Keys>();
+        private static readonly Keys[] INVALID_KEYS = new Keys[] { Keys.Back, Keys.Enter, Keys.LWin, Keys.Apps, Keys.Escape, Keys.CapsLock,
+            Keys.LineFeed, Keys.BrowserHome, Keys.ControlKey, Keys.ShiftKey };
 
         private Logger logger = new Logger();
 
@@ -1459,29 +1464,40 @@ namespace iDash
             maxRPM = String.IsNullOrEmpty(this.maxRpm.Text) ? 0.90f : float.Parse(this.maxRpm.Text)/100;
         }
 
-        private void keyMap_KeyDown(object sender, KeyEventArgs e)
-        {
-            keyMap.Clear();
-        }
+        [DllImport("user32.dll")]
+        private static extern short GetAsyncKeyState(Keys key);
 
-        private void keyMap_KeyUp(object sender, KeyEventArgs e)
+        public HashSet<Keys> GetPressedKeys()
         {
-            KeysConverter kc = new KeysConverter();
-            string keyChar = kc.ConvertToString(e.KeyValue);
-
-            if (e.KeyValue != 8 && e.KeyValue != 46)
+            // Get state of every key we know
+            foreach (Keys key in Utils.GetEnumValues<Keys>().Where(x => x != Keys.None))
             {
-                if (keyMap.Text.Length > 0)
+                bool down = false;
+                // Is it pressed?
+                down = GetAsyncKeyState(key) < 0;
+
+                // It's not pressed, but it was - we consider this key as released
+                if (!down && PressedKeys.Contains(key))
                 {
-                    keyMap.Text += "+" + keyChar;
+                    PressedKeys.Remove(key);
                 }
-                else
+                else if (down && !PressedKeys.Contains(key) && !INVALID_KEYS.Contains(key)) // The key is pressed, but wasn't pressed before - it will be returned
                 {
-                    keyMap.Text = keyChar;
+                    PressedKeys.Add(key);
                 }
             }
-            else
-                keyMap.Clear();
+
+            return PressedKeys;
+        }
+
+        private void keyMap_KeyDown(object sender, KeyEventArgs e)
+        {
+            GetPressedKeys();
+            if (PressedKeys.Any())
+            {
+                keyMap.Text = Utils.converKeysToHotkeyString(PressedKeys);
+            }
+            e.Handled = true;
         }
 
         private void keyMap_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)

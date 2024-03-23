@@ -38,13 +38,13 @@ namespace iDash
                 {
                     VirtualKeyCode keycode = (VirtualKeyCode)Utils.ConvertCharToVirtualKey(a);
                     switch (keycode)
-                    {
-                        case VirtualKeyCode.CONTROL:
+                    {                        
                         case VirtualKeyCode.RCONTROL:
                         case VirtualKeyCode.LCONTROL:
-                        case VirtualKeyCode.SHIFT:
+                        case VirtualKeyCode.CONTROL:                        
                         case VirtualKeyCode.RSHIFT:
                         case VirtualKeyCode.LSHIFT:
+                        case VirtualKeyCode.SHIFT:
                         case VirtualKeyCode.MENU:
                         case VirtualKeyCode.LWIN:
                         case VirtualKeyCode.RWIN:

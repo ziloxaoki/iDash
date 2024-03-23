@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace iDash
 {
@@ -547,6 +548,16 @@ namespace iDash
             }
             sb.Append("}");
             Console.WriteLine(sb.ToString());
+        }
+
+        public static IEnumerable<T> GetEnumValues<T>()
+        {
+            return Enum.GetValues(typeof(T)).Cast<T>();
+        }
+
+        public static string converKeysToHotkeyString(HashSet<Keys> keys)
+        {
+            return String.Join(" + ", keys.OrderBy(x => x));
         }
     }    
 
